@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @MapperScan(value = {"com.nutrimate.nutrimatebackend.mapper"})
 @Log4j2
+@EnableTransactionManagement
 public class MybatisConfig {
 	//https://mybatis.org/spring/ko/factorybean.html
 	
@@ -27,7 +29,7 @@ public class MybatisConfig {
 	//마이바티스 관련 빈
 	@Bean
 	public SqlSessionFactory sqlSessionFactory(HikariDataSource hikariDataSource) {
-		SqlSessionFactory factory=null;
+		SqlSessionFactory factory = null;
 		try {
 			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
 			factoryBean.setDataSource(hikariDataSource);//데이타 소스로 히카리 전달
@@ -36,9 +38,8 @@ public class MybatisConfig {
 			factoryBean.setTypeAliasesPackage("com.nutrimate.nutrimatebackend");
 			factoryBean.setMapperLocations(
 					applicationContext.getResources("classpath:mybatis/**/*.xml"));
-			factory=factoryBean.getObject();
-		}
-		catch(Exception e) {
+			factory = factoryBean.getObject();
+		} catch (Exception e) {
 			log.warn(e.getMessage());
 		}
 		return factory;
