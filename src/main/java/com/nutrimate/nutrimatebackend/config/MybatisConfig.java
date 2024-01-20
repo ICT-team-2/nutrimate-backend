@@ -38,6 +38,10 @@ public class MybatisConfig {
 			factoryBean.setTypeAliasesPackage("com.nutrimate.nutrimatebackend");
 			factoryBean.setMapperLocations(
 					applicationContext.getResources("classpath:mybatis/**/*.xml"));
+			org.apache.ibatis.session.Configuration configuration
+					= new org.apache.ibatis.session.Configuration();
+			configuration.setMapUnderscoreToCamelCase(true);
+			factoryBean.setConfiguration(configuration);
 			factory = factoryBean.getObject();
 		} catch (Exception e) {
 			log.warn(e.getMessage());
