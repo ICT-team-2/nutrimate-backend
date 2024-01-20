@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="MemberMapper">
-
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.MemberMapper">
+	
 	<insert id="insertMember" parameterType="MemberDto">
-		<!-- <selectKey keyProperty="user_id" resultType="long" order="BEFORE">
-			SELECT SEQ_MEMBER.NEXTVAL FROM DUAL
-		</selectKey> -->
-		INSERT INTO MEMBER(USER_NAME,USER_UID,USER_PWD,USER_NICK,USER_HEIGHT,USER_WEIGHT,USER_EMAIL,USER_GENDER,USER_EXER_HARD,USER_CAL,CREATED_DATE,USER_ROLE,USER_DIET,PROVIDER,PROVIDER_ID) 
-		VALUES(#{userName},#{userUid},#{userPwd},#{userNick},#{userHeight},#{userWeight},#{userEmail},#{userGender},#{userExerHard},#{userCal},DEFAULT,#{userRole},#{userDiet},#{provider},#{providerId})
+		<selectKey keyProperty="userId"
+		           resultType="long" order="BEFORE">
+			SELECT SEQ_MEMBER.NEXTVAL userId
+				FROM DUAL
+		</selectKey>
+		INSERT INTO
+		member(user_id, user_nick, user_height, user_weight, user_email, user_gender,
+		user_sport_hard, user_cal,user_name)
+		VALUES (#{userId}, #{userNick}, #{userHeight},
+		#{userWeight}, #{userEmail}, #{userGender},
+		#{userSportHard}, #{userCal}, #{userName})
+	</insert>
+	<insert id="insertCommonMember">
+		INSERT INTO
+			commonmember(user_id, user_uid, user_pwd)
+			VALUES (#{userId}, #{userUid}, #{userPwd})
 	</insert>
 	
-	<select id="findByUser" parameterType="String" resultType="MemberDto">
-		SELECT m.USER_NAME,
-			   m.USER_NICK,		   
-			   m.USER_HEIGHT,
-			   m.USER_WEIGHT,
-			   m.USER_EMAIL,
-			   m.USER_GENDER,
-			   m.USER_EXER_HARD,
-			   m.USER_CAL,
-			   m.USER_ROLE,
-			   m.USER_DIET,
-			   m.PROVIDER,
-			   m.PROVIDER_ID,
-			   c.USER_UID,
-			   c.USER_PWD	 
-			   FROM MEMBER m JOIN COMMONMEMBER c ON m.USER_ID=c.USER_ID 
-			   WHERE USER_UID=#{userUid}
+	<select id="findCommonMemberByUid" parameterType="string"
+	        resultType="MemberDto">
+		SELECT m.*,
+		       c.user_uid,
+		       c.user_pwd
+			FROM member m
+				     JOIN commonmember c ON m.user_id = c.user_id
+			WHERE c.user_uid = #{userUid} AND m.deleted = 'N'
+	
 	</select>
-
+	
+	<select id="findOAuthMemberByProviderId" parameterType="String" resultType="MemberDto">
+		SELECT m.*,
+		       o.provider,
+		       o.provider_id,
+		       c.user_uid,
+		       c.user_pwd
+			FROM member m
+				     JOIN commonmember c ON m.user_id = c.user_id
+				     JOIN oauth o ON m.user_id = o.user_id
+			WHERE o.provider_id = #{providerId} AND m.deleted = 'N'
+	
+	</select>
 </mapper>
