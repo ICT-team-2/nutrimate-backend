@@ -1,13 +1,12 @@
 package com.nutrimate.nutrimatebackend.config.auth;
 
-import com.nutrimate.nutrimatebackend.model.user.MemberDto;
-import com.nutrimate.nutrimatebackend.service.MemberService;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import com.nutrimate.nutrimatebackend.model.user.MemberDto;
+import com.nutrimate.nutrimatebackend.service.MemberService;
+import lombok.extern.log4j.Log4j2;
 
 
 // 시큐리티 설정에서 loginProcessingUrl("/login");
@@ -15,24 +14,23 @@ import org.springframework.stereotype.Service;
 @Service
 @Log4j2
 public class PrincipalDetailsService implements UserDetailsService {
-	
-	private MemberService memberService;
-	
-	@Autowired
-	public PrincipalDetailsService(MemberService memberService) {
-		this.memberService = memberService;
-	}
-	
-	
-	// 시큐리티 session(내부 Authentication(내부 UserDetails))
-	@Override
-	public UserDetails loadUserByUsername(String userUid) throws UsernameNotFoundException {
-		log.info("userUid: " + userUid);
-		MemberDto userEntity = memberService.findCommonMemberByUid(userUid);
-		log.info("userEntity: " + userEntity);
-		if (userEntity != null) {
-			return new PrincipalDetails(userEntity);
-		}
-		return null;
-	}
+
+  private MemberService memberService;
+
+  public PrincipalDetailsService(MemberService memberService) {
+    this.memberService = memberService;
+  }
+
+
+  // 시큐리티 session(내부 Authentication(내부 UserDetails))
+  @Override
+  public UserDetails loadUserByUsername(String userUid) throws UsernameNotFoundException {
+    log.info("userUid: " + userUid);
+    MemberDto userEntity = memberService.findCommonMemberByUid(userUid);
+    log.info("userEntity: " + userEntity);
+    if (userEntity != null) {
+      return new PrincipalDetails(userEntity);
+    }
+    return null;
+  }
 }

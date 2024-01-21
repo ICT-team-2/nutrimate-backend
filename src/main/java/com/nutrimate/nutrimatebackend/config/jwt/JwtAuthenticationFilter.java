@@ -17,8 +17,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 
-
+@Log4j2
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private AuthenticationManager authenticationManager;
@@ -30,7 +31,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
       HttpServletResponse response) throws AuthenticationException {
-    System.out.println("JwtAuthenticationFilter:로그인 시도 중");
+    log.info("JwtAuthenticationFilter : 로그인 시도 중");
 
     ObjectMapper om = new ObjectMapper();
     LoginRequestDto loginRequestDto = null;
@@ -38,7 +39,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     try {
       loginRequestDto = om.readValue(request.getInputStream(), LoginRequestDto.class);
-      System.out.println("loginRequestDto:" + loginRequestDto);
+      log.info("loginRequestDto : " + loginRequestDto);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -46,14 +47,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     UsernamePasswordAuthenticationToken authenticationToken =
         new UsernamePasswordAuthenticationToken(loginRequestDto.getUserUid(),
             loginRequestDto.getUserPwd());
-    System.out.println("authenticationToken: " + authenticationToken);
+    log.info("authenticationToken : " + authenticationToken);
 
+    Authentication authentication = null;
 
-    Authentication authentication = authenticationManager.authenticate(authenticationToken);
+    try {
+      authentication = authenticationManager.authenticate(authenticationToken);
+      log.info("authentication: " + authentication);
+    } catch (AuthenticationException e) {
+      log.error("Authentication failure", e);
+    }
+
 
     // => 로그인이 되었다는 뜻
     PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-    System.out.println("로그인 완료:" + principalDetails.getMemberDto().getUserUid());
+    log.info("로그인 완료 : " + principalDetails.getMemberDto().getUserUid());
 
     return authentication;
   }
@@ -62,7 +70,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain, Authentication authResult) throws IOException, ServletException {
-    System.out.println("successfulAuthentication 실행 : 인증 완료 뜻");
+    log.info("successfulAuthentication 실행 : 인증 완료 뜻");
     PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
 
