@@ -19,11 +19,13 @@ public class SecurityConfig {
 				.sessionManagement((sessionManagement) ->
 						sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				)
-				.authorizeHttpRequests((authorizeRequests) ->
+				// 실행 에러 해결을 위해 authorizeHttpRequests -> authorizeRequests 임의로 변경
+				.authorizeRequests((authorizeRequests) ->
 						authorizeRequests
-								.requestMatchers("/user/**").authenticated()
-								.requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-								.requestMatchers("/admin/**").hasAnyRole("ADMIN")
+						        // 실행 에러 해결을 위해 requestMatchers -> antMatchers 임의로 변경
+								.antMatchers("/user/**").authenticated()
+								.antMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+								.antMatchers("/admin/**").hasAnyRole("ADMIN")
 								.anyRequest().permitAll()
 				);
 		return http.build();
