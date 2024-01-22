@@ -2,7 +2,7 @@
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="FollowMapper">
-	<!-- 팔로잉, 팔로워 -->
+
 	<!-- 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기) -->
 	<select id="getRecommendedFollowers" resultType="Member">
 	    <![CDATA[
@@ -23,7 +23,7 @@
 	 -->
 	
 	<!-- 내가 상대를 팔로우 하는 쿼리문 -->
-	<!-- 입력 데이터 : 내userId(follower_id), 상대의userId(followee_id) -->
+	<!-- 입력 데이터 : 내userId(followerId), 상대의userId(followeeId) -->
 	<insert id="followUser" parameterType="Follow">
 	    INSERT INTO follow (follow_id, follower_id, created_date, followee_id)
 	    VALUES (SEQ_FOLLOW.NEXTVAL, #{followerId}, SYSDATE, #{followeeId});
@@ -65,10 +65,11 @@
 	</select>
 	
 	<!-- 팔로우 유무 확인 (0일시 안누름) -->
+	<!-- 입력 데이터 : userId, 상대의 userId(followeeId) -->
 	<select id="checkFollowStatus" resultType="int" parameterType="Follow">
 	    SELECT COUNT(*)
 	    FROM follow
-	    WHERE follower_id = #{followerId} AND followee_id = #{followeeId};
+	    WHERE follower_id = #{userId} AND followee_id = #{followeeId};
 	</select>
 	
 	<!-- 내가 등록한 사람 삭제. 팔로우 취소 -->

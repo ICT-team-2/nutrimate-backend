@@ -1,17 +1,33 @@
 package com.nutrimate.nutrimatebackend.mapper.test;
 
-import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import com.nutrimate.nutrimatebackend.model.member.MemberDto;
+import com.nutrimate.nutrimatebackend.model.member.FollowDto;
 
 @Mapper
 public interface FollowMapper {
 
-  @Select(value = "SELECT sysdate FROM dual")
-  String getTimeByAnnotation();
+  // 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기)
+  int getRecommendedFollowers(FollowDto todoDto);
 
-  @Select(value = "SELECT * FROM member")
-  List<MemberDto> getAllUser();
+  // 내가 상대를 팔로우 하는 쿼리문
+  int followUser(FollowDto followDto);
+
+  // 내 팔로잉(내가 등록한 사람) 수를 가져오기
+  int getFollowingCount(FollowDto followDto);
+
+  // 내 팔로워(나를 등록한 사람) 수를 가져오기
+  int getFollowerCount(FollowDto followDto);
+
+  // 내 팔로잉(내가 등록한 사람) 목록을 가져오기
+  int getFollowingList(FollowDto followDto);
+
+  // 내 팔로워(나를 등록한 사람) 목록을 가져오기
+  int getFollowerList(FollowDto followDto);
+
+  // 팔로우 유무 확인 (0일시 안누름)
+  int checkFollowStatus(FollowDto followDto);
+
+  // 내가 등록한 사람 삭제. 팔로우 취소
+  int unfollowUser(FollowDto followDto);
 
 }
