@@ -34,10 +34,6 @@ public class SecurityConfig {
     this.memberMapper = memberMapper;
   }
 
-  @Bean
-  static BCryptPasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
 
   @Bean
   AuthenticationManager authenticationManager(
@@ -65,6 +61,12 @@ public class SecurityConfig {
             .userInfoEndpoint(endpoint -> endpoint.userService(principalOauth2UserService)));
 
     return http.build();
+  }
+
+
+  @Bean
+  static BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
 }

@@ -28,6 +28,9 @@ public class PrincipalDetailsService implements UserDetailsService {
     log.info("userUid: " + userUid);
     MemberDto userEntity = memberService.findCommonMemberByUid(userUid);
     log.info("userEntity: " + userEntity);
+
+
+
     if (userEntity != null) {
       return new PrincipalDetails(userEntity);
     }

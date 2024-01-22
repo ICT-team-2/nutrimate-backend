@@ -21,11 +21,6 @@ public class MemberService {
 
   @Transactional
   public int insertMember(MemberDto memberDto) {
-    String rawPassword = memberDto.getUserPwd();
-    System.out.println("rawPassword" + rawPassword);
-    String encodePassword = passwordEncoder.encode(rawPassword);
-    memberDto.setUserPwd(encodePassword);
-    memberDto.setUserRole("ROLE_USER");
     memberMapper.insertMember(memberDto);
     log.info("memberDto: " + memberDto);
     return memberMapper.insertCommonMember(memberDto);
@@ -34,6 +29,13 @@ public class MemberService {
   public MemberDto findCommonMemberByUid(String userUid) {
     MemberDto memberDto = memberMapper.findCommonMemberByUid(userUid);
     log.info("memberDto: " + memberDto);
+    return memberDto;
+  }
+
+  @Transactional
+  public MemberDto insertOAuthMember(MemberDto memberDto) {
+    memberMapper.insertMemberId(memberDto);
+    memberMapper.insertOAuthMember(memberDto);
     return memberDto;
   }
 }

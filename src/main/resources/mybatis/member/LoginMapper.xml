@@ -16,11 +16,26 @@
 		#{userWeight}, #{userEmail}, #{userGender},
 		#{userSportHard}, #{userCal}, #{userName})
 	</insert>
-	<insert id="insertCommonMember">
+	<insert id="insertCommonMember" parameterType="MemberDto">
 		INSERT INTO
 			commonmember(user_id, user_uid, user_pwd)
 			VALUES (#{userId}, #{userUid}, #{userPwd})
 	</insert>
+	<insert id="insertMemberId" parameterType="MemberDto">
+		<selectKey keyProperty="userId"
+		           resultType="long" order="BEFORE">
+			SELECT SEQ_MEMBER.NEXTVAL userId
+				FROM DUAL
+		</selectKey>
+		INSERT INTO
+		member(user_id) VALUES (#{userId})
+	</insert>
+	<insert id="insertOAuthMember" parameterType="MemberDto">
+		INSERT INTO
+			oauth(user_id, provider, provider_id)
+			VALUES (#{userId}, #{provider}, #{providerId})
+	</insert>
+	
 	
 	<select id="findCommonMemberByUid" parameterType="string"
 	        resultType="MemberDto">
@@ -36,12 +51,9 @@
 	<select id="findOAuthMemberByProviderId" parameterType="String" resultType="MemberDto">
 		SELECT m.*,
 		       o.provider,
-		       o.provider_id,
-		       c.user_uid,
-		       c.user_pwd
+		       o.provider_id
 			FROM member m
-				     JOIN commonmember c ON m.user_id = c.user_id
-				     JOIN oauth o ON m.user_id = o.user_id
+				    JOIN oauth o ON m.user_id = o.user_id
 			WHERE o.provider_id = #{providerId} AND m.deleted = 'N'
 	
 	</select>
