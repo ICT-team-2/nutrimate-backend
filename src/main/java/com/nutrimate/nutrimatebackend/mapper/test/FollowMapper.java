@@ -16,10 +16,10 @@ public interface FollowMapper {
   // int getUserIdByNick(@Param("userNick") String userNick);
 
   // 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기)
-  @Select("SELECT * FROM (SELECT * FROM member ORDER BY DBMS_RANDOM.VALUE) WHERE ROWNUM <= 5")
+  @Select("SELECT user_id, user_profile, user_nick, user_intro FROM (SELECT * FROM member ORDER BY DBMS_RANDOM.VALUE) WHERE ROWNUM <= 5")
   List<FollowDto> getRecommendedFollowers();
 
-  // 내가 상대를 팔로우 하는 쿼리문
+  // 내가 상대를 팔로우 하는 쿼리문 (내가 팔로워가 된다)
   @Insert("INSERT INTO follow (follow_id, follower_id, created_date, followee_id) VALUES (SEQ_FOLLOW.NEXTVAL, #{followerId}, SYSDATE, #{followeeId})")
   int followUser(FollowDto followDto);
 
@@ -35,13 +35,16 @@ public interface FollowMapper {
   @Select("SELECT user_profile, user_nick, user_intro, user_id, MAX(follow_id) AS follow_id "
       + "FROM follow F RIGHT JOIN member M ON M.user_id = F.followee_id "
       + "WHERE M.user_id IN (SELECT DISTINCT followee_id FROM follow WHERE follower_id = #{userId}) "
+      // + "AND user_nick LIKE 'E%' " // 닉네임으로 검색 추가시 사용
       + "GROUP BY user_profile, user_nick, user_intro, user_id")
   List<FollowDto> getFollowingList(FollowDto userId);
 
   // 내 팔로워(나를 등록한 사람) 목록을 가져오기
   @Select("SELECT user_profile, user_nick, user_intro, user_id "
       + "FROM follow F RIGHT JOIN member M ON M.user_id = F.follower_id "
-      + "WHERE M.user_id IN (SELECT DISTINCT follower_id FROM follow WHERE followee_id = #{userId})")
+      + "WHERE M.user_id IN (SELECT DISTINCT follower_id FROM follow WHERE followee_id = #{userId}) "
+  // + "AND user_nick LIKE 'E%'" // 닉네임으로 검색 추가시 사용
+  )
   List<FollowDto> getFollowerList(FollowDto userId);
 
   // 팔로우 유무 확인 (0일시 안누름)
