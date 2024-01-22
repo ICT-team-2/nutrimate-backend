@@ -1,5 +1,6 @@
 package com.nutrimate.nutrimatebackend.controller.test;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,38 +24,43 @@ public class FollowController {
 
   // 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기)
   @GetMapping("/Recommend")
-  public int getRecommendedFollowers(@RequestBody FollowDto followDto) {
+  public List<FollowDto> getRecommendedFollowers(@RequestBody FollowDto followDto) {
     return followservice.getRecommendedFollowers(followDto);
   }
 
   // 내가 상대를 팔로우 하는 쿼리문
+  // 입력 데이터 : 내userId(followerId), 상대의userId(followeeId)
   @PostMapping("/followUser")
   public int followUser(@RequestBody FollowDto followDto) {
     return followservice.followUser(followDto);
   }
 
-  // 내 팔로잉(내가 등록한 사람) 수를 가져오기
+  // 내 팔로잉(내가 등록한 사람) 수를 가져오기 (완료)
+  // 입력 데이터 : userId
   @GetMapping("/FollowingCount")
-  public int getFollowingCount(@RequestBody FollowDto followDto) {
-    return followservice.getFollowingCount(followDto);
+  public int getFollowingCount(@RequestBody FollowDto userId) {
+    return followservice.getFollowingCount(userId);
   }
 
-  // 내 팔로워(나를 등록한 사람) 수를 가져오기
+  // 내 팔로워(나를 등록한 사람) 수를 가져오기 (완료)
+  // 입력 데이터 : userId
   @GetMapping("/FollowerCount")
-  public int getFollowerCount(@RequestBody FollowDto followDto) {
-    return followservice.getFollowerCount(followDto);
+  public int getFollowerCount(@RequestBody FollowDto userId) {
+    return followservice.getFollowerCount(userId);
   }
 
   // 내 팔로잉(내가 등록한 사람) 목록을 가져오기
+  // 입력 데이터 : userId
   @GetMapping("/FollowingList")
-  public int getFollowingList(@RequestBody FollowDto followDto) {
-    return followservice.getFollowingList(followDto);
+  public List<FollowDto> getFollowingList(@RequestBody FollowDto userId) {
+    return followservice.getFollowingList(userId);
   }
 
   // 내 팔로워(나를 등록한 사람) 목록을 가져오기
+  // 입력 데이터 : userId
   @GetMapping("/FollowerList")
-  public int getFollowerList(@RequestBody FollowDto followDto) {
-    return followservice.getFollowerList(followDto);
+  public List<FollowDto> getFollowerList(@RequestBody FollowDto userId) {
+    return followservice.getFollowerList(userId);
   }
 
   // 팔로우 유무 확인 (0일시 안누름)
@@ -64,9 +70,10 @@ public class FollowController {
   }
 
   // 내가 등록한 사람 삭제. 팔로우 취소
+  // 입력 데이터 : followId
   @DeleteMapping("/unfollow")
-  public int unfollowUser(@RequestBody FollowDto followDto) {
-    return followservice.unfollowUser(followDto);
+  public int unfollowUser(@RequestBody FollowDto followId) {
+    return followservice.unfollowUser(followId);
   }
 
 }

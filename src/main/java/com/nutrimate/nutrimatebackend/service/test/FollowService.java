@@ -1,5 +1,6 @@
 package com.nutrimate.nutrimatebackend.service.test;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.nutrimate.nutrimatebackend.mapper.test.FollowMapper;
@@ -12,8 +13,8 @@ public class FollowService {
   private FollowMapper followMapper;
 
   // 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기)
-  public int getRecommendedFollowers(FollowDto followDto) {
-    return followMapper.getRecommendedFollowers(followDto);
+  public List<FollowDto> getRecommendedFollowers(FollowDto followDto) {
+    return followMapper.getRecommendedFollowers();
   }
 
   // 내가 상대를 팔로우 하는 쿼리문
@@ -22,23 +23,23 @@ public class FollowService {
   }
 
   // 내 팔로잉(내가 등록한 사람) 수를 가져오기
-  public int getFollowingCount(FollowDto followDto) {
-    return followMapper.getFollowingCount(followDto);
+  public int getFollowingCount(FollowDto userId) {
+    return followMapper.getFollowingCount(userId);
   }
 
   // 내 팔로워(나를 등록한 사람) 수를 가져오기
-  public int getFollowerCount(FollowDto followDto) {
-    return followMapper.getFollowerCount(followDto);
+  public int getFollowerCount(FollowDto userId) {
+    return followMapper.getFollowerCount(userId);
   }
 
   // 내 팔로잉(내가 등록한 사람) 목록을 가져오기
-  public int getFollowingList(FollowDto followDto) {
-    return followMapper.getFollowingList(followDto);
+  public List<FollowDto> getFollowingList(FollowDto userId) {
+    return followMapper.getFollowingList(userId);
   }
 
   // 내 팔로워(나를 등록한 사람) 목록을 가져오기
-  public int getFollowerList(FollowDto followDto) {
-    return followMapper.getFollowerList(followDto);
+  public List<FollowDto> getFollowerList(FollowDto userId) {
+    return followMapper.getFollowerList(userId);
   }
 
   // 팔로우 유무 확인 (0일시 안누름)
@@ -47,8 +48,8 @@ public class FollowService {
   }
 
   // 내가 등록한 사람 삭제. 팔로우 취소
-  public int unfollowUser(FollowDto followDto) {
-    return followMapper.unfollowUser(followDto);
+  public int unfollowUser(FollowDto followId) {
+    return followMapper.unfollowUser(followId);
   }
 
 }
