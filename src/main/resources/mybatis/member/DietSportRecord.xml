@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.test.DietSportRecordMapper">
+
+    <!-- 음식 목록 가져오기 -->
+    <select id="selectFoodList" resultType="java.lang.String">
+        SELECT food_name FROM food
+        <!-- 추가 검색 조건을 사용하려면 주석 해제 -->
+        <!-- WHERE food_name LIKE '김%' -->
+    </select>
+
+    <!-- 자신이 먹은 음식을 기록하는 쿼리문 (식단DB 데이터 사용) -->
+    <insert id="insertDietRecord" parameterType="java.util.Map">
+        INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, (SELECT user_id FROM member WHERE user_id = #{userId}), SYSDATE, DEFAULT);
+        INSERT INTO dietrecord VALUES (SEQ_DIETRECORD.NEXTVAL, (SELECT record_id FROM record WHERE user_id=#{userId}), (SELECT FOOD_ID FROM food WHERE FOOD_NAME=#{foodName}));
+    </insert>
+
+    <!-- 자신이 먹은 음식을 기록하는 쿼리문 (유저가 직접 입력) -->
+    <insert id="insertCustomFood" parameterType="java.util.Map">
+        INSERT INTO food (food_id, food_name, food_cal)
+        VALUES ((SELECT COUNT(*)+1 FROM food), #{foodName}, #{foodCal});
+        INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, (SELECT user_id FROM member WHERE user_id = #{userId}), SYSDATE, DEFAULT);
+        INSERT INTO customfood VALUES ((SELECT FOOD_ID FROM FOOD WHERE FOOD_NAME=#{foodName}), #{userId}, SYSDATE);
+        INSERT INTO dietrecord VALUES (SEQ_DIETRECORD.NEXTVAL, (SELECT SEQ_RECORD.CURRVAL FROM DUAL), (SELECT food_id FROM food WHERE food_name=#{foodName}));
+    </insert>
+
+    <!-- 자신이 먹은 칼로리를 일일 권장 칼로리와 함께 열람할 수 있는 쿼리문 -->
+    <select id="selectCaloriesInfo" resultType="java.lang.Integer" parameterType="int">
+        SELECT sum(food_cal) FROM food WHERE record_id=(SELECT record_id FROM record WHERE user_id=#{userId} AND do_date=SYSDATE)
+    </select>
+
+    <!-- 일일 권장 칼로리 -->
+    <select id="selectUserCalories" resultType="java.lang.Integer" parameterType="int">
+        SELECT user_cal FROM member WHERE user_id=#{userId}
+    </select>
+
+    <!-- 운동 목록 가져오기 -->
+    <select id="selectSportList" resultType="java.lang.String">
+        SELECT sport_name FROM sport
+        <!-- 추가 검색 조건을 사용하려면 주석 해제 -->
+        <!-- WHERE sport_name LIKE '바%' -->
+    </select>
+
+    <!-- 운동 기록 -->
+    <insert id="insertSportRecord" parameterType="java.util.Map">
+        INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, (SELECT user_id FROM member WHERE user_id = #{userId}), SYSDATE, DEFAULT);
+        INSERT INTO sportrecord VALUES (SEQ_SPORTRECORD.NEXTVAL, (SELECT record_id FROM record WHERE user_id=#{userId}), (SELECT sport_id FROM sport WHERE sport_name=#{sportName}), (SELECT sport_met FROM sport WHERE sport_name=#{sportName}), #{sportTime}, (SELECT user_weight FROM member WHERE user_id=#{userId}));
+    </insert>
+
+    <!-- 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력) -->
+    <insert id="insertCustomSport" parameterType="java.util.Map">
+        INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, (SELECT user_id FROM member WHERE user_id = #{userId}), SYSDATE, DEFAULT);
+        INSERT INTO sport (sport_id, sport_name, sport_cal)
+        VALUES ((SELECT COUNT(*)+1 FROM sport), #{sportName}, #{sportCal});
+        INSERT INTO customsport VALUES ((SELECT sport_id FROM sport WHERE sport_name=#{sportName}), #{userId}, SYSDATE);
+        INSERT INTO sportrecord VALUES (SEQ_SPORTRECORD.NEXTVAL, (SELECT SEQ_RECORD.CURRVAL FROM DUAL), (SELECT sport_id FROM sport WHERE sport_name=#{sportName}), #{sportCal}, #{sportTime}, (SELECT user_weight FROM member WHERE user_id=#{userId}));
+    </insert>
+
+    <!-- 오늘 자신이 소모한 칼로리를 열람할 수 있는 쿼리문 -->
+    <select id="selectTotalSportCalories" resultType="java.lang.Integer" parameterType="int">
+        SELECT SUM(sport_cal) FROM sportrecord WHERE record_id=(SELECT record_id FROM record WHERE user_id=#{userId} AND do_date=SYSDATE)
+    </select>
+
+</mapper>
