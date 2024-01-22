@@ -28,7 +28,7 @@ public class DietSportRecordController {
   }
 
   // 자신이 먹은 음식을 기록하는 쿼리문 (식단DB 데이터 사용)
-  @PostMapping("/Recommend")
+  // @PostMapping("/Recommend")
   public int insertDietRecord(@RequestBody DietSportRecordDto dietSportRecordDto) {
     return dietSportRecordService.insertDietRecord(dietSportRecordDto);
   }
@@ -41,38 +41,38 @@ public class DietSportRecordController {
 
   // 자신이 먹은 칼로리를 일일 권장 칼로리와 함께 열람할 수 있는 쿼리문
   // 오늘 내가 먹은 칼로리
-  @GetMapping("/Recommend")
+  // @GetMapping("/Recommend")
   public int selectCaloriesInfo(@RequestBody DietSportRecordDto dietSportRecordDto) {
     return dietSportRecordService.selectCaloriesInfo(dietSportRecordDto);
   }
 
   // 일일 권장 칼로리
-  @GetMapping("/Recommend")
+  // @GetMapping("/Recommend")
   public int selectUserCalories(@RequestBody DietSportRecordDto dietSportRecordDto) {
     return dietSportRecordService.selectUserCalories(dietSportRecordDto);
   }
 
   // 운동 목록 가져오기
-  @GetMapping("/Recommend")
+  // @GetMapping("/Recommend")
   public List<String> selectSportList(@RequestBody DietSportRecordDto dietSportRecordDto) {
     return dietSportRecordService.selectSportList(dietSportRecordDto);
   }
 
   // 운동 기록
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용)
-  @PostMapping("/Recommend")
+  // @PostMapping("/Recommend")
   public int insertSportRecord(@RequestBody DietSportRecordDto dietSportRecordDto) {
     return dietSportRecordService.insertSportRecord(dietSportRecordDto);
   }
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력)
-  @PostMapping("/Recommend")
+  // @PostMapping("/Recommend")
   public int insertCustomSport(@RequestBody DietSportRecordDto dietSportRecordDto) {
     return dietSportRecordService.insertCustomSport(dietSportRecordDto);
   }
 
   // 오늘 자신이 소모한 칼로리를 열람할 수 있는 쿼리문
-  @GetMapping("/Recommend")
+  // @GetMapping("/Recommend")
   public int selectTotalSportCalories(@RequestBody DietSportRecordDto dietSportRecordDto) {
     return dietSportRecordService.selectTotalSportCalories(dietSportRecordDto);
   }

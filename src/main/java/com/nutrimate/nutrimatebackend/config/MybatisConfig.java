@@ -13,7 +13,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.log4j.Log4j2;
 
 @Configuration
-@MapperScan(value = {"com.nutrimate.nutrimatebackend.mapper"})
+@MapperScan(
+    value = {"com.nutrimate.nutrimatebackend.mapper", "com.nutrimate.nutrimatebackend.mapper.test"},
+    sqlSessionFactoryRef = "sqlSessionFactory")
 @Log4j2
 @EnableTransactionManagement
 public class MybatisConfig {
@@ -30,6 +32,7 @@ public class MybatisConfig {
   // 마이바티스 관련 빈
   @Bean
   public SqlSessionFactory sqlSessionFactory(HikariDataSource hikariDataSource) {
+    log.info("Creating SqlSessionFactory...");
     SqlSessionFactory factory = null;
     try {
       SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
@@ -45,13 +48,15 @@ public class MybatisConfig {
       factory = factoryBean.getObject();
     } catch (Exception e) {
       log.error(e.getMessage());
+      log.error("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
+      throw new RuntimeException("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
     }
     return factory;
 
   }
 
   @Bean
-  public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+  public SqlSessionTemplate sqlSessionTemplate(@Autowired SqlSessionFactory sqlSessionFactory) {
     return new SqlSessionTemplate(sqlSessionFactory);
   }////////////////
 }
