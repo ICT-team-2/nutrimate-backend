@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.MemberMapper">
-	
-	<insert id="insertMember" parameterType="MemberDto">
-		<selectKey keyProperty="userId"
-		           resultType="long" order="BEFORE">
-			SELECT SEQ_MEMBER.NEXTVAL userId
-				FROM DUAL
-		</selectKey>
-		INSERT INTO
-		member(user_id, user_nick, user_height, user_weight, user_email, user_gender,
-		user_sport_hard, user_cal,user_name)
-		VALUES (#{userId}, #{userNick}, #{userHeight},
-		#{userWeight}, #{userEmail}, #{userGender},
-		#{userSportHard}, #{userCal}, #{userName})
-	</insert>
-	<insert id="insertCommonMember" parameterType="MemberDto">
-		INSERT INTO
-			commonmember(user_id, user_uid, user_pwd)
-			VALUES (#{userId}, #{userUid}, #{userPwd})
-	</insert>
-	<insert id="insertMemberId" parameterType="MemberDto">
-		<selectKey keyProperty="userId"
-		           resultType="long" order="BEFORE">
-			SELECT SEQ_MEMBER.NEXTVAL userId
-				FROM DUAL
-		</selectKey>
-		INSERT INTO
-		member(user_id) VALUES (#{userId})
-	</insert>
-	<insert id="insertOAuthMember" parameterType="MemberDto">
-		INSERT INTO
-			oauth(user_id, provider, provider_id)
-			VALUES (#{userId}, #{provider}, #{providerId})
-	</insert>
-	
-	
-	<select id="findCommonMemberByUid" parameterType="string"
-	        resultType="MemberDto">
-		SELECT m.*,
-		       c.user_uid,
-		       c.user_pwd
-			FROM member m
-				     JOIN commonmember c ON m.user_id = c.user_id
-			WHERE c.user_uid = #{userUid} AND m.deleted = 'N'
-	
-	</select>
-	
-	<select id="findOAuthMemberByProviderId" parameterType="String" resultType="MemberDto">
-		SELECT m.*,
-		       o.provider,
-		       o.provider_id
-			FROM member m
-				    JOIN oauth o ON m.user_id = o.user_id
-			WHERE o.provider_id = #{providerId} AND m.deleted = 'N'
-	
-	</select>
+
+  <insert id="insertMember" parameterType="MemberDto">
+    <selectKey keyProperty="userId"
+      order="BEFORE" resultType="long">
+      SELECT SEQ_MEMBER.NEXTVAL userId
+      FROM DUAL
+    </selectKey>
+    INSERT INTO
+    member(user_id, user_nick, user_height, user_weight, user_email, user_gender,
+    user_sport_hard, user_cal,user_name)
+    VALUES (#{userId}, #{userNick}, #{userHeight},
+    #{userWeight}, #{userEmail}, #{userGender},
+    #{userSportHard}, #{userCal}, #{userName})
+  </insert>
+  <insert id="insertCommonMember" parameterType="MemberDto">
+    INSERT INTO commonmember(user_id, user_uid, user_pwd)
+    VALUES (#{userId}, #{userUid}, #{userPwd})
+  </insert>
+  <insert id="insertMemberIdAndEmail" parameterType="MemberDto">
+    <selectKey keyProperty="userId"
+      order="BEFORE" resultType="long">
+      SELECT SEQ_MEMBER.NEXTVAL userId
+      FROM DUAL
+    </selectKey>
+    INSERT INTO
+    member(user_id,user_email) VALUES (#{userId},#{userEmail})
+  </insert>
+  <insert id="insertOAuthMember" parameterType="MemberDto">
+    INSERT INTO oauth(user_id, provider, provider_id)
+    VALUES (#{userId}, #{provider}, #{providerId})
+  </insert>
+
+
+  <select id="findCommonMemberByUid" parameterType="string"
+    resultType="MemberDto">
+    SELECT m.*,
+           c.user_uid,
+           c.user_pwd
+    FROM member m
+           JOIN commonmember c ON m.user_id = c.user_id
+    WHERE c.user_uid = #{userUid}
+      AND m.deleted = 'N'
+
+  </select>
+
+  <select id="findOAuthMemberByProviderId" parameterType="String" resultType="MemberDto">
+    SELECT m.*,
+           o.provider,
+           o.provider_id
+    FROM member m
+           JOIN oauth o ON m.user_id = o.user_id
+    WHERE o.provider_id = #{providerId}
+      AND m.deleted = 'N'
+
+  </select>
 </mapper>
