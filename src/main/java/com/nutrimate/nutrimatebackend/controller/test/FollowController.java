@@ -31,7 +31,7 @@ public class FollowController {
 
   // 내가 상대를 팔로우 하는 쿼리문 (내가 팔로워가 된다) (완료)
   // 입력 데이터 : followerId(내userId), followeeId(상대의userId)
-  @PostMapping("/followUser")
+  @PostMapping("/FollowUser")
   public int followUser(@RequestBody FollowDto followDto) {
     return followservice.followUser(followDto);
   }
@@ -73,7 +73,7 @@ public class FollowController {
 
   // 내가 등록한 사람 삭제. 팔로우 취소 (완료)
   // 입력 데이터 : followId
-  @DeleteMapping("/unfollow")
+  @DeleteMapping("/Unfollow")
   public int unfollowUser(@RequestBody FollowDto followId) {
     return followservice.unfollowUser(followId);
   }
