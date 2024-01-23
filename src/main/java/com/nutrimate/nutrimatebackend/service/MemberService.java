@@ -13,25 +13,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 	private MemberMapper memberMapper;
 	private PasswordEncoder passwordEncoder;
-
+	
 	public MemberService(MemberMapper memberMapper, PasswordEncoder passwordEncoder) {
 		this.memberMapper = memberMapper;
 		this.passwordEncoder = passwordEncoder;
 	}
-
-	@Transactional
+	
 	public int insertMember(MemberDto memberDto) {
-		memberMapper.insertMember(memberDto);
-		log.info("memberDto: " + memberDto);
-		return memberMapper.insertCommonMember(memberDto);
+		return memberMapper.insertMember(memberDto);
 	}
-
+	
 	public MemberDto findCommonMemberByUid(String userUid) {
 		MemberDto memberDto = memberMapper.findCommonMemberByUid(userUid);
 		log.info("memberDto: " + memberDto);
 		return memberDto;
 	}
-
+	
 	@Transactional
 	public MemberDto insertOAuthMember(MemberDto memberDto) {
 		memberMapper.insertMemberIdAndEmail(memberDto);
