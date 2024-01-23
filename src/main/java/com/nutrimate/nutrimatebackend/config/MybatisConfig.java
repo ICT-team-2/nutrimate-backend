@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @EnableTransactionManagement
 public class MybatisConfig {
-<<<<<<< HEAD
+
   // https://mybatis.org/spring/ko/factorybean.html
 
   // 생성자 인젝션을 통해 ApplicationContext를 컨테이너로부터 받는다
@@ -33,7 +33,6 @@ public class MybatisConfig {
   // 마이바티스 관련 빈
   @Bean
   public SqlSessionFactory sqlSessionFactory(HikariDataSource hikariDataSource) {
-    log.info("Creating SqlSessionFactory...");
     SqlSessionFactory factory = null;
     try {
       SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
@@ -48,54 +47,14 @@ public class MybatisConfig {
       factoryBean.setConfiguration(configuration);
       factory = factoryBean.getObject();
     } catch (Exception e) {
-      log.error(e.getMessage());
-      log.error("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
-      throw new RuntimeException("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
+      log.warn(e.getMessage());
     }
     return factory;
 
   }
 
   @Bean
-  public SqlSessionTemplate sqlSessionTemplate(@Autowired SqlSessionFactory sqlSessionFactory) {
+  public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
     return new SqlSessionTemplate(sqlSessionFactory);
   }////////////////
-=======
-	//https://mybatis.org/spring/ko/factorybean.html
-	
-	// 생성자 인젝션을 통해 ApplicationContext를 컨테이너로부터 받는다
-	private final ApplicationContext applicationContext;
-	@Autowired
-	public MybatisConfig(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
-	
-	//마이바티스 관련 빈
-	@Bean
-	public SqlSessionFactory sqlSessionFactory(HikariDataSource hikariDataSource) {
-		SqlSessionFactory factory = null;
-		try {
-			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-			factoryBean.setDataSource(hikariDataSource);//데이타 소스로 히카리 전달
-			//타입 별칭을 적용할 최상위 패키지 경로 설정
-			// (마이바티스 프레임워크는 최상위 패키지부터 하위 패키지까지 @Alias가 적용됨)
-			factoryBean.setTypeAliasesPackage("com.nutrimate.nutrimatebackend");
-			factoryBean.setMapperLocations(
-					applicationContext.getResources("classpath:mybatis/**/*.xml"));
-			org.apache.ibatis.session.Configuration configuration
-					= new org.apache.ibatis.session.Configuration();
-			configuration.setMapUnderscoreToCamelCase(true);
-			factoryBean.setConfiguration(configuration);
-			factory = factoryBean.getObject();
-		} catch (Exception e) {
-			log.warn(e.getMessage());
-		}
-		return factory;
-		
-	}
-	@Bean
-	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
-		return new SqlSessionTemplate(sqlSessionFactory);
-	}////////////////
->>>>>>> a4cc294b0382c63fd9aecaa3fd96690d832a2f4c
 }

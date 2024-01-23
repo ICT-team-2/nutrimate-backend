@@ -12,7 +12,7 @@
 	 -->
 
 	<!-- 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기) -->
-	<select id="getRecommendedFollowers" resultType="Member">
+	<select id="getRecommendedFollowers" resultType="FollowDto">
 	    <![CDATA[
 	    SELECT *
 	    FROM (SELECT *
@@ -24,14 +24,14 @@
 	
 	<!-- 내가 상대를 팔로우 하는 쿼리문 -->
 	<!-- 입력 데이터 : 내userId(followerId), 상대의userId(followeeId) -->
-	<insert id="followUser" parameterType="Follow">
+	<insert id="followUser" parameterType="FollowDto">
 	    INSERT INTO follow (follow_id, follower_id, created_date, followee_id)
 	    VALUES (SEQ_FOLLOW.NEXTVAL, #{followerId}, SYSDATE, #{followeeId});
 	</insert>
 	
 	<!-- 내 팔로잉(내가 등록한 사람) 수를 가져오는 쿼리문 -->
 	<!-- 입력 데이터 : userId -->
-	<select id="getFollowingCount" resultType="int" parameterType="int">
+	<select id="getFollowingCount" resultType="FollowDto" parameterType="FollowDto">
 	    SELECT COUNT(*)
 	    FROM follow
 	    WHERE follower_id = #{userId};
@@ -39,7 +39,7 @@
 	
 	<!-- 내 팔로워(나를 등록한 사람) 수를 가져오는 쿼리문 -->
 	<!-- 입력 데이터 : userId -->
-	<select id="getFollowerCount" resultType="int" parameterType="int">
+	<select id="getFollowerCount" resultType="FollowDto" parameterType="FollowDto">
 	    SELECT COUNT(*)
 	    FROM follow
 	    WHERE followee_id = #{userId};
@@ -47,7 +47,7 @@
 	
 	<!-- 내 팔로잉(내가 등록한 사람) 목록을 가져오는 쿼리문 -->
 	<!-- 입력 데이터 : userId -->
-	<select id="getFollowingList" resultType="Following" parameterType="int">
+	<select id="getFollowingList" resultType="FollowDto" parameterType="FollowDto">
 	    SELECT user_profile, user_nick, user_intro, user_id, MAX(follow_id) AS follow_id
 	    FROM follow F RIGHT JOIN member M
 	    ON M.user_id = F.followee_id
@@ -57,7 +57,7 @@
 	
 	<!-- 내 팔로워(나를 등록한 사람) 목록을 가져오는 쿼리문 -->
 	<!-- 입력 데이터 : userId -->
-	<select id="getFollowerList" resultType="Follower" parameterType="int">
+	<select id="getFollowerList" resultType="FollowDto" parameterType="FollowDto">
 	    SELECT user_profile, user_nick, user_intro, user_id
 	    FROM follow F RIGHT JOIN member M
 	    ON M.user_id = F.followee_id
@@ -66,7 +66,7 @@
 	
 	<!-- 팔로우 유무 확인 (0일시 안누름) -->
 	<!-- 입력 데이터 : userId, 상대의 userId(followeeId) -->
-	<select id="checkFollowStatus" resultType="int" parameterType="Follow">
+	<select id="checkFollowStatus" resultType="FollowDto" parameterType="FollowDto">
 	    SELECT COUNT(*)
 	    FROM follow
 	    WHERE follower_id = #{userId} AND followee_id = #{followeeId};
@@ -74,7 +74,7 @@
 	
 	<!-- 내가 등록한 사람 삭제. 팔로우 취소 -->
 	<!-- 입력 데이터 : followId -->
-	<delete id="unfollowUser" parameterType="int">
+	<delete id="unfollowUser" parameterType="FollowDto">
 	    DELETE FROM follow
 	    WHERE follow_id = #{followId};
 	</delete>

@@ -1,5 +1,6 @@
 package com.nutrimate.nutrimatebackend.model.member;
 
+import org.apache.ibatis.type.Alias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Builder
+@Alias("FollowDto")
 public class FollowDto {
   private String followId; // 팔로우 번호
   private String followeeId; // 팔로잉
