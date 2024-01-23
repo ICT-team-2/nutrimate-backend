@@ -49,12 +49,24 @@ public class DietSportRecordController {
     return ResponseEntity.ok(jsonResponse);
   }
 
-  // 자신이 먹은 음식 기록하기 (유저가 직접 입력)
-  // 입력 데이터 : userId, foodName, calories
-  @PostMapping("/logCustomFood")
-  public ResponseEntity<String> logCustomFood(@RequestBody DietSportRecordDto dietSportRecordDto) {
+  // 자신이 먹은 음식 기록하기 (유저가 직접 입력) (완료)
+  // 입력 데이터 : userId, foodName, foodCal
+  // 출력 데이터 : message, recordId, dietrecordId
+  @PostMapping("/insertCustomFoodRecord")
+  public ResponseEntity<Map<String, Object>> insertCustomFoodRecord(
+      @RequestBody DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordService.insertRecordFo(dietSportRecordDto);
+    dietSportRecordService.insertRecordFood(dietSportRecordDto);
+    dietSportRecordService.insertRecordCustomFood(dietSportRecordDto);
     dietSportRecordService.insertCustomFoodRecord(dietSportRecordDto);
-    return new ResponseEntity<>("Custom food Record successfully", HttpStatus.OK);
+
+    int recordId = dietSportRecordDto.getRecordId();
+    int dietrecordId = dietSportRecordDto.getDietrecordId();
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "Custom Food Record successfully");
+    jsonResponse.put("recordId", recordId);
+    jsonResponse.put("dietrecordId", dietrecordId);
+    return ResponseEntity.ok(jsonResponse);
   }
 
   // 먹은 칼로리와 일일 권장 칼로리 열람하기
@@ -74,7 +86,7 @@ public class DietSportRecordController {
     return new ResponseEntity<>(sportList, HttpStatus.OK);
   }
 
-  // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용) (진행중)
+  // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용) (완료)
   // 입력 데이터 : userId, sportName, sportTime
   // 출력 데이터 : message, recordId, exerciseId
   @PostMapping("/insertExerciseRecord")
@@ -92,13 +104,23 @@ public class DietSportRecordController {
     return ResponseEntity.ok(jsonResponse);
   }
 
-  // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력)
-  // 입력 데이터 : userId, sportName, calories, exerciseTime
-  @PostMapping("/logCustomExercise")
-  public ResponseEntity<String> logCustomExercise(
+  // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력) (진행중)
+  // 입력 데이터 : userId, sportName, sportCal, sportTime
+  @PostMapping("/insertCustomSportRecord")
+  public ResponseEntity<Map<String, Object>> insertCustomSportRecord(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordService.insertCustomExerciseRecord(dietSportRecordDto);
-    return new ResponseEntity<>("Custom exercise Record successfully", HttpStatus.OK);
+    dietSportRecordService.insertRecordSp(dietSportRecordDto);
+    dietSportRecordService.insertRecordSport(dietSportRecordDto);
+    dietSportRecordService.insertRecordCustomSport(dietSportRecordDto);
+    dietSportRecordService.insertCustomSportRecord(dietSportRecordDto);
+
+    int recordId = dietSportRecordDto.getRecordId();
+    int exerciseId = dietSportRecordDto.getExerciseId();
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "Exercise Record successfully");
+    jsonResponse.put("recordId", recordId);
+    jsonResponse.put("exerciseId", exerciseId);
+    return ResponseEntity.ok(jsonResponse);
   }
 
   // 오늘 자신이 소모한 칼로리를 열람하는 쿼리문

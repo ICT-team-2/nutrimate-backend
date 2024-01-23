@@ -1,8 +1,6 @@
 package com.nutrimate.nutrimatebackend.service.test;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +30,24 @@ public class DietSportRecordService {
   }
 
   // 자신이 먹은 음식 기록하기 (유저가 직접 입력)
+  @Transactional
+  public void insertRecordFo(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordFo(dietSportRecordDto);
+  }
+
+  @Transactional
+  public void insertRecordFood(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordFood(dietSportRecordDto);
+  }
+
+  @Transactional
+  public void insertRecordCustomFood(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordCustomFood(dietSportRecordDto);
+  }
+
+  @Transactional
   public void insertCustomFoodRecord(DietSportRecordDto dietSportRecordDto) {
-    Map<String, Object> paramMap = new HashMap<>();
-    paramMap.put("userId", dietSportRecordDto.getUserId());
-    paramMap.put("foodName", dietSportRecordDto.getFoodName());
-    paramMap.put("calories", dietSportRecordDto.getFoodCal());
-    dietSportRecordMapper.insertCustomFoodRecord(paramMap);
+    dietSportRecordMapper.insertCustomFoodRecord(dietSportRecordDto);
   }
 
   // 먹은 칼로리와 일일 권장 칼로리 열람하기
@@ -62,13 +72,24 @@ public class DietSportRecordService {
   }
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력)
-  public void insertCustomExerciseRecord(DietSportRecordDto dietSportRecordDto) {
-    Map<String, Object> paramMap = new HashMap<>();
-    paramMap.put("userId", dietSportRecordDto.getUserId());
-    paramMap.put("sportName", dietSportRecordDto.getSportName());
-    paramMap.put("calories", dietSportRecordDto.getSportCal());
-    paramMap.put("exerciseTime", dietSportRecordDto.getSportTime());
-    dietSportRecordMapper.insertCustomExerciseRecord(paramMap);
+  @Transactional
+  public void insertRecordSp(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordSp(dietSportRecordDto);
+  }
+
+  @Transactional
+  public void insertRecordSport(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordSport(dietSportRecordDto);
+  }
+
+  @Transactional
+  public void insertRecordCustomSport(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordCustomSport(dietSportRecordDto);
+  }
+
+  @Transactional
+  public void insertCustomSportRecord(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertCustomSportRecord(dietSportRecordDto);
   }
 
   // 오늘 자신이 소모한 칼로리를 열람하는 쿼리문

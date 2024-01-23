@@ -25,7 +25,7 @@ public class DietSportRecordDto {
 
   private int sportId; // 운동아이디
   private String sportName; // 운동이름
-  private String sportMet; // Met
-  private String sportTime; // 운동시간
-  private String sportCal; // 운동(소모)칼로리
+  private int sportMet; // Met
+  private int sportTime; // 운동시간
+  private int sportCal; // 운동(소모)칼로리
 }
