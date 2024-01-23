@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 매퍼파일 -->
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.admin.BlockMapper">
+	<select id="findByUserIdAndBoarderId" resultType="int" parameterType="blockDto">
+		SELECT COUNT(*) FROM report r join boardreport br on r.report_id=br.report_id where r.user_id=#{userid} and br.board_id=#{boardid}
+	</select>
+	
+	<select id="findByUserIdAndCmtId" resultType="int" parameterType="blockDto">
+		SELECT COUNT(*) FROM report r join commentreport cr on r.report_id=cr.report_id where r.user_id=#{userid} and cr.cmt_id=#{cmtid}
+	</select>
+	
+	<insert id="insertReport" parameterType="blockDto">
+		<selectKey keyProperty="reportid" resultType="int" order="BEFORE">
+			SELECT SEQ_REPORT.NEXTVAL FROM DUAL
+		</selectKey>
+		   INSERT INTO report VALUES(SEQ_REPORT.CURRVAL,#{userid}, SYSDATE,#{reportreason})
+	</insert>
+	
+	<insert id="insertCommentReport" parameterType="blockDto">
+		INSERT INTO commentreport VALUES(#{reportid},#{cmtid})
+	</insert>
+	
+	<insert id="insertBorderReport" parameterType="blockDto">
+		INSERT INTO boardreport VALUES(#{reportid},#{boardid})
+	</insert>
+	
+		
+	
+	<resultMap id="boardResult" type="blockDto">
+	    <result property="boardid" column="board_id"/>
+	    <result property="userid" column="user_id"/>
+	    <result property="boardtitle" column="board_title"/>
+	    <result property="createddate" column="created_date"/>
+	    <result property="blocked" column="blocked"/>
+	    <result property="usernick" column="user_nick"/>
+	    <result property="count" column="COUNT"/>
+	</resultMap>
+	
+	
+	<select id="findAllBoard" resultMap="boardResult">
+	    SELECT DISTINCT b.*, m.user_nick, COUNT(*) OVER (PARTITION BY b.board_id) AS COUNT
+	    FROM boardreport br
+	    JOIN board b ON br.board_id = b.board_id
+	    JOIN member m ON b.user_id = m.user_id
+	    <where>
+			<if test="searchUser !=null">
+				m.user_nick LIKE '%' || #{searchUser} || '%'
+			</if>	
+			<if test="searchContent !=null">
+				b.board_title LIKE '%' || #{searchContent} || '%'
+			</if>		
+	   </where>
+	    
+	</select>
+	
+	
+	<resultMap id="commentResult" type="blockDto">
+	    <result property="cmtid" column="cmt_id"/>
+	    <result property="userid" column="user_id"/>
+	    <result property="cmtcontent" column="cmt_content"/>
+	    <result property="createddate" column="created_date"/>
+	    <result property="usernick" column="user_nick"/>
+	    <result property="blocked" column="blocked"/>
+	    <result property="count" column="COUNT"/>
+	</resultMap>
+	
+	<select id="findAllComment" resultMap="commentResult">
+	    SELECT DISTINCT c.*,m.user_nick, COUNT(*) OVER (PARTITION BY c.cmt_id) AS COUNT
+        FROM commentreport cr join comments c on cr.cmt_id=c.cmt_id join member m on c.user_id = m.user_id
+        <where>
+			<if test="searchUser !=null">
+				m.user_nick LIKE '%' || #{searchUser} || '%'
+			</if>	
+			<if test="searchContent !=null">
+				c.cmt_content LIKE '%' || #{searchContent} || '%'
+			</if>		
+	   </where>
+	</select>
+	
+	<select id="findByBoarderId" resultType="reportDto" parameterType="blockDto">
+		SELECT r.* FROM report r join boardreport br ON r.report_id=br.report_id WHERE br.board_id=#{boardid}
+	</select>
+	<select id="findByCmtId" resultType="reportDto" parameterType="blockDto">
+		SELECT r.* FROM report r join commentreport cr ON r.report_id=cr.report_id WHERE cr.cmt_id=#{cmtid}
+	</select>
+	<update id="updateBoarderBlockByBoardId" parameterType="blockDto">
+		UPDATE board SET  blocked='Y' WHERE board_id=#{boardid}	
+	</update>
+	<update id="updateCommentBlockByBoardId" parameterType="blockDto">
+		 UPDATE comments SET blocked='Y' WHERE cmt_id=#{cmtid}
+	</update>
+	<update id="updateBoarderBlockCancelByBoardId" parameterType="blockDto">
+		UPDATE board SET blocked='N' WHERE board_id=#{boardid}	
+	</update>
+	<update id="updateCommentBlockCancelByBoardId" parameterType="blockDto">
+		 UPDATE comments SET blocked='Y' WHERE cmt_id=#{cmtid}
+	</update>
+	<delete id="deleteReportByReport_id" parameterType="blockDto">
+	      DELETE report WHERE report_id=#{reportid}
+	</delete>
+	<delete id="deleteBoardReportByReport_id" parameterType="blockDto">
+	      DELETE boardreport WHERE report_id=#{reportid}
+	</delete>
+	<delete id="deleteCommentReportByReport_id" parameterType="blockDto">
+	      DELETE commentreport WHERE report_id=#{reportid}
+	</delete>
+	
+	
+	
+</mapper>
