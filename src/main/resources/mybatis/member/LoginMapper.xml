@@ -18,15 +18,16 @@
 		#{userSportHard}, #{userCal}, #{userName},
 		#{userUid}, #{userPwd})
 	</insert>
-	<insert id="insertMemberIdAndEmail" parameterType="MemberDto">
+	<insert id="insertMemberWithOAuth" parameterType="MemberDto">
 		<selectKey keyProperty="userId"
 		           order="BEFORE" resultType="long">
 			SELECT SEQ_MEMBER.NEXTVAL userId
 				FROM DUAL
 		</selectKey>
-		INSERT INTO member(user_id, user_email) VALUES (#{userId},#{userEmail})
+		INSERT INTO member(user_id, user_email,user_uid,user_pwd)
+		VALUES (#{userId},#{userEmail},#{userUid},#{userPwd})
 	</insert>
-	<insert id="insertOAuthMember" parameterType="MemberDto">
+	<insert id="insertOAuth" parameterType="MemberDto">
 		INSERT INTO oauth(user_id, provider, provider_id)
 			VALUES (#{userId}, #{provider}, #{providerId})
 	</insert>

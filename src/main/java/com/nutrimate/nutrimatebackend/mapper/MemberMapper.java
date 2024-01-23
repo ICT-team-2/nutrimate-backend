@@ -9,9 +9,9 @@ public interface MemberMapper {
 	
 	int insertMember(MemberDto memberDto);
 	
-	int insertMemberIdAndEmail(MemberDto memberDto);
+	int insertMemberWithOAuth(MemberDto memberDto);
 	
-	int insertOAuthMember(MemberDto memberDto);
+	int insertOAuth(MemberDto memberDto);
 	
 	MemberDto findCommonMemberByUid(String userUid);
 	

@@ -97,7 +97,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 					.provider(provider)
 					.providerId(providerId)
 					.build();
-			
+			log.info("userEntity : " + userEntity);
 			memberService.insertOAuthMember(userEntity);
 		} else {
 			log.info("로그인을 이미 한 적이있습니다. 당신은 자동 회원가입이 되어있습니다");

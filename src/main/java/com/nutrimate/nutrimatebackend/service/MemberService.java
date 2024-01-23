@@ -31,8 +31,8 @@ public class MemberService {
 	
 	@Transactional
 	public MemberDto insertOAuthMember(MemberDto memberDto) {
-		memberMapper.insertMemberIdAndEmail(memberDto);
-		memberMapper.insertOAuthMember(memberDto);
+		memberMapper.insertMemberWithOAuth(memberDto);
+		memberMapper.insertOAuth(memberDto);
 		return memberDto;
 	}
 }
