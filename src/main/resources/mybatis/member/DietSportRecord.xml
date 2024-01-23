@@ -18,7 +18,7 @@
         INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, DEFAULT) <!-- 기록 공통 -->
     </insert>
     <insert id="insertFoodRecord" parameterType="DietSportRecordDto">
-    	<selectKey keyProperty="recordId" resultType="int" order="AFTER">
+    	<selectKey keyProperty="dietrecordId" resultType="int" order="AFTER">
 	        SELECT SEQ_DIETRECORD.CURRVAL FROM DUAL
 	    </selectKey>
         INSERT INTO dietrecord VALUES (
@@ -55,17 +55,26 @@
     </select>
     
     <!-- 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용) -->
+    <insert id="insertRecordExer" parameterType="DietSportRecordDto">
+	    <selectKey keyProperty="recordId" resultType="int" order="AFTER">
+	        SELECT SEQ_RECORD.CURRVAL FROM DUAL
+	    </selectKey>
+        INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, DEFAULT) <!-- 기록 공통 -->
+    </insert>
     <insert id="insertExerciseRecord" parameterType="DietSportRecordDto">
-    	INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, DEFAULT) <!-- 기록 공통 -->
-		INSERT INTO sportrecord VALUES (SEQ_SPORTRECORD.NEXTVAL,
-		    (SELECT record_id FROM record WHERE user_id=#{userId}),
+    	<selectKey keyProperty="exerciseId" resultType="int" order="AFTER">
+	        SELECT SEQ_SPORTRECORD.CURRVAL FROM DUAL
+	    </selectKey>
+		INSERT INTO sportrecord VALUES (
+			SEQ_SPORTRECORD.NEXTVAL,
+		    (SELECT MAX(record_id) FROM record WHERE user_id=#{userId}),
 		    (SELECT sport_id FROM sport WHERE sporrt_name=#{sportName}),
 		    (SELECT sport_met FROM sport WHERE sporrt_name=#{sportName}) * (1 / 60) * #{sportTime} * (SELECT user_weight FROM member WHERE user_id=#{userId}),
 		    #{sportTime},
 		    (SELECT user_weight FROM member WHERE user_id=#{userId})
-		);
+		)
     </insert>
-    
+     
     <!-- 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력) -->
     <insert id="insertCustomExerciseRecord" parameterType="Map">
             INSERT INTO record VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, DEFAULT); <!-- 기록 공통 -->

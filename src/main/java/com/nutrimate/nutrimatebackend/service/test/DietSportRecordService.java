@@ -51,6 +51,12 @@ public class DietSportRecordService {
   }
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용)
+  @Transactional
+  public void insertRecordExer(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordExer(dietSportRecordDto);
+  }
+
+  @Transactional
   public void insertExerciseRecord(DietSportRecordDto dietSportRecordDto) {
     dietSportRecordMapper.insertExerciseRecord(dietSportRecordDto);
   }

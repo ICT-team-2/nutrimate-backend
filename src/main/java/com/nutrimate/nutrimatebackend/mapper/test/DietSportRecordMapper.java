@@ -26,6 +26,8 @@ public interface DietSportRecordMapper {
   List<DietSportRecordDto> findSportList();
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용)
+  void insertRecordExer(DietSportRecordDto dietSportRecordDto);
+
   void insertExerciseRecord(DietSportRecordDto dietSportRecordDto);
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력)

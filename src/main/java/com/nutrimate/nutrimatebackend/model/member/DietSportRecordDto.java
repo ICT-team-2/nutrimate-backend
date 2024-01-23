@@ -15,8 +15,9 @@ import lombok.ToString;
 @Builder
 public class DietSportRecordDto {
   private int userId; // 유저아이디
-  private int recordId;
-  private int dietrecordId;
+  private int recordId; // 기록아이디
+  private int dietrecordId; // 식단기록아이디
+  private int exerciseId; // 운동기록아이디
 
   private int foodId; // 음식아이디
   private String foodName; // 음식이름

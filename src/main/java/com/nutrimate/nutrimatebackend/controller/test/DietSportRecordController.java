@@ -1,6 +1,8 @@
 package com.nutrimate.nutrimatebackend.controller.test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,13 +33,19 @@ public class DietSportRecordController {
 
   // 자신이 먹은 음식 기록하기 (식단DB 데이터 사용) (완료)
   // 입력 데이터 : userId, foodName
-  @PostMapping("/logEatenFood")
-  public ResponseEntity<String> insertFoodRecord(
+  // 출력 데이터 : message, recordId, dietrecordId
+  @PostMapping("/insertFoodRecord")
+  public ResponseEntity<Map<String, Object>> insertFoodRecord(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
     dietSportRecordService.insertRecord(dietSportRecordDto);
     dietSportRecordService.insertFoodRecord(dietSportRecordDto);
-    // JSON 형식으로 응답
-    String jsonResponse = "{\"message\": \"Food Record successfully\"}";
+
+    int recordId = dietSportRecordDto.getRecordId();
+    int dietrecordId = dietSportRecordDto.getDietrecordId();
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "Food Record successfully");
+    jsonResponse.put("recordId", recordId);
+    jsonResponse.put("dietrecordId", dietrecordId);
     return ResponseEntity.ok(jsonResponse);
   }
 
@@ -68,12 +76,20 @@ public class DietSportRecordController {
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용) (진행중)
   // 입력 데이터 : userId, sportName, sportTime
-  @PostMapping("/logExerciseWithDBData")
-  public ResponseEntity<String> insertExerciseRecord(
+  // 출력 데이터 : message, recordId, exerciseId
+  @PostMapping("/insertExerciseRecord")
+  public ResponseEntity<Map<String, Object>> insertExerciseRecord(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
-    // dietSportRecordService.insertRecord(dietSportRecordDto);
+    dietSportRecordService.insertRecordExer(dietSportRecordDto);
     dietSportRecordService.insertExerciseRecord(dietSportRecordDto);
-    return new ResponseEntity<>("Exercise Record successfully", HttpStatus.OK);
+
+    int recordId = dietSportRecordDto.getRecordId();
+    int exerciseId = dietSportRecordDto.getExerciseId();
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "Exercise Record successfully");
+    jsonResponse.put("recordId", recordId);
+    jsonResponse.put("exerciseId", exerciseId);
+    return ResponseEntity.ok(jsonResponse);
   }
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력)
