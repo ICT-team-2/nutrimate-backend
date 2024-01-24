@@ -99,7 +99,7 @@ public class DietSportRecordController {
     return ResponseEntity.ok(jsonResponse);
   }
 
-  // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력) (진행중)
+  // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력) (완료)
   // 입력 데이터 : userId, sportName, sportCal, sportTime
   @PostMapping("/insertCustomSportRecord")
   public ResponseEntity<Map<String, Object>> insertCustomSportRecord(
