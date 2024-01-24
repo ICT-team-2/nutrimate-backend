@@ -148,25 +148,19 @@ public class DietSportRecordController {
     return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
   }
 
-  // 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(식단,운동 분석 그래프)
+  // 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(식단,운동 분석 그래프) (완료)
   // totalFoodCalories나 totalSportCalories 값이 없을시 0처리
   // 입력 데이터 : userId, startDate, endDate (입력데이터 예시 : 20240101)
   // 출력 데이터 : totalFoodCalories, totalSportCalories
   @GetMapping("/findTotalCalories")
   public ResponseEntity<Map<String, Object>> findTotalCalories(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
-    // try {
     int totalFoodCalories = dietSportRecordService.findTotalFoodCalories(dietSportRecordDto);
     int totalSportCalories = dietSportRecordService.findTotalSportCalories(dietSportRecordDto);
     Map<String, Object> jsonResponse = new HashMap<>();
     jsonResponse.put("totalFoodCalories", totalFoodCalories);
     jsonResponse.put("totalSportCalories", totalSportCalories);
     return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
-    // } catch (Exception e) { // 유저를 못찾았다면 error 반환
-    // Map<String, Object> errorResponse = new HashMap<>();
-    // errorResponse.put("error", "User not found");
-    // return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    // }
   }
 
 }
