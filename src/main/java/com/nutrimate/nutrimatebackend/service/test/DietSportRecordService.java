@@ -35,8 +35,14 @@ public class DietSportRecordService {
   }
 
   // 먹은 칼로리와 일일 권장 칼로리 열람하기
-  public Integer findFoodCaloriesByUserId(int userId) {
-    return dietSportRecordMapper.findFoodCaloriesByUserId(userId);
+  public int findFoodCaloriesByUserId(DietSportRecordDto dietSportRecordDto) {
+    Integer result = dietSportRecordMapper.findFoodCaloriesByUserId(dietSportRecordDto);
+    return (result != null) ? result : 0;
+  }
+
+  public int findFoodRecommendedCaloriesByUserId(DietSportRecordDto dietSportRecordDto) {
+    Integer result = dietSportRecordMapper.findFoodRecommendedCaloriesByUserId(dietSportRecordDto);
+    return (result != null) ? result : 0;
   }
 
   // 운동 목록 가져오기
@@ -60,9 +66,10 @@ public class DietSportRecordService {
     dietSportRecordMapper.insertCustomSportRecord(dietSportRecordDto);
   }
 
-  // 오늘 자신이 소모한 칼로리를 열람하는 쿼리문
-  public Integer findExerciseCaloriesByUserId(int userId) {
-    return dietSportRecordMapper.findExerciseCaloriesByUserId(userId);
+  // 오늘 자신이 운동으로 소모한 칼로리를 열람하는 쿼리문
+  public int findExerciseCaloriesByUserId(DietSportRecordDto dietSportRecordDto) {
+    Integer result = dietSportRecordMapper.findExerciseCaloriesByUserId(dietSportRecordDto);
+    return (result != null) ? result : 0;
   }
 
 }

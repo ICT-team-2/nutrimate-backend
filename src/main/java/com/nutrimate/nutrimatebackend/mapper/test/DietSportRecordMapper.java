@@ -25,7 +25,9 @@ public interface DietSportRecordMapper {
   void insertCustomFoodRecord(DietSportRecordDto dietSportRecordDto);
 
   // 먹은 칼로리와 일일 권장 칼로리 열람하기
-  Integer findFoodCaloriesByUserId(int userId);
+  Integer findFoodCaloriesByUserId(DietSportRecordDto dietSportRecordDto);
+
+  Integer findFoodRecommendedCaloriesByUserId(DietSportRecordDto dietSportRecordDto);
 
   // 운동 목록 가져오기
   List<DietSportRecordDto> findSportList();
@@ -45,6 +47,6 @@ public interface DietSportRecordMapper {
   void insertCustomSportRecord(DietSportRecordDto dietSportRecordDto);
 
   // 오늘 자신이 소모한 칼로리를 열람하는 쿼리문
-  Integer findExerciseCaloriesByUserId(int userId);
+  Integer findExerciseCaloriesByUserId(DietSportRecordDto dietSportRecordDto);
 
 }

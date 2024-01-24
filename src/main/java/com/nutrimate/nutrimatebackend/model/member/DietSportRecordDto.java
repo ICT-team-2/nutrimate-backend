@@ -21,7 +21,8 @@ public class DietSportRecordDto {
 
   private int foodId; // 음식아이디
   private String foodName; // 음식이름
-  private String foodCal; // 음식칼로리
+  private int foodCal; // 음식칼로리
+  private int userCal; // 일일권장칼로리
 
   private int sportId; // 운동아이디
   private String sportName; // 운동이름

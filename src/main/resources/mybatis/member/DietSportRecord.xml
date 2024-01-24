@@ -55,21 +55,29 @@
     
     <!-- 먹은 칼로리와 일일 권장 칼로리 열람하기 -->
     <!-- (운동 정도에 따라 권장 칼로리를 바꿀 수 있도록) -->
-    <select id="findFoodCaloriesByUserId" resultType="Integer">
+    <select id="findFoodCaloriesByUserId" resultType="int">
         <!-- 오늘 먹은 칼로리 -->
-        SELECT sum(food_cal) FROM food
-        WHERE food_id = (
-            SELECT food_id 
-            FROM dietrecord
-            WHERE record_id=(
+        SELECT SUM(f.food_cal) AS food_cal
+		FROM food f
+		JOIN dietrecord dr ON f.food_id = dr.food_id
+		JOIN record r ON dr.record_id = r.record_id
+		WHERE r.user_id = #{userId}
+		AND TRUNC(r.do_date) = TO_DATE(SYSDATE)
+        <!-- 
+        SELECT SUM(food_cal) FROM food
+        WHERE food_id IN (
+        	SELECT food_id FROM dietrecord WHERE record_id IN (
                 SELECT record_id FROM record
                 WHERE user_id=#{userId}
                 AND TRUNC(do_date) = TO_DATE(SYSDATE)
             )
-        );
+        )
+         -->
+    </select>
+    <select id="findFoodRecommendedCaloriesByUserId" resultType="int">
         <!-- 일일 권장 칼로리 -->
         SELECT user_cal FROM member
-        WHERE user_id=#{userId};
+        WHERE user_id=#{userId}
     </select>
     
     
@@ -134,13 +142,13 @@
     </insert>
 
     <!-- 오늘 자신이 소모한 칼로리를 열람하는 쿼리문 -->
-    <select id="findExerciseCaloriesByUserId" resultType="Integer">
-        SELECT SUM(sport_cal) FROM sportrecord
-        WHERE record_id=(
-            SELECT record_id FROM record
-            WHERE user_id=#{userId}
-            AND TRUNC(do_date)=TO_DATE(SYSDATE)
-        );
+    <select id="findExerciseCaloriesByUserId" resultType="int">
+        SELECT SUM(sport_cal) as sport_cal FROM sportrecord
+		WHERE record_id IN (
+			SELECT record_id FROM record
+		  WHERE user_id=#{userId}
+		  AND TRUNC(do_date)=TO_DATE(SYSDATE)
+		)
     </select>
     
 </mapper>
