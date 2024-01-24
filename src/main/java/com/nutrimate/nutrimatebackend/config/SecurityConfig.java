@@ -11,21 +11,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf(AbstractHttpConfigurer::disable)
-				.sessionManagement((sessionManagement) ->
-						sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				)
-				.authorizeHttpRequests((authorizeRequests) ->
-						authorizeRequests
-								.requestMatchers("/user/**").authenticated()
-								.requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-								.requestMatchers("/admin/**").hasAnyRole("ADMIN")
-								.anyRequest().permitAll()
-				);
-		return http.build();
-	}
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement((sessionManagement) -> sessionManagement
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+            // 실행 에러 해결을 위해 requestMatchers -> antMatchers 임의로 변경
+            .antMatchers("/user/**").authenticated().antMatchers("/manager/**")
+            .hasAnyRole("MANAGER", "ADMIN").antMatchers("/admin/**").hasAnyRole("ADMIN")
+            .anyRequest().permitAll());
+    return http.build();
+  }
 }
