@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.test.FeedMapper">
+
+	<!-- 피드 글목록 가져오기 -->
+	<select id="findFeedList" resultType="FeedDto">
+	    SELECT BOARD_ID, BOARD_THUMBNAIL
+	    FROM board
+	    WHERE DELETED = 'N' AND BLOCKED = 'N'
+	    ORDER BY BOARD_ID DESC
+	    OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY;
+	</select>
+	
+	<!-- 피드 상세보기 정보 가져오기 -->
+	<select id="findFeedDetail" resultType="FeedDto">
+	    SELECT B.BOARD_ID, M.USER_NICK, M.USER_PROFILE, B.CREATED_DATE, B.BOARD_THUMBNAIL, B.BOARD_VIEWCOUNT,
+	    (SELECT COUNT(LIKE_ID) FROM BOARDLIKE WHERE BOARD_ID = B.BOARD_ID) AS LIKE_COUNT,
+	    (SELECT h.TAG_NAME FROM HASHTAG H INNER JOIN BOARD_HASHTAG BH ON H.TAG_ID = BH.TAG_ID WHERE BH.BOARD_ID = B.BOARD_ID) AS HASHTAG
+	    FROM BOARD B
+	    RIGHT JOIN MEMBER M ON M.USER_ID = B.USER_ID
+	    WHERE B.BOARD_ID = #{boardId};
+	</select>
+
+	<!-- 피드의 조회수를 +1하기 -->
+	<update id="updateincreaseViewCount">
+	    UPDATE BOARD SET BOARD_VIEWCOUNT = BOARD_VIEWCOUNT + 1 WHERE BOARD_ID = #{boardId};
+	</update>
+
+	<!-- 피드 작성 -->
+	<insert id="insertFeed" parameterType="FeedDto">
+	    INSERT INTO BOARD VALUES (SEQ_BOARD.NEXTVAL, #{userId}, 'FEED', #{boardTitle}, #{boardContent}, #{boardThumbnail}, 0, SYSDATE, DEFAULT, DEFAULT);
+	    <selectKey keyProperty="boardId" resultType="int" order="AFTER">
+	        SELECT SEQ_BOARD.CURRVAL FROM DUAL;
+	    </selectKey>
+	</insert>
+	<insert id="insertTag" parameterType="FeedDto">
+	    INSERT INTO BOARD_HASHTAG VALUES (#{boardId}, SEQ_HASHTAG.NEXTVAL);
+	</insert>
+	<insert id="insertHashtag" parameterType="FeedDto">
+	    INSERT INTO HASHTAG VALUES (SEQ_HASHTAG.CURRVAL, #{tagName});
+	</insert>
+
+	<!-- 피드 수정 -->
+	<update id="updateFeed" parameterType="FeedDto">
+	    UPDATE BOARD SET BOARD_TITLE = #{boardTitle}, BOARD_CONTENT = #{boardContent}, BOARD_THUMBNAIL = #{boardThumbnail} WHERE BOARD_ID = #{boardId};
+	</update>
+	<update id="updateHashtag" parameterType="FeedDto">
+	    UPDATE HASHTAG SET TAG_NAME = #{tagName} WHERE TAG_ID = (SELECT TAG_ID FROM BOARD_HASHTAG WHERE BOARD_ID = #{boardId});
+	</update>
+	
+	<!-- 피드 삭제 -->
+	<update id="deleteFeed">
+	    UPDATE BOARD SET DELETED = 'Y' WHERE BOARD_ID = #{boardId};
+	</update>
+
+
+
+</mapper>
