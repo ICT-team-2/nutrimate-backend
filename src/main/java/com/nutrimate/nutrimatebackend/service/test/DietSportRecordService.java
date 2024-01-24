@@ -72,4 +72,16 @@ public class DietSportRecordService {
     return (result != null) ? result : 0;
   }
 
+  // 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(식단 분석 그래프)
+  public int findTotalFoodCalories(DietSportRecordDto dietSportRecordDto) {
+    Integer result = dietSportRecordMapper.findTotalFoodCalories(dietSportRecordDto);
+    return (result != null) ? result : 0;
+  }
+
+  // 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(운동 분석 그래프)
+  public int findTotalSportCalories(DietSportRecordDto dietSportRecordDto) {
+    Integer result = dietSportRecordMapper.findTotalSportCalories(dietSportRecordDto);
+    return (result != null) ? result : 0;
+  }
+
 }

@@ -51,8 +51,6 @@
         INSERT INTO dietrecord VALUES (SEQ_DIETRECORD.NEXTVAL, #{recordId}, (SELECT food_id FROM food WHERE food_name = #{foodName}))
     </insert>
     
-    
-    
     <!-- 먹은 칼로리와 일일 권장 칼로리 열람하기 -->
     <!-- (운동 정도에 따라 권장 칼로리를 바꿀 수 있도록) -->
     <select id="findFoodCaloriesByUserId" resultType="int">
@@ -79,7 +77,6 @@
         SELECT user_cal FROM member
         WHERE user_id=#{userId}
     </select>
-    
     
     <!-- 운동 목록 가져오기 -->
     <select id="findSportList" resultType="DietSportRecordDto">
@@ -150,5 +147,30 @@
 		  AND TRUNC(do_date)=TO_DATE(SYSDATE)
 		)
     </select>
+    
+    <!-- 자신이 기록했던 식단의 섭취한 칼로리 정보를 가져오기(식단 분석 그래프) -->
+    <select id="findTotalFoodCalories" resultType="int" parameterType="DietSportRecordDto">
+		SELECT SUM(food_cal) as foodCal
+		FROM food
+		WHERE food_id IN (
+		  SELECT food_id FROM dietrecord
+		  WHERE record_id IN (
+		    SELECT record_id FROM record 
+		    WHERE user_id = #{userId}
+		    AND TRUNC(do_date) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD') AND TO_DATE(#{endDate}, 'YYYYMMDD')
+		  )
+		)
+	</select>
+	
+	<!-- 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(운동 분석 그래프) -->
+	<select id="findTotalSportCalories" resultType="int" parameterType="DietSportRecordDto">
+		SELECT SUM(sport_cal) as sportCal
+		FROM sportrecord
+		WHERE record_id IN (
+		  SELECT record_id FROM record 
+		  WHERE user_id = #{userId}
+		  AND TRUNC(do_date) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD') AND TO_DATE(#{endDate}, 'YYYYMMDD')
+		)
+	</select>
     
 </mapper>

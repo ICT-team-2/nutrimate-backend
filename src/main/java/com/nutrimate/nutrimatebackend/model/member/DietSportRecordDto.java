@@ -29,4 +29,7 @@ public class DietSportRecordDto {
   private int sportMet; // Met
   private int sportTime; // 운동시간
   private int sportCal; // 운동(소모)칼로리
+
+  private int startDate; // 칼로리 정보를 가져올 날짜의 시작일
+  private int endDate; // 칼로리 정보를 가져올 날짜의 종료일
 }

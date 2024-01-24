@@ -49,4 +49,10 @@ public interface DietSportRecordMapper {
   // 오늘 자신이 소모한 칼로리를 열람하는 쿼리문
   Integer findExerciseCaloriesByUserId(DietSportRecordDto dietSportRecordDto);
 
+  // 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(식단 분석 그래프)
+  Integer findTotalFoodCalories(DietSportRecordDto dietSportRecordDto);
+
+  // 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(운동 분석 그래프)
+  Integer findTotalSportCalories(DietSportRecordDto dietSportRecordDto);
+
 }
