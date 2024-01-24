@@ -20,33 +20,17 @@ public class DietSportRecordService {
 
   // 자신이 먹은 음식 기록하기 (식단DB 데이터 사용)
   @Transactional
-  public void insertRecord(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecord(dietSportRecordDto);
-  }
-
-  @Transactional
   public void insertFoodRecord(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecord(dietSportRecordDto);
     dietSportRecordMapper.insertFoodRecord(dietSportRecordDto);
   }
 
   // 자신이 먹은 음식 기록하기 (유저가 직접 입력)
   @Transactional
-  public void insertRecordFo(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecordFo(dietSportRecordDto);
-  }
-
-  @Transactional
-  public void insertRecordFood(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecordFood(dietSportRecordDto);
-  }
-
-  @Transactional
-  public void insertRecordCustomFood(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecordCustomFood(dietSportRecordDto);
-  }
-
-  @Transactional
   public void insertCustomFoodRecord(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordFo(dietSportRecordDto);
+    dietSportRecordMapper.insertRecordFood(dietSportRecordDto);
+    dietSportRecordMapper.insertRecordCustomFood(dietSportRecordDto);
     dietSportRecordMapper.insertCustomFoodRecord(dietSportRecordDto);
   }
 
@@ -62,33 +46,17 @@ public class DietSportRecordService {
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용)
   @Transactional
-  public void insertRecordExer(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecordExer(dietSportRecordDto);
-  }
-
-  @Transactional
   public void insertExerciseRecord(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordExer(dietSportRecordDto);
     dietSportRecordMapper.insertExerciseRecord(dietSportRecordDto);
   }
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력)
   @Transactional
-  public void insertRecordSp(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecordSp(dietSportRecordDto);
-  }
-
-  @Transactional
-  public void insertRecordSport(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecordSport(dietSportRecordDto);
-  }
-
-  @Transactional
-  public void insertRecordCustomSport(DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordMapper.insertRecordCustomSport(dietSportRecordDto);
-  }
-
-  @Transactional
   public void insertCustomSportRecord(DietSportRecordDto dietSportRecordDto) {
+    dietSportRecordMapper.insertRecordSp(dietSportRecordDto);
+    dietSportRecordMapper.insertRecordSport(dietSportRecordDto);
+    dietSportRecordMapper.insertRecordCustomSport(dietSportRecordDto);
     dietSportRecordMapper.insertCustomSportRecord(dietSportRecordDto);
   }
 

@@ -37,7 +37,6 @@ public class DietSportRecordController {
   @PostMapping("/insertFoodRecord")
   public ResponseEntity<Map<String, Object>> insertFoodRecord(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordService.insertRecord(dietSportRecordDto);
     dietSportRecordService.insertFoodRecord(dietSportRecordDto);
 
     int recordId = dietSportRecordDto.getRecordId();
@@ -55,9 +54,6 @@ public class DietSportRecordController {
   @PostMapping("/insertCustomFoodRecord")
   public ResponseEntity<Map<String, Object>> insertCustomFoodRecord(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordService.insertRecordFo(dietSportRecordDto);
-    dietSportRecordService.insertRecordFood(dietSportRecordDto);
-    dietSportRecordService.insertRecordCustomFood(dietSportRecordDto);
     dietSportRecordService.insertCustomFoodRecord(dietSportRecordDto);
 
     int recordId = dietSportRecordDto.getRecordId();
@@ -92,7 +88,6 @@ public class DietSportRecordController {
   @PostMapping("/insertExerciseRecord")
   public ResponseEntity<Map<String, Object>> insertExerciseRecord(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordService.insertRecordExer(dietSportRecordDto);
     dietSportRecordService.insertExerciseRecord(dietSportRecordDto);
 
     int recordId = dietSportRecordDto.getRecordId();
@@ -109,9 +104,6 @@ public class DietSportRecordController {
   @PostMapping("/insertCustomSportRecord")
   public ResponseEntity<Map<String, Object>> insertCustomSportRecord(
       @RequestBody DietSportRecordDto dietSportRecordDto) {
-    dietSportRecordService.insertRecordSp(dietSportRecordDto);
-    dietSportRecordService.insertRecordSport(dietSportRecordDto);
-    dietSportRecordService.insertRecordCustomSport(dietSportRecordDto);
     dietSportRecordService.insertCustomSportRecord(dietSportRecordDto);
 
     int recordId = dietSportRecordDto.getRecordId();
