@@ -53,7 +53,150 @@
 	<update id="deleteFeed">
 	    UPDATE BOARD SET DELETED = 'Y' WHERE BOARD_ID = #{boardId};
 	</update>
+	
 
+	<!-- 좋아요 -->
+	<!-- 유저가 좋아요 누른지 확인(0일시 안누름) -->
+    <select id="checkUserLike" resultType="int">
+        SELECT COUNT(like_id)
+        FROM boardlike B RIGHT JOIN board D
+        ON B.board_id = D.board_id
+        WHERE B.user_id = #{userId} AND D.board_id = #{boardId}
+    </select>
 
+    <!-- 해당 글의 좋아요 수 -->
+    <select id="findLikeCount" resultType="int">
+        SELECT COUNT(like_id)
+        FROM boardlike B RIGHT JOIN board D
+        ON B.board_id = D.board_id
+        WHERE D.board_id = #{boardId}
+    </select>
 
+    <!-- 좋아요 추가 -->
+    <insert id="insertLike">
+        INSERT INTO boardlike (like_id, board_id, user_id, like_date)
+        VALUES (SEQ_LIKE.NEXTVAL, #{boardId}, #{userId}, SYSDATE)
+    </insert>
+
+    <!-- 좋아요 해제 -->
+    <delete id="deleteLike">
+        DELETE FROM boardlike
+        WHERE like_id = (SELECT like_id FROM boardlike
+                         WHERE user_id = #{userId} AND board_id = #{boardId})
+    </delete>
+    
+    
+    <!-- 북마크 -->
+    <!-- 유저가 북마크 누른지 확인(0일시 안누름) -->
+    <select id="checkUserBookmark" resultType="int">
+        SELECT COUNT(B.CREATED_DATE)
+        FROM bookmark B RIGHT JOIN board D
+        ON B.board_id = D.board_id
+        WHERE B.user_id = #{userId} AND D.board_id = #{boardId}
+    </select>
+
+    <!-- 북마크 추가 -->
+    <insert id="insrtBookmark">
+        INSERT INTO bookmark (user_id, board_id, bookmark_date)
+        VALUES (#{userId}, #{boardId}, SYSDATE)
+    </insert>
+
+    <!-- 북마크 해제 -->
+    <delete id="deleteBookmark">
+        DELETE FROM bookmark
+        WHERE user_id = #{userId} AND board_id = #{boardId}
+    </delete>
+    
+    <!-- 북마크한 피드 확인+댓글수(마이페이지) -->
+    <select id="findBookmarkFeedByUserId" resultType="FeedDto">
+    	SELECT B.board_id, B.board_thumbnail, COUNT(C.cmt_id) AS comment_count
+		FROM board B LEFT JOIN comments C
+		ON B.board_id = C.board_id
+		WHERE B.board_id IN (
+		    SELECT board_id FROM bookmark
+		    WHERE user_id = 1
+		)
+		GROUP BY B.board_id, B.board_thumbnail
+    </select>
+    
+    
+    <!-- 해시태그 -->
+    <!-- 해당 글의 해시태그 가져오기 -->
+    <select id="findHashtagsByBoardId" resultType="FeedDto">
+        SELECT h.TAG_NAME
+        FROM hashtag H INNER JOIN board_hashtag B
+        ON H.tag_id = B.tag_id
+        WHERE B.board_id = #{boardId}
+    </select>
+
+    <!-- 해시태그로 글 검색 -->
+    <select id="findBoardsByTagName" resultType="FeedDto">
+        SELECT BOARD_ID, BOARD_THUMBNAIL
+        FROM board
+        WHERE DELETED = 'N' AND BLOCKED = 'N'
+        AND board_id IN (
+            SELECT board_id
+            FROM hashtag H RIGHT JOIN board_hashtag B
+            ON H.tag_id = B.tag_id
+            WHERE tag_name = #{tagName}
+        )
+    </select>
+    
+    <!-- 신고 -->
+    <!-- 글 신고 -->
+    <insert id="insertReportBo" parameterType="FeedDto">
+        INSERT INTO report (REPORT_ID, USER_ID, REPORT_DATE, REPORT_REASON)
+        VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, #{reportReason})
+    </insert>
+    <insert id="insertBoardReport" parameterType="int">
+        INSERT INTO BOARDREPORT (REPORT_ID, BOARD_ID)
+        VALUES (SEQ_RECORD.CURRVAL, #{boardId})
+    </insert>
+
+    <!-- 댓글/대댓글 신고 -->
+    <insert id="insertReportCo" parameterType="FeedDto">
+        INSERT INTO report (REPORT_ID, USER_ID, REPORT_DATE, REPORT_REASON)
+        VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, #{reportReason})
+    </insert>
+    <insert id="insertCommentReport" parameterType="int">
+        INSERT INTO COMMENTREPORT (REPORT_ID, COMMENT_ID)
+        VALUES (SEQ_RECORD.CURRVAL, #{commentId})
+    </insert>
+
+    <!-- 글신고 취소하기 -->
+	<delete id="deleteBoardReport" parameterType="FeedDto">
+	    DELETE FROM BOARDREPORT
+	    WHERE board_id = #{board_id};
+	    DELETE FROM report
+	    WHERE user_id = #{user_id};
+	</delete>
+	
+	<!-- 댓글신고 취소하기 -->
+	<delete id="deleteCommentReport" parameterType="FeedDto">
+	    DELETE FROM COMMENTREPORT
+	    WHERE cmt_id = #{cmt_id};
+	    DELETE FROM report
+	    WHERE user_id = #{user_id};
+	</delete>
+
+    <!-- 신고된 글 보기 (관리자 페이지) -->
+    <select id="findReportedBoards" resultType="FeedDto">
+        SELECT B.board_id, B.user_id AS write_user_id, B.board_category, B.board_title, B.board_content, B.board_viewcount, B.created_date AS write_time, 
+		R.user_id AS reporter_user_id, R.created_date AS report_time, R.report_reason
+		FROM board B
+		JOIN boardReport BR ON B.board_id = BR.board_id
+		JOIN report R ON BR.report_id = R.report_id;
+    </select>
+    
+    <!-- 신고된 댓글 보기 (관리자 페이지) -->
+    <select id="findReportedComments" resultType="FeedDto">
+        SELECT C.cmt_id, C.user_id AS write_user_id, C.board_id, C.cmt_content, C.created_date AS write_time, 
+		R.user_id AS reporter_user_id, R.created_date AS report_time, R.report_reason
+		FROM comments C Left JOIN commentReport CR
+		ON C.cmt_id = CR.cmt_id JOIN report R
+		ON CR.report_id = R.report_id;
+    </select>
+    
+    
+    
 </mapper>

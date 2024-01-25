@@ -56,6 +56,14 @@ public class FeedDto {
   private int tagId; // 태그 기본키
   private String tagName; // 태그 이름
 
+  /** 신고 **/
+  private int reportId; // 신고 기본키
+  private String reporterId; // 신고자 아이디
+  private Date reportTime; // 신고된 날짜
+  private String reportReason; // 신고이유
+  // private int boardId; // 신고당한 글번호
+  // private int cmtId; // 신고당한 댓글번호
+
   /** 댓글+대댓글 **/
   private int cmtId; // 댓글번호
   // private int boardId; // 글번호(+댓글+대댓글FK)
@@ -67,14 +75,5 @@ public class FeedDto {
   private int cmtRef; // 대댓글을 달은 댓글의 번호
   // 부모 깊이를 가져와서 자식은 +1 자식 깊이가 됨
   // seleckKey사용
-
-  /** 신고 **/
-  private int reportId; // 신고 기본키
-  private String reporterId; // 신고자 아이디
-  private Date reportTime; // 신고된 날짜
-  private String reportReason; // 신고이유
-  // private int boardId; // 신고당한 글번호
-  // private int cmtId; // 신고당한 댓글번호
-
 
 }
