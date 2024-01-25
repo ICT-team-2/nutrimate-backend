@@ -22,7 +22,7 @@ public class DietController {
 	  private DietService dietService;
 	  
 	//게시글 전체 리스트
-	  @GetMapping("/DietBoardList.do")
+	  @GetMapping("/infoBoard/DietBoardList.do")
 	  public List<DietDto> DietBoardList(@ModelAttribute DietDto dto) {
 		  List<DietDto> dietList =dietService.selectListDietBoard(dto);
 		  return dietList;
@@ -30,7 +30,7 @@ public class DietController {
 	  }
 	  
 	 //게시글 상세 보기
-	  @GetMapping("/DietBoardOne.do")
+	  @GetMapping("/infoBoard/DietBoardOne.do")
 	  public List<FoodboardDto> DietBoardOne(@ModelAttribute DietDto dto) {
     	    if(dto.getBOARD() !=null && dto.getBOARD().equals("LIST") ) {
     	      dietService.saveViewCount(dto);
@@ -41,7 +41,7 @@ public class DietController {
 	  }
 	  
 	  //게시글 입력
-	  @PostMapping("/WriteBoard.do")
+	  @PostMapping("/infoBoard/WriteBoard.do")
 	  public Map WriteBlock(@RequestBody DietDto dto,@RequestParam String userId) {
 	       Map map = new HashMap();
 	       if(dto.getFoodId()==null) {
@@ -60,7 +60,7 @@ public class DietController {
       }
 	  
 	  //게시글 수정
-	  @PutMapping("/EditBoard.do")
+	  @PutMapping("/infoBoard/EditBoard.do")
 	  public Map EditBoard(@RequestBody DietDto dto,@RequestParam String userId,@RequestParam int boardId) {
 		  Map map = new HashMap();
 		  dto.setUserId(userId);
@@ -79,7 +79,7 @@ public class DietController {
 	  
 	  
 	//게시글 삭제
-	  @PutMapping("/DeleteBoard.do")
+	  @PutMapping("/infoBoard/DeleteBoard.do")
 	  public Map DeleteBoard(@ModelAttribute DietDto dto) {
 		  Map map = new HashMap();
 		  int affected= dietService.deleteBoard(dto);
@@ -93,7 +93,7 @@ public class DietController {
 		  
 	  }
 	  //좋아요 입력 삭제
-	  @PostMapping("/WriteLike.do")
+	  @PostMapping("/infoBoard/WriteLike.do")
       public Map WriteLike(@ModelAttribute DietDto dto) {
 	        Map map = new HashMap();
     	    int count=dietService.countLike(dto);//
@@ -106,7 +106,7 @@ public class DietController {
             return map;
       }
 	  //이전글-다음글
-	  @GetMapping("/DietPriev.do")
+	  @GetMapping("/infoBoard/DietPriev.do")
       public List<DietDto> DietPriev(@ModelAttribute DietDto dto) {
 	      
 	      DietDto prev = dietService.selectPrev(dto);
