@@ -21,9 +21,10 @@ public class SecurityConfig {
 				)
 				.authorizeHttpRequests((authorizeRequests) ->
 						authorizeRequests
-								.requestMatchers("/user/**").authenticated()
-								.requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-								.requestMatchers("/admin/**").hasAnyRole("ADMIN")
+								.antMatchers("/user/**").authenticated()
+								.antMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+								.antMatchers("/admin/**").hasAnyRole("ADMIN")
+								.antMatchers("/report/**").hasAnyRole("ADMIN")
 								.anyRequest().permitAll()
 				);
 		return http.build();

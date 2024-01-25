@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 매퍼파일 -->
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.report.ReportMapper">
+	<select id="findByUserIdAndBoarderId" resultType="int" parameterType="reportDto">
+		SELECT COUNT(*) FROM report r join boardreport br on r.report_id=br.report_id where r.user_id=#{userid} and br.board_id=#{boardid}
+	</select>
+	
+	<select id="findByUserIdAndCmtId" resultType="int" parameterType="reportDto">
+		SELECT COUNT(*) FROM report r join commentreport cr on r.report_id=cr.report_id where r.user_id=#{userid} and cr.cmt_id=#{cmtid}
+	</select>
+	
+	<insert id="insertReport" parameterType="reportDto">
+		<selectKey keyProperty="reportid" resultType="int" order="BEFORE">
+			SELECT SEQ_REPORT.NEXTVAL FROM DUAL
+		</selectKey>
+		   INSERT INTO report VALUES(SEQ_REPORT.CURRVAL,#{userid}, SYSDATE,#{reportreason})
+	</insert>
+	
+	<insert id="insertCommentReport" parameterType="reportDto">
+		INSERT INTO commentreport VALUES(#{reportid},#{cmtid})
+	</insert>
+	
+	<insert id="insertBorderReport" parameterType="reportDto">
+		INSERT INTO boardreport VALUES(#{reportid},#{boardid})
+	</insert>
+	
+		
+
+	
+	
+</mapper>
