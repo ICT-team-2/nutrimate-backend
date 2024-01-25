@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.nutrimate.nutrimatebackend.model.infoboard.DietDto;
+import com.nutrimate.nutrimatebackend.model.infoboard.FileUtils;
 import com.nutrimate.nutrimatebackend.model.infoboard.FoodboardDto;
 import com.nutrimate.nutrimatebackend.service.infoboard.DietService;
 
@@ -20,6 +24,9 @@ import com.nutrimate.nutrimatebackend.service.infoboard.DietService;
 public class DietController {
 	  @Autowired
 	  private DietService dietService;
+	  
+	  @Value("C://Temp/upload")
+	  private String saveDirectory;
 	  
 	//게시글 전체 리스트
 	  @GetMapping("/infoBoard/DietBoardList.do")
@@ -41,18 +48,32 @@ public class DietController {
 	  }
 	  
 	  //게시글 입력
-	  @PostMapping("/infoBoard/WriteBoard.do")
-	  public Map WriteBlock(@RequestBody DietDto dto,@RequestParam String userId) {
+	  @PostMapping(value="/infoBoard/WriteBoard.do",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)//@RequestBody
+	  public Map WriteBlock(DietDto dto,@RequestParam String userId,HttpServletRequest req) {
+	       String phisicalPath="C://Temp/upload";
+	       StringBuffer fileNames=new StringBuffer();
+	       System.out.println(phisicalPath);
 	       Map map = new HashMap();
 	       if(dto.getFoodId()==null) {
 	         map.put("WriteOK", "음식 사진을 올려주세요.");
-	         return map;      
+	         return map;
+	         
 	       }
-		   dto.setUserId(userId);
+	       try {
+	             System.out.println(dto.getFiles());
+	             fileNames= FileUtils.upload(dto.getFiles(), phisicalPath);
+	             dto.setFbImage(fileNames.toString());
+	       }catch(Exception e) {//파일용량 초과시
+	         map.put("WriteOK", "게시물 입력을 실패했습니다!");
+	         return map;
+             
+           }
+	       dto.setUserId(userId);
 	   	   int affected= dietService.saveBoard(dto);
 	   	   if(affected == 1) {
 	   		   map.put("WriteOK", "게시물 입력을 성공했습니다.");
 	   	   }else {
+	   	       FileUtils.deletes(fileNames, phisicalPath, ",");
 	   		   map.put("WriteOK", "게시물 입력을 실패했습니다!");
 	   		   
 	   	   }
@@ -118,5 +139,9 @@ public class DietController {
           return prevnextList;//[0]이 이전글 [1]이 다음글
           
       }
+	  
+	  
+	  
+	  
 
 }

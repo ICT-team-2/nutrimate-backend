@@ -27,7 +27,6 @@ public class DietService {
 	//게시글 입력
 	@Transactional
 	public int saveBoard(DietDto dto) {
-	      
 		try {
 			dietmapper.insertBoard(dto);
             return dietmapper.insertFoodBoard(dto);
