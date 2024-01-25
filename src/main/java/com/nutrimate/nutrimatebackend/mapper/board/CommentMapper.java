@@ -1,8 +1,8 @@
-package com.nutrimate.nutrimatebackend.mapper.test;
+package com.nutrimate.nutrimatebackend.mapper.board;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
-import com.nutrimate.nutrimatebackend.model.member.CommentDto;
+import com.nutrimate.nutrimatebackend.model.board.CommentDto;
 
 @Mapper
 public interface CommentMapper {

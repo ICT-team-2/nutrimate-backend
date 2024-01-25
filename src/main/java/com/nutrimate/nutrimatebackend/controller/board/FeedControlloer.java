@@ -1,4 +1,4 @@
-package com.nutrimate.nutrimatebackend.controller.test;
+package com.nutrimate.nutrimatebackend.controller.board;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.nutrimate.nutrimatebackend.model.member.FeedDto;
-import com.nutrimate.nutrimatebackend.service.test.FeedService;
+import com.nutrimate.nutrimatebackend.model.board.FeedDto;
+import com.nutrimate.nutrimatebackend.service.board.FeedService;
 
 @RestController
 @RequestMapping("/api/board/Feed")

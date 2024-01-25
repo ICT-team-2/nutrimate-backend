@@ -1,8 +1,8 @@
-package com.nutrimate.nutrimatebackend.mapper.test;
+package com.nutrimate.nutrimatebackend.mapper.board;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
-import com.nutrimate.nutrimatebackend.model.member.FeedDto;
+import com.nutrimate.nutrimatebackend.model.board.FeedDto;
 
 @Mapper
 public interface FeedMapper {

@@ -1,11 +1,11 @@
-package com.nutrimate.nutrimatebackend.service.test;
+package com.nutrimate.nutrimatebackend.service.board;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.nutrimate.nutrimatebackend.mapper.test.FeedMapper;
-import com.nutrimate.nutrimatebackend.model.member.FeedDto;
+import com.nutrimate.nutrimatebackend.mapper.board.FeedMapper;
+import com.nutrimate.nutrimatebackend.model.board.FeedDto;
 
 @Service
 public class FeedService {

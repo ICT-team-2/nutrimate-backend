@@ -1,4 +1,4 @@
-package com.nutrimate.nutrimatebackend.model.member;
+package com.nutrimate.nutrimatebackend.model.board;
 
 import java.util.Date;
 import org.apache.ibatis.type.Alias;

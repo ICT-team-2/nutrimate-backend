@@ -1,10 +1,10 @@
-package com.nutrimate.nutrimatebackend.service.test;
+package com.nutrimate.nutrimatebackend.service.board;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.nutrimate.nutrimatebackend.mapper.test.CommentMapper;
-import com.nutrimate.nutrimatebackend.model.member.CommentDto;
+import com.nutrimate.nutrimatebackend.mapper.board.CommentMapper;
+import com.nutrimate.nutrimatebackend.model.board.CommentDto;
 
 @Service
 public class CommentService {
