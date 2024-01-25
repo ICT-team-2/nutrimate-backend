@@ -2,17 +2,19 @@ package com.nutrimate.nutrimatebackend.mapper.board;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import com.nutrimate.nutrimatebackend.model.board.FeedDto;
 
 @Mapper
 public interface FeedMapper {
 
-  /** 피드 기능 **/
   // 피드 글목록 가져오기
-  List<FeedDto> findFeedList();
+  List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow);
+
+  int findFeedtotalRecordCount();
 
   // 피드의 상세보기 정보를 가져오기
-  FeedDto findFeedDetail(FeedDto feedDto);
+  List<FeedDto> findFeedDetail(FeedDto feedDto);
 
   // 피드의 조회수를 +1하기
   void updateincreaseViewCount(FeedDto feedDto);
@@ -22,7 +24,7 @@ public interface FeedMapper {
 
   void insertTag(FeedDto feedDto);
 
-  void insertHashtag(FeedDto feedDto);
+  void insertHashtag(int tagid, String hashtag);
 
   // 피드 수정
   void updateFeed(FeedDto feedDto);
@@ -88,5 +90,6 @@ public interface FeedMapper {
 
   // 신고된 댓글 보기 (관리자 페이지)
   List<FeedDto> findReportedComments();
+
 
 }

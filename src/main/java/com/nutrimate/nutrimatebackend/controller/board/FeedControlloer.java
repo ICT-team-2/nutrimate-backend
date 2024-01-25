@@ -1,7 +1,11 @@
 package com.nutrimate.nutrimatebackend.controller.board;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.nutrimate.nutrimatebackend.model.board.FeedDto;
 import com.nutrimate.nutrimatebackend.service.board.FeedService;
@@ -21,28 +26,103 @@ public class FeedControlloer {
   private FeedService feedService;
 
   /** 피드 **/
-  // 피드 글목록 가져오기
+  // 피드 글목록 가져오기 (완료)
+  // 입력 데이터 : nowPage(디폴트1), receivePage(디폴트10)
+  // 출력 데이터 : boardId, thumbnail, nowPage, receivePage, totalPages, totalRecordCount
   @GetMapping("/FeedList")
-  public List<FeedDto> findFeedList() {
-    return feedService.findFeedList();
+  public ResponseEntity<List<Map<String, Object>>> findFeedList(
+      @RequestParam(defaultValue = "1") int nowPage,
+      @RequestParam(defaultValue = "10") int receivePage) {
+
+    int totalRecordCount = feedService.findFeedtotalRecordCount();
+
+    // 페이징 계산
+    int totalPages = (int) Math.ceil((double) totalRecordCount / receivePage);
+    int startRow = (nowPage - 1) * receivePage + 1;
+    int endRow = nowPage * receivePage;
+
+    // 피드 목록 가져오기
+    List<FeedDto> FeedList = feedService.findFeedList(startRow, endRow);
+
+    // 각 피드에 페이징 정보 추가
+    List<Map<String, Object>> simplifiedFeedList = new ArrayList<>();
+    for (FeedDto feed : FeedList) {
+      Map<String, Object> simplifiedFeed = new HashMap<>();
+      simplifiedFeed.put("boardId", feed.getBoardId());
+      simplifiedFeed.put("thumbnail", feed.getBoardThumbnail());
+      simplifiedFeed.put("nowPage", nowPage);
+      simplifiedFeed.put("receivePage", receivePage);
+      simplifiedFeed.put("totalPages", totalPages);
+      simplifiedFeed.put("totalRecordCount", totalRecordCount);
+      simplifiedFeedList.add(simplifiedFeed);
+    }
+
+    return new ResponseEntity<>(simplifiedFeedList, HttpStatus.OK);
   }
 
-  // 피드 상세보기 정보 가져오기
+  // 피드 상세보기 정보 가져오기 (해시태그 입력 후 재확인 필요)
+  // 댓글 수는 제외하고 조회(상세보기 화면이니까:해당 글번호의 모든 댓글 뿌리니까)
+  // 좋아요, 북마크 누른 여부는 제외하고 조회(따로 확인)
+  // 입력 데이터 : boardId
+  // 출력 데이터 : boardId, userNick, userProfile, createdDate, boardThumbnail, boardViewCount,
+  // LIKE_COUNT, HASHTAG
   @GetMapping("/findFeedDetail")
-  public FeedDto findFeedDetail(@RequestBody FeedDto feedDto) {
-    return feedService.findFeedDetail(feedDto);
+  public ResponseEntity<List<Map<String, Object>>> findFeedDetail(@RequestBody FeedDto feedDto) {
+    List<FeedDto> FeedList = feedService.findFeedDetail(feedDto);
+
+    List<Map<String, Object>> detailfiedFeedList = new ArrayList<>();
+    for (FeedDto feed : FeedList) {
+      Map<String, Object> detailfiedFeed = new HashMap<>();
+      detailfiedFeed.put("boardId", feed.getBoardId());
+      detailfiedFeed.put("userNick", feed.getBoardThumbnail());
+      detailfiedFeed.put("userProfile", feed.getUserProfile());
+      detailfiedFeed.put("createdDate", feed.getCreatedDate());
+      detailfiedFeed.put("boardThumbnail", feed.getBoardThumbnail());
+      detailfiedFeed.put("boardViewCount", feed.getBoardViewCount()); // 조회수
+      detailfiedFeed.put("LIKE_COUNT", feed.getLikeCount()); // 좋아요 수
+      detailfiedFeed.put("HASHTAG", feed.getHashtag()); // 해시태그
+      detailfiedFeedList.add(detailfiedFeed);
+    }
+
+    return new ResponseEntity<>(detailfiedFeedList, HttpStatus.OK);
   }
 
-  // 피드의 조회수를 +1하기
+  // 피드의 조회수를 +1하기 (완료)
+  // 입력 데이터 : boardId
+  // 출력 데이터 : message, boardViewCount
   @PutMapping("/updateincreaseViewCount")
-  public void updateincreaseViewCount(@RequestBody FeedDto feedDto) {
+  public ResponseEntity<Map<String, Object>> updateincreaseViewCount(@RequestBody FeedDto feedDto) {
     feedService.updateincreaseViewCount(feedDto);
+    int boardViewCount = feedDto.getBoardViewCount();
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "boardViewCount Update successfully");
+    jsonResponse.put("boardViewCount", boardViewCount);
+    return ResponseEntity.ok(jsonResponse);
   }
 
   // 피드 작성
+  // 입력 데이터 : boardId, userId, boardTitle, boardContent, boardThumbnail, tagName
+  // 썸네일 입력 예시 : "boardThumbnail" : ""
+  // 해시태그 입력 예시 : "tagName" : [ "태그1", "태그2", "태그3" ]
+  // 출력 데이터 : message, boardId, tagId
   @PostMapping("/insertFeed")
-  public void insertFeed(@RequestBody FeedDto feedDto) {
+  public ResponseEntity<Map<String, Object>> insertFeed(@RequestBody FeedDto feedDto) {
+
+    // 피드 작성
     feedService.insertFeed(feedDto);
+
+    int boardId = feedDto.getBoardId();
+    int tagId = feedDto.getTagId();
+
+    /*
+     * // 해시태그 작성 List<String> hashtags = feedDto.getHashtag(); for (String tagName : hashtags) {
+     * feedService.insertHashtag(tagId, tagName); }
+     */
+
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "Feed inserted successfully");
+    jsonResponse.put("boardId", boardId);
+    return ResponseEntity.ok(jsonResponse);
   }
 
   // 피드 수정

@@ -1,6 +1,7 @@
 package com.nutrimate.nutrimatebackend.service.board;
 
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +15,16 @@ public class FeedService {
   private FeedMapper feedMapper;
 
   /** 피드 기능 **/
-  // 피드 글목록 가져오기
-  public List<FeedDto> findFeedList() {
-    return feedMapper.findFeedList();
+  public List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow) {
+    return feedMapper.findFeedList(startRow, endRow);
+  }
+
+  public int findFeedtotalRecordCount() {
+    return feedMapper.findFeedtotalRecordCount();
   }
 
   // 피드의 상세보기 정보를 가져오기
-  public FeedDto findFeedDetail(FeedDto feedDto) {
+  public List<FeedDto> findFeedDetail(FeedDto feedDto) {
     return feedMapper.findFeedDetail(feedDto);
   }
 
@@ -34,7 +38,10 @@ public class FeedService {
   public void insertFeed(FeedDto feedDto) {
     feedMapper.insertFeed(feedDto);
     feedMapper.insertTag(feedDto);
-    feedMapper.insertHashtag(feedDto);
+  }
+
+  public void insertHashtag(int tagid, String hashtag) {
+    feedMapper.insertHashtag(tagid, hashtag);
   }
 
   // 피드 수정
@@ -141,7 +148,5 @@ public class FeedService {
   public List<FeedDto> findReportedComments() {
     return feedMapper.findReportedComments();
   }
-
-
 
 }

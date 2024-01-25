@@ -1,6 +1,7 @@
 package com.nutrimate.nutrimatebackend.model.board;
 
 import java.util.Date;
+import org.apache.ibatis.type.Alias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Builder
+@Alias("CommentDto")
 public class CommentDto {
 
   /** 댓글+대댓글 **/

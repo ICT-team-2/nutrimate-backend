@@ -1,6 +1,7 @@
 package com.nutrimate.nutrimatebackend.model.board;
 
 import java.util.Date;
+import java.util.List;
 import org.apache.ibatis.type.Alias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,12 +40,14 @@ public class FeedDto {
   /* 페이징 */
   private int nowPage; // 현재 페이지
   private int receivePage; // 받아올 페이지
+  private int totalPages; // 총 페이지
 
   /** 좋아요 **/
   private int likeId; // 좋아요 기본키
   // private int boardId; // 글번호(+좋아요FK)
   // private int userId; // 유저아이디(+좋아요FK)
   private Date createdDate; // 좋아요 누른 날짜
+  private int likeCount; // 좋아요 수
 
   /** 북마크 **/
   // private int userId; // 유저아이디(+북마크FK)
@@ -54,7 +57,8 @@ public class FeedDto {
   /** 해시태그 (검색) **/
   // private int boardId; // 글번호(+해시태그FK)
   private int tagId; // 태그 기본키
-  private String tagName; // 태그 이름
+  // private String tagName; // 태그 이름
+  private List<String> hashtag; // 해시태그
 
   /** 신고 **/
   private int reportId; // 신고 기본키
