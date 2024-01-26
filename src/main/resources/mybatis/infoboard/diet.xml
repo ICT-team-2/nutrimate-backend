@@ -82,5 +82,15 @@
 			]]>
 		</select>
 		
+		<select id="findBookMarkByBoardIdANDuserId" resultType="int" parameterType="dietDto">
+			select count(*) from bookmark where board_id=#{boardId} AND user_id=#{userId}
+		</select>
+		<insert id="InsertBookMarkByBoardIdANDuserId" parameterType="dietDto">
+			INSERT INTO bookmark VALUES(#{userId},#{boardId},SYSDATE)
+		</insert>
+		<delete id="DeleteBookMarkByBoardIdANDuserId" parameterType="dietDto">
+			DELETE bookmark WHERE board_id=#{boardId} AND user_id=#{userId}
+		</delete>
+		
 
 </mapper>

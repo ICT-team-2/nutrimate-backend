@@ -34,6 +34,12 @@ public interface DietMapper {
     DietDto findPrevByBoardId(DietDto dto);
     //다음 글 -(엣날)
     DietDto findNextByBoardId(DietDto dto);
+    //북마크 여부 판별
+    int findBookMarkByBoardIdANDuserId(DietDto dto);
+    //북마크 입력
+    int InsertBookMarkByBoardIdANDuserId(DietDto dto);
+    //북마트 삭제
+    int DeleteBookMarkByBoardIdANDuserId(DietDto dto);
  
 
 }

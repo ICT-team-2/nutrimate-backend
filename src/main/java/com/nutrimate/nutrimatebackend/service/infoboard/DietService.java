@@ -79,6 +79,18 @@ public class DietService {
     public DietDto selectNext(DietDto dto) {
       return dietmapper.findNextByBoardId(dto);
     }
+    //북마크 중복 여부
+    public int countBookMark(DietDto dto) {
+      return dietmapper.findBookMarkByBoardIdANDuserId(dto);
+    }
+  //북마크 입력
+    public int saveBookMarkBoard(DietDto dto) {
+      return dietmapper.InsertBookMarkByBoardIdANDuserId(dto);
+    }
+  //북마크 삭제
+    public int DeleteBookMarkBoard(DietDto dto) {
+      return dietmapper.DeleteBookMarkByBoardIdANDuserId(dto);
+    }
 
 
 

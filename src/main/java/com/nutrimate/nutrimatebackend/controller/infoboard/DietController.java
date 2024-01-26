@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import com.nutrimate.nutrimatebackend.model.infoboard.DietDto;
 import com.nutrimate.nutrimatebackend.model.infoboard.FileUtils;
 import com.nutrimate.nutrimatebackend.service.infoboard.DietService;
@@ -54,7 +55,7 @@ public class DietController {
 	  
 	  //게시글 입력
 	  @PostMapping(value="/infoboard/dietboards",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)//@RequestBody
-	  public Map WriteBlock(DietDto dto,@RequestParam String userId,HttpServletRequest req) {
+	  public Map WriteBlock(DietDto dto,@RequestParam String userId,HttpServletRequest req,List<MultipartFile> files) {
 	       StringBuffer fileNames=new StringBuffer();
 	       Map map = new HashMap();
 	       if(dto.getFoodId()==null) {
@@ -63,7 +64,7 @@ public class DietController {
 	       }
 
 	       try { 
-	         fileNames= FileUtils.upload(dto.getFiles(), phisicalPath);
+	         fileNames= FileUtils.upload(files, phisicalPath);
 	         dto.setFbImg(fileNames.toString());
 	       }catch(Exception e) {//파일용량 초과시
 	         map.put("WriteOK", "게시물 입력을 실패했습니다!!");
@@ -84,19 +85,19 @@ public class DietController {
 	  
 	  //게시글 수정
 	  @PutMapping(value="/infoboard/dietboards/{boardId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	  public Map EditBoard(DietDto dto,@RequestParam String userId,@RequestParam int boardId,HttpServletRequest req) {
+	  public Map EditBoard(DietDto dto,@RequestParam String userId,@RequestParam int boardId,HttpServletRequest req,List<MultipartFile> files) {
 		  Map map = new HashMap();
 		  StringBuffer fileNames=new StringBuffer();
 		  dto.setUserId(userId);
 		  dto.setBoardId(boardId);
-		  if(dto.getFiles()!=null) {
+		  if(files !=null) {
     		  try {
     		    
     		    DietDto titledto=dietService.selectDietBoardOne(dto);
     		    System.out.println(titledto);
                 StringBuffer titledto_ = new StringBuffer(titledto.getFbImg());
+                fileNames= FileUtils.upload(files, phisicalPath);
                 FileUtils.deletes(titledto_, phisicalPath, ",");
-                fileNames= FileUtils.upload(dto.getFiles(), phisicalPath);
                 dto.setFbImg(fileNames.toString());
                 
                 
@@ -136,7 +137,7 @@ public class DietController {
 		  
 	  }
 	  //좋아요 입력 삭제
-	  @PostMapping("/infoboard/dietboards/{boardId}")
+	  @PostMapping("/infoboard/likeboard/{boardId}")
       public Map WriteLike(@ModelAttribute DietDto dto) {
 	        Map map = new HashMap();
     	    int count=dietService.countLike(dto);//
@@ -148,6 +149,24 @@ public class DietController {
             }
             return map;
       }
+	  
+	//북마크 입력 삭제
+      @PostMapping("/infoboard/bookmark/{boardId}")
+      public Map WriteBookmark(@ModelAttribute DietDto dto) {
+            Map map = new HashMap();
+            int count=dietService.countBookMark(dto);//
+            if(count == 0) {
+                int affected= dietService.saveBookMarkBoard(dto);
+                System.out.println("입력");
+                 
+            }else { 
+              int affected= dietService.DeleteBookMarkBoard(dto);
+              System.out.println("삭제");
+            }
+            return map;
+      }
+      
+
 
 
 	  
