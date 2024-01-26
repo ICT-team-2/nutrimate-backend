@@ -18,7 +18,6 @@ public class SecurityConfig {
 				.antMatchers("/user/**").authenticated()
 				.antMatchers("/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
 				.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
-				.antMatchers("/infoboard/**").access("hasRole('ROLE_ADMIN')")
 				.anyRequest().permitAll()
 		;
 		

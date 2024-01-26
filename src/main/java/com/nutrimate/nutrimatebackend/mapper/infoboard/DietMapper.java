@@ -3,7 +3,6 @@ package com.nutrimate.nutrimatebackend.mapper.infoboard;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import com.nutrimate.nutrimatebackend.model.infoboard.DietDto;
-import com.nutrimate.nutrimatebackend.model.infoboard.FoodboardDto;
 
 @Mapper
 public interface DietMapper {
@@ -12,7 +11,7 @@ public interface DietMapper {
 	List<DietDto> findAllDietBoard(DietDto dto);//게시글 전체 리스트
     
 	//게시글 상세 보기
-	List<FoodboardDto> findDietBoardOne(DietDto dto);
+	DietDto findDietBoardOne(DietDto dto);
 	//음식 게시글 입력
 	int insertFoodBoard(DietDto dto);
 	//게시글 입력

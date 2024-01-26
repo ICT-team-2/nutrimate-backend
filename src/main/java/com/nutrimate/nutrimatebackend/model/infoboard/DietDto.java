@@ -29,14 +29,20 @@ public class DietDto {
 	  private String boardTitle;
 	  private String boardContent;
 	  private String foodId;
-	  private String fbImage;
+	  private String fbImg;
 	  private int boardViewCount;
+	  private java.sql.Date createdDate;
 	  private String deleted;
 	  private String blocked;
 	  private String likeCount;
 	  private String searchTitle;
 	  private String searchUser;
 	  private String BOARD;
+	  private String intakeUnit;
+      private String foodIntake;
+      private String foodCal;
+      private int pagesize;
+      private int blockPage;
 	  private int totalPage;//전체 페이지
 	  private int nowPage; // 현재 페이지
 	  private int receivePage; // 받아올 페이지

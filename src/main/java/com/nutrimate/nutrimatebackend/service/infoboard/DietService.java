@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import com.nutrimate.nutrimatebackend.mapper.infoboard.DietMapper;
 import com.nutrimate.nutrimatebackend.model.infoboard.DietDto;
-import com.nutrimate.nutrimatebackend.model.infoboard.FoodboardDto;
 
 @Service
 public class DietService {
@@ -20,7 +19,7 @@ public class DietService {
 		return dietmapper.findAllDietBoard(dto);
 	}
 	//게시글 상세 보기
-	public List<FoodboardDto> selectDietBoardOne(DietDto dto) {
+	public DietDto selectDietBoardOne(DietDto dto) {
 		return dietmapper.findDietBoardOne(dto);
 	}
 	
@@ -72,9 +71,11 @@ public class DietService {
       return dietmapper.updateViewCountByBoardId(dto);
       
     }
+   //이전
     public DietDto selectPrev(DietDto dto) {
       return dietmapper.findPrevByBoardId(dto);
     }
+    //다음
     public DietDto selectNext(DietDto dto) {
       return dietmapper.findNextByBoardId(dto);
     }
