@@ -213,7 +213,6 @@ public class FeedControlloer {
   public ResponseEntity<Map<String, Object>> insertBookmark(@RequestBody FeedDto feedDto) {
     int checkUserBookmark = feedService.checkUserBookmark(feedDto);
     Map<String, Object> jsonResponse = new HashMap<>();
-    System.out.println("checkUserBookmark:" + checkUserBookmark);
     if (checkUserBookmark == 0) {
       feedService.insrtBookmark(feedDto);
       jsonResponse.put("message", "Bookmark Insert successfully");
@@ -224,6 +223,30 @@ public class FeedControlloer {
     jsonResponse.put("boardId", feedDto.getBoardId());
     jsonResponse.put("userId", feedDto.getUserId());
     return ResponseEntity.ok(jsonResponse);
+  }
+
+  // 북마크된 글 목록 가져오기 (완료)
+  // 입력 데이터 : userId
+  // 출력 데이터 : boardId, boardThumbnail, commentCount
+  @GetMapping("/findBookmarkFeedByUserId")
+  public ResponseEntity<List<Map<String, Object>>> findBookmarkFeedByUserId(
+      @RequestBody FeedDto feedDto) {
+    List<FeedDto> findBookmarks = feedService.findBookmarkFeedByUserId(feedDto);
+    Map<String, Object> jsonResponse = new HashMap<>();
+    List<Map<String, Object>> simplifiedFeedList = new ArrayList<>();
+    for (FeedDto findBookmark : findBookmarks) {
+      Map<String, Object> simplifiedFeed = new HashMap<>();
+      simplifiedFeed.put("boardId", findBookmark.getBoardId());
+      simplifiedFeed.put("thumbnail", findBookmark.getBoardThumbnail());
+      simplifiedFeed.put("commentCount", findBookmark.getCommentCount());
+      simplifiedFeedList.add(simplifiedFeed);
+    }
+    if (findBookmarks.isEmpty()) {
+      Map<String, Object> simplifiedFeed = new HashMap<>();
+      simplifiedFeed.put("message", "북마크된 글 목록이 없어요");
+      simplifiedFeedList.add(simplifiedFeed);
+    }
+    return new ResponseEntity<>(simplifiedFeedList, HttpStatus.OK);
   }
 
 

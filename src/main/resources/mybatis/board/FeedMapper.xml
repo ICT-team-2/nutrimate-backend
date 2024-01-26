@@ -130,12 +130,12 @@
     
     <!-- 북마크한 피드 확인+댓글수(마이페이지) -->
     <select id="findBookmarkFeedByUserId" resultType="FeedDto">
-    	SELECT B.board_id, B.board_thumbnail, COUNT(C.cmt_id) AS comment_count
+    	SELECT B.board_id, B.board_thumbnail, COUNT(C.cmt_id) AS commentCount
 		FROM board B LEFT JOIN comments C
 		ON B.board_id = C.board_id
 		WHERE B.board_id IN (
 		    SELECT board_id FROM bookmark
-		    WHERE user_id = 1
+		    WHERE user_id = #{userId}
 		)
 		GROUP BY B.board_id, B.board_thumbnail
     </select>

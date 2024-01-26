@@ -120,6 +120,11 @@ public class FeedService {
     feedMapper.deleteBookmark(feedDto);
   }
 
+  // 북마크된 글 목록 가져오기
+  public List<FeedDto> findBookmarkFeedByUserId(FeedDto feedDto) {
+    return feedMapper.findBookmarkFeedByUserId(feedDto);
+  }
+
 
   /** 해시태그 **/
   // 해당 글의 해시태그 가져오기
@@ -173,5 +178,7 @@ public class FeedService {
   public List<FeedDto> findReportedComments() {
     return feedMapper.findReportedComments();
   }
+
+
 
 }

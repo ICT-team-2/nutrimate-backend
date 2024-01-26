@@ -61,6 +61,9 @@ public interface FeedMapper {
   // 북마크 해제
   void deleteBookmark(FeedDto feedDto);
 
+  // 북마크된 글 목록 가져오기
+  List<FeedDto> findBookmarkFeedByUserId(FeedDto feedDto);
+
 
   /** 해시태그 **/
   // 해당 글의 해시태그 가져오기

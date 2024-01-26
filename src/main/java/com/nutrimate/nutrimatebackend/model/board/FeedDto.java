@@ -78,7 +78,6 @@ public class FeedDto {
   private int cmtDepth; // 댓글 깊이
   // private deleted; // 삭제 여부(Y,N(디폴트))
   private int cmtRef; // 대댓글을 달은 댓글의 번호
-  // 부모 깊이를 가져와서 자식은 +1 자식 깊이가 됨
-  // seleckKey사용
+  private int commentCount; // 댓글 수
 
 }
