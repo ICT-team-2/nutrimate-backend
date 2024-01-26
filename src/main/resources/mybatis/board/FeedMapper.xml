@@ -10,6 +10,7 @@
 	        SELECT BOARD_ID, BOARD_THUMBNAIL, ROW_NUMBER() OVER (ORDER BY BOARD_ID DESC) AS RNUM
 	        FROM board
 	        WHERE DELETED = 'N' AND BLOCKED = 'N'
+	        AND board_category = 'FEED'
 	    )
 	    WHERE RNUM BETWEEN #{startRow} AND #{endRow}
 	</select>
@@ -19,6 +20,7 @@
 	    SELECT COUNT(*)
 	    FROM board
 	    WHERE DELETED = 'N' AND BLOCKED = 'N'
+	    AND board_category = 'FEED'
 	</select>
 	
 	<!-- 피드 상세보기 정보 가져오기 -->
@@ -136,6 +138,7 @@
 		WHERE B.board_id IN (
 		    SELECT board_id FROM bookmark
 		    WHERE user_id = #{userId}
+		    AND board_category = 'FEED'
 		)
 		GROUP BY B.board_id, B.board_thumbnail
     </select>
@@ -162,62 +165,5 @@
             WHERE tag_name = #{tagName}
         )
     </select>
-    
-    <!-- 신고 -->
-    <!-- 글 신고 -->
-    <insert id="insertReportBo" parameterType="FeedDto">
-        INSERT INTO report (REPORT_ID, USER_ID, REPORT_DATE, REPORT_REASON)
-        VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, #{reportReason})
-    </insert>
-    <insert id="insertBoardReport" parameterType="int">
-        INSERT INTO BOARDREPORT (REPORT_ID, BOARD_ID)
-        VALUES (SEQ_RECORD.CURRVAL, #{boardId})
-    </insert>
-
-    <!-- 댓글/대댓글 신고 -->
-    <insert id="insertReportCo" parameterType="FeedDto">
-        INSERT INTO report (REPORT_ID, USER_ID, REPORT_DATE, REPORT_REASON)
-        VALUES (SEQ_RECORD.NEXTVAL, #{userId}, SYSDATE, #{reportReason})
-    </insert>
-    <insert id="insertCommentReport" parameterType="int">
-        INSERT INTO COMMENTREPORT (REPORT_ID, COMMENT_ID)
-        VALUES (SEQ_RECORD.CURRVAL, #{commentId})
-    </insert>
-
-    <!-- 글신고 취소하기 -->
-	<delete id="deleteBoardReport" parameterType="FeedDto">
-	    DELETE FROM BOARDREPORT
-	    WHERE board_id = #{board_id}
-	    DELETE FROM report
-	    WHERE user_id = #{user_id}
-	</delete>
-	
-	<!-- 댓글신고 취소하기 -->
-	<delete id="deleteCommentReport" parameterType="FeedDto">
-	    DELETE FROM COMMENTREPORT
-	    WHERE cmt_id = #{cmt_id}
-	    DELETE FROM report
-	    WHERE user_id = #{user_id}
-	</delete>
-
-    <!-- 신고된 글 보기 (관리자 페이지) -->
-    <select id="findReportedBoards" resultType="FeedDto">
-        SELECT B.board_id, B.user_id AS write_user_id, B.board_category, B.board_title, B.board_content, B.board_viewcount, B.created_date AS write_time, 
-		R.user_id AS reporter_user_id, R.created_date AS report_time, R.report_reason
-		FROM board B
-		JOIN boardReport BR ON B.board_id = BR.board_id
-		JOIN report R ON BR.report_id = R.report_id
-    </select>
-    
-    <!-- 신고된 댓글 보기 (관리자 페이지) -->
-    <select id="findReportedComments" resultType="FeedDto">
-        SELECT C.cmt_id, C.user_id AS write_user_id, C.board_id, C.cmt_content, C.created_date AS write_time, 
-		R.user_id AS reporter_user_id, R.created_date AS report_time, R.report_reason
-		FROM comments C Left JOIN commentReport CR
-		ON C.cmt_id = CR.cmt_id JOIN report R
-		ON CR.report_id = R.report_id
-    </select>
-    
-    
     
 </mapper>

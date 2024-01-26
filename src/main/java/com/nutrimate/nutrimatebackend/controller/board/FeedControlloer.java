@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.nutrimate.nutrimatebackend.model.board.FeedDto;
+import com.nutrimate.nutrimatebackend.model.board.FileUtils;
 import com.nutrimate.nutrimatebackend.service.board.FeedService;
 
 @RestController
@@ -24,6 +28,9 @@ public class FeedControlloer {
 
   @Autowired
   private FeedService feedService;
+
+  @Value("C://Temp/upload")
+  private String saveDirectory;
 
   /** 피드 **/
   // 피드 글목록 가져오기 (완료)
@@ -72,8 +79,8 @@ public class FeedControlloer {
       detailfiedFeed.put("userNick", feed.getBoardThumbnail());
       detailfiedFeed.put("userProfile", feed.getUserProfile());
       detailfiedFeed.put("createdDate", feed.getCreatedDate());
-      detailfiedFeed.put("boardThumbnail", feed.getBoardThumbnail());
-      detailfiedFeed.put("boardViewCount", feed.getBoardViewCount()); // 조회수
+      detailfiedFeed.put("Thumbnail", feed.getBoardThumbnail());
+      detailfiedFeed.put("ViewCount", feed.getBoardViewCount()); // 조회수
       detailfiedFeed.put("LIKE_COUNT", feed.getLikeCount()); // 좋아요 수
       detailfiedFeedList.add(detailfiedFeed);
     }
@@ -94,32 +101,72 @@ public class FeedControlloer {
   }
 
   // 피드 작성 (완료)
-  // 입력 데이터 : userId, boardTitle, boardContent, boardThumbnail, hashtag
+  // 입력 데이터 : userId, boardTitle, boardContent, files, hashtag
   // 이미지 저장 경로 : C://Temp/upload
-  // 썸네일 입력 예시 : "boardThumbnail" : "testimages.jpg"
-  // 해시태그 입력 예시 : "hashtag" : [ "태그1", "태그2", "태그3" ]
+  // 해시태그 입력 예시 : "hashtag" : "태그1, 태그2"
+  // multipart/form-data로 보낸다
   // 출력 데이터 : message, boardId
-  @PostMapping("/insertFeed")
-  public ResponseEntity<Map<String, Object>> insertFeed(@RequestBody FeedDto feedDto) {
-    feedService.insertFeed(feedDto);
-    int boardId = feedDto.getBoardId();
-    Map<String, Object> jsonResponse = new HashMap<>();
-    jsonResponse.put("message", "Feed Inserted successfully");
-    jsonResponse.put("boardId", boardId);
-    return ResponseEntity.ok(jsonResponse);
+  @PostMapping(value = "/insertFeed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public Map insertFeed(FeedDto dto, @RequestParam String userId, HttpServletRequest req) {
+    String phisicalPath = "C://Temp/upload";
+    StringBuffer fileNames = new StringBuffer();
+    System.out.println(phisicalPath);
+    Map map = new HashMap();
+    if (dto.getFiles() == null) {
+      map.put("WriteOK", "사진을 올려주세요.");
+      return map;
+    }
+    try {
+      System.out.println("dto.getFiles()" + dto.getFiles());
+      fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
+      dto.setBoardThumbnail(fileNames.toString());
+    } catch (Exception e) {// 파일용량 초과시
+      map.put("message", "게시물 입력을 실패했습니다!");
+      return map;
+    }
+    try {
+      feedService.insertFeed(dto);
+      int boardId = dto.getBoardId();
+      map.put("message", "게시물 입력을 성공했습니다.");
+      map.put("boardId", boardId);
+    } catch (Exception e) {
+      FileUtils.deletes(fileNames, phisicalPath, ",");
+      map.put("message", "게시물 입력을 실패했습니다!");
+    }
+    return map;
   }
 
   // 피드 수정
   // 입력 데이터 : boardId, userId, boardTitle, boardContent, boardThumbnail, hashtag
   // 출력 데이터 : message, boardId
-  @PutMapping("/updateFeed")
-  public ResponseEntity<Map<String, Object>> updateFeed(@RequestBody FeedDto feedDto) {
-    feedService.updateFeed(feedDto);
-    int boardId = feedDto.getBoardId();
-    Map<String, Object> jsonResponse = new HashMap<>();
-    jsonResponse.put("message", "Feed Update successfully");
-    jsonResponse.put("boardId", boardId);
-    return ResponseEntity.ok(jsonResponse);
+  @PutMapping(value = "/updateFeed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public Map updateFeed(FeedDto dto, @RequestParam String userId, HttpServletRequest req) {
+    // feedService.updateFeed(feedDto);
+    // int boardId = feedDto.getBoardId();
+    // Map<String, Object> jsonResponse = new HashMap<>();
+    // jsonResponse.put("message", "Feed Update successfully");
+    // jsonResponse.put("boardId", boardId);
+    // return ResponseEntity.ok(jsonResponse);
+    Map<String, Object> map = new HashMap<>();
+
+    try {
+      if (dto.getFiles() != null) {
+        String phisicalPath = "C://Temp/upload";
+        StringBuffer fileNames = new StringBuffer();
+
+        fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
+        dto.setBoardThumbnail(fileNames.toString());
+      }
+
+      feedService.updateFeed(dto);
+      int boardId = dto.getBoardId();
+
+      map.put("message", "Feed Update successfully");
+      map.put("boardId", boardId);
+    } catch (Exception e) {
+      map.put("message", "Feed Update failed");
+    }
+    return map;
   }
 
   // 피드 삭제 (완료)
@@ -294,74 +341,6 @@ public class FeedControlloer {
       return new ResponseEntity<>(BoardsByTagNameList, HttpStatus.OK);
     }
     return new ResponseEntity<>(BoardsByTagNameList, HttpStatus.OK);
-  }
-
-
-  /** 신고 **/
-  // 글 신고
-  // 입력 데이터 : boardId
-  // 출력 데이터 :
-  @PostMapping("/reportBoard")
-  public ResponseEntity<String> insertBoardReport(@RequestBody FeedDto feedDto) {
-    feedService.insertReportBo(feedDto);
-    feedService.insertBoardReport(feedDto);
-
-    return ResponseEntity.ok("Board reported successfully.");
-  }
-
-  // 댓글/대댓글 신고
-  // 입력 데이터 : boardId
-  // 출력 데이터 :
-  @PostMapping("/reportComment")
-  public ResponseEntity<String> insertCommentReport(@RequestBody FeedDto feedDto) {
-    feedService.insertReportCo(feedDto);
-    feedService.insertCommentReport(feedDto);
-
-    return ResponseEntity.ok("Comment reported successfully.");
-  }
-
-  // 글신고 취소하기
-  // 입력 데이터 : boardId
-  // 출력 데이터 :
-  @PostMapping("/deleteBoardReport")
-  public ResponseEntity<String> deleteBoardReport(@RequestBody FeedDto feedDto) {
-    int boardId = feedDto.getBoardId();
-    int userId = feedDto.getUserId();
-
-    feedService.deleteBoardReport(feedDto);
-
-    return ResponseEntity.ok("Board report deleted successfully.");
-  }
-
-  // 댓글신고 취소하기
-  // 입력 데이터 : boardId
-  // 출력 데이터 :
-  @PostMapping("/deleteCommentReport")
-  public ResponseEntity<String> deleteCommentReport(@RequestBody FeedDto feedDto) {
-    int commentId = feedDto.getCmtId();
-    int userId = feedDto.getUserId();
-
-    feedService.deleteCommentReport(feedDto);
-
-    return ResponseEntity.ok("Comment report deleted successfully.");
-  }
-
-  // 신고된 글 보기 (관리자 페이지)
-  // 입력 데이터 : boardId
-  // 출력 데이터 :
-  @GetMapping("/findReportedBoards")
-  public ResponseEntity<List<FeedDto>> findReportedBoards() {
-    List<FeedDto> reportedBoards = feedService.findReportedBoards();
-    return ResponseEntity.ok(reportedBoards);
-  }
-
-  // 신고된 댓글 보기 (관리자 페이지)
-  // 입력 데이터 : boardId
-  // 출력 데이터 :
-  @GetMapping("/findReportedComments")
-  public ResponseEntity<List<FeedDto>> findReportedComments() {
-    List<FeedDto> reportedComments = feedService.findReportedComments();
-    return ResponseEntity.ok(reportedComments);
   }
 
 }

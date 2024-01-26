@@ -3,6 +3,7 @@ package com.nutrimate.nutrimatebackend.model.board;
 import java.util.Date;
 import java.util.List;
 import org.apache.ibatis.type.Alias;
+import org.springframework.web.multipart.MultipartFile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,8 @@ import lombok.ToString;
 @Builder
 @Alias("FeedDto")
 public class FeedDto {
+
+  private List<MultipartFile> files;// 업로드 파일
 
   /** 회원정보 **/
   private int userId; // 유저아이디
@@ -60,14 +63,6 @@ public class FeedDto {
   private String tagName; // 태그 이름
   private List<String> hashtag; // 해시태그
   private int checkTagId; // 해시태그 중복체크
-
-  /** 신고 **/
-  private int reportId; // 신고 기본키
-  private String reporterId; // 신고자 아이디
-  private Date reportTime; // 신고된 날짜
-  private String reportReason; // 신고이유
-  // private int boardId; // 신고당한 글번호
-  // private int cmtId; // 신고당한 댓글번호
 
   /** 댓글+대댓글 **/
   private int cmtId; // 댓글번호

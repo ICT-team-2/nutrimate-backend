@@ -120,7 +120,7 @@ public class FeedService {
     feedMapper.deleteBookmark(feedDto);
   }
 
-  // 북마크된 글 목록 가져오기
+  // 북마크된 글 목록 가져오기 (마이페이지)
   public List<FeedDto> findBookmarkFeedByUserId(FeedDto feedDto) {
     return feedMapper.findBookmarkFeedByUserId(feedDto);
   }
@@ -136,49 +136,5 @@ public class FeedService {
   public List<FeedDto> findBoardsByTagName(FeedDto feedDto) {
     return feedMapper.findBoardsByTagName(feedDto);
   }
-
-
-  /** 신고 **/
-  // 글 신고
-  public void insertReportBo(FeedDto feedDto) {
-    feedMapper.insertReportBo(feedDto);
-
-  }
-
-  public void insertBoardReport(FeedDto feedDto) {
-    feedMapper.insertBoardReport(feedDto);
-
-  }
-
-  // 댓글/대댓글 신고
-  public void insertReportCo(FeedDto feedDto) {
-    feedMapper.insertReportCo(feedDto);
-  }
-
-  public void insertCommentReport(FeedDto feedDto) {
-    feedMapper.insertCommentReport(feedDto);
-  }
-
-  // 글신고 취소하기
-  public void deleteBoardReport(FeedDto feedDto) {
-    feedMapper.deleteBoardReport(feedDto);
-  }
-
-  // 댓글신고 취소하기
-  public void deleteCommentReport(FeedDto feedDto) {
-    feedMapper.deleteCommentReport(feedDto);
-  }
-
-  // 신고된 글 보기 (관리자 페이지)
-  public List<FeedDto> findReportedBoards() {
-    return feedMapper.findReportedBoards();
-  }
-
-  // 신고된 댓글 보기 (관리자 페이지)
-  public List<FeedDto> findReportedComments() {
-    return feedMapper.findReportedComments();
-  }
-
-
 
 }

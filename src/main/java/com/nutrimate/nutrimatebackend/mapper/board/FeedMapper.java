@@ -72,30 +72,4 @@ public interface FeedMapper {
   // 해시태그로 글 검색
   List<FeedDto> findBoardsByTagName(FeedDto feedDto);
 
-
-  /** 신고 **/
-  // 글 신고
-  void insertReportBo(FeedDto feedDto);
-
-  void insertBoardReport(FeedDto feedDto);
-
-  // 댓글/대댓글 신고
-  void insertReportCo(FeedDto feedDto);
-
-  void insertCommentReport(FeedDto feedDto);
-
-  // 글신고 취소하기
-  void deleteBoardReport(FeedDto feedDto);
-
-  // 댓글신고 취소하기
-  void deleteCommentReport(FeedDto feedDto);
-
-  // 신고된 글 보기 (관리자 페이지)
-  List<FeedDto> findReportedBoards();
-
-  // 신고된 댓글 보기 (관리자 페이지)
-  List<FeedDto> findReportedComments();
-
-
-
 }
