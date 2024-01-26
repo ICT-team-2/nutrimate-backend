@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.challenge.ChallengeChatMapper">
+	<insert id="insertChat">
+		INSERT INTO challengechat (chat_id, user_id, message_type, chat_message, room_type)
+			VALUES (seq_challenge_chat.nextval,
+			        #{userId}, #{messageType},
+			        #{chatMessage}, #{roomType});
+	</insert>
+	
+	
+	<select id="findAllChatByRoomType"
+	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
+		SELECT *
+			FROM challengechat
+			WHERE room_type = #{roomType}
+	</select>
+</mapper>

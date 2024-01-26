@@ -14,10 +14,15 @@ import java.sql.Date;
 @ToString
 public class ChallengeCommentDto {
 	
+	private Long cmtId;
 	private Long userId;
-	private Long challengeCmtId;
-	private String challengeCmt;
+	private String cmtContent;
+	private String challengeNick;
 	private String userNick;
 	private Date createdDate;
 	
+	private String deleted;
+	private String cmtDepth;
+	private String cmtRef;
+	private String cmtRefWriter; //부모 댓글의 작성자
 }

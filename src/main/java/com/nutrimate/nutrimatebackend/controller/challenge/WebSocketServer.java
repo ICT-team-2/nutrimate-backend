@@ -1,11 +1,15 @@
-package com.nutrimate.nutrimatebackend.config.websocket;
+package com.nutrimate.nutrimatebackend.controller.challenge;
 
+import com.nutrimate.nutrimatebackend.model.challenge.ChallengeChatDto;
+import com.nutrimate.nutrimatebackend.service.challenge.ChallengeChatService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,16 +23,25 @@ public class WebSocketServer extends TextWebSocketHandler {
 	//키는 웹소켓의 세션 아이디
 	//값은 웹소켓 세션 객체
 	private Map<String, WebSocketSession> clients = new HashMap<>();
-	
+	private ChallengeChatService service;
 	
 	//클라이언트와 연결이 될 때 마다 실행
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-		//컬렉션에 연결된 클라이언트 추가
-		clients.put(session.getId(), session);
-		log.info("session.getId(): " + session.getId());
+		UriComponents uriComponents = UriComponentsBuilder.fromUri(session.getUri()).build();
 		
+		// DTO 객체 생성 - userId, roomType 파라미터는 필수
+		ChallengeChatDto userRoomDto = new ChallengeChatDto();
+		userRoomDto.setUserId(Long.valueOf(uriComponents.getQueryParams().getFirst("userId")));
+		userRoomDto.setRoomType(ChallengeChatDto.RoomType.valueOf(uriComponents.getQueryParams().getFirst("roomType")));
+		
+		// 클라이언트를 맵에 추가
+		clients.put(session.getId(), session);
+		log.info("New session established: " + session.getId() + ", User ID: " + userRoomDto.getUserId() + ", Room Name: " + userRoomDto.getRoomType());
+		
+		service.enterChatInUser(userRoomDto);
 	}
+	
 	//클라이언트로부터 메시지를 받을때 마다 실행
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
