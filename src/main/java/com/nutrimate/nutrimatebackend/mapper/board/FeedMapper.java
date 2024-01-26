@@ -45,10 +45,10 @@ public interface FeedMapper {
   int findLikeCount(FeedDto feedDto);
 
   // 좋아요 추가
-  void insertLike(FeedDto feedDto);
+  int insertLike(FeedDto feedDto);
 
   // 좋아요 해제
-  void deleteLike(FeedDto feedDto);
+  int deleteLike(FeedDto feedDto);
 
 
   /** 북마크 **/

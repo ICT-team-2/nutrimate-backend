@@ -79,6 +79,14 @@
 	
 
 	<!-- 좋아요 -->
+	<!-- 해당 글의 좋아요 수 -->
+    <select id="findLikeCount" resultType="int">
+        SELECT COUNT(like_id)
+        FROM boardlike B RIGHT JOIN board D
+        ON B.board_id = D.board_id
+        WHERE D.board_id = #{boardId}
+    </select>
+    
 	<!-- 유저가 좋아요 누른지 확인(0일시 안누름) -->
     <select id="checkUserLike" resultType="int">
         SELECT COUNT(like_id)
@@ -87,22 +95,13 @@
         WHERE B.user_id = #{userId} AND D.board_id = #{boardId}
     </select>
 
-    <!-- 해당 글의 좋아요 수 -->
-    <select id="findLikeCount" resultType="int">
-        SELECT COUNT(like_id)
-        FROM boardlike B RIGHT JOIN board D
-        ON B.board_id = D.board_id
-        WHERE D.board_id = #{boardId}
-    </select>
-
     <!-- 좋아요 추가 -->
-    <insert id="insertLike">
-        INSERT INTO boardlike (like_id, board_id, user_id, like_date)
-        VALUES (SEQ_LIKE.NEXTVAL, #{boardId}, #{userId}, SYSDATE)
+    <insert id="insertLike" parameterType="FeedDto">
+        INSERT INTO boardlike VALUES (SEQ_LIKE.NEXTVAL, #{boardId}, #{userId}, SYSDATE)
     </insert>
 
     <!-- 좋아요 해제 -->
-    <delete id="deleteLike">
+    <delete id="deleteLike" parameterType="FeedDto">
         DELETE FROM boardlike
         WHERE like_id = (SELECT like_id FROM boardlike
                          WHERE user_id = #{userId} AND board_id = #{boardId})
@@ -120,8 +119,7 @@
 
     <!-- 북마크 추가 -->
     <insert id="insrtBookmark">
-        INSERT INTO bookmark (user_id, board_id, bookmark_date)
-        VALUES (#{userId}, #{boardId}, SYSDATE)
+        INSERT INTO bookmark VALUES (#{userId}, #{boardId}, SYSDATE)
     </insert>
 
     <!-- 북마크 해제 -->
