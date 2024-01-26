@@ -3,6 +3,8 @@ package com.nutrimate.nutrimatebackend.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 //todo: 아래 내용 수정하여 사용할 것!!
@@ -11,19 +13,6 @@ public class SecurityConfig {
 	
 	
 	@Bean
-<<<<<<< Updated upstream
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable();
-		http.authorizeRequests()
-				//url에 접근 권한 설정
-				.antMatchers("/user/**").authenticated()
-				.antMatchers("/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-				.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
-				.anyRequest().permitAll()
-		;
-		
-		
-=======
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.csrf(AbstractHttpConfigurer::disable)
@@ -31,13 +20,12 @@ public class SecurityConfig {
 						sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				)
 				.authorizeHttpRequests((authorizeRequests) ->
-						authorizeRequests
+								authorizeRequests
 //								.antMatchers("/user/**").authenticated()
 //								.antMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
 //								.antMatchers("/admin/**").hasAnyRole("ADMIN")
-								.anyRequest().permitAll()
+										.anyRequest().permitAll()
 				);
->>>>>>> Stashed changes
 		return http.build();
 	}
 }

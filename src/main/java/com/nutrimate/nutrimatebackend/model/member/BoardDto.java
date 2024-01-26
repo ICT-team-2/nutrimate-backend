@@ -1,15 +1,7 @@
 package com.nutrimate.nutrimatebackend.model.member;
 
-import java.util.List;
-
+import lombok.*;
 import org.apache.ibatis.type.Alias;
-import org.springframework.web.multipart.MultipartFile;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Setter
@@ -17,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Alias("BoardDto")
+@ToString
 public class BoardDto {
 	private int boardId;
 	private long userId;
@@ -39,7 +32,7 @@ public class BoardDto {
 	
 	private String searchUser;
 	private String searchTitle;
-	
-	private List<MultipartFile> files;
+
+//	private List<MultipartFile> files;
 }
 
