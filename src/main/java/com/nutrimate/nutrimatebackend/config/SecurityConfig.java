@@ -11,6 +11,7 @@ public class SecurityConfig {
 	
 	
 	@Bean
+<<<<<<< Updated upstream
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable();
 		http.authorizeRequests()
@@ -22,6 +23,21 @@ public class SecurityConfig {
 		;
 		
 		
+=======
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+				.csrf(AbstractHttpConfigurer::disable)
+				.sessionManagement((sessionManagement) ->
+						sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				)
+				.authorizeHttpRequests((authorizeRequests) ->
+						authorizeRequests
+//								.antMatchers("/user/**").authenticated()
+//								.antMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+//								.antMatchers("/admin/**").hasAnyRole("ADMIN")
+								.anyRequest().permitAll()
+				);
+>>>>>>> Stashed changes
 		return http.build();
 	}
 }
