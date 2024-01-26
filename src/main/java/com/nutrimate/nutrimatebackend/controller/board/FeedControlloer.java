@@ -60,12 +60,13 @@ public class FeedControlloer {
     return new ResponseEntity<>(simplifiedFeedList, HttpStatus.OK);
   }
 
-  // 피드 상세보기 정보 가져오기 (해시태그 입력 후 재확인 필요)
+  // 피드 상세보기 정보 가져오기 (완료)
   // 댓글 수는 제외하고 조회(상세보기 화면이니까:해당 글번호의 모든 댓글 뿌리니까)
+  // 해시 태그는 제외하고 조회(상세보기 화면이니까:해당 글번호의 모든 해시태그 뿌리니까)
   // 좋아요, 북마크 누른 여부는 제외하고 조회(따로 확인)
   // 입력 데이터 : boardId
   // 출력 데이터 : boardId, userNick, userProfile, createdDate, boardThumbnail, boardViewCount,
-  // LIKE_COUNT, HASHTAG
+  // LIKE_COUNT
   @GetMapping("/findFeedDetail")
   public ResponseEntity<List<Map<String, Object>>> findFeedDetail(@RequestBody FeedDto feedDto) {
     List<FeedDto> FeedList = feedService.findFeedDetail(feedDto);
@@ -80,10 +81,8 @@ public class FeedControlloer {
       detailfiedFeed.put("boardThumbnail", feed.getBoardThumbnail());
       detailfiedFeed.put("boardViewCount", feed.getBoardViewCount()); // 조회수
       detailfiedFeed.put("LIKE_COUNT", feed.getLikeCount()); // 좋아요 수
-      detailfiedFeed.put("HASHTAG", feed.getHashtag()); // 해시태그
       detailfiedFeedList.add(detailfiedFeed);
     }
-
     return new ResponseEntity<>(detailfiedFeedList, HttpStatus.OK);
   }
 
@@ -100,41 +99,50 @@ public class FeedControlloer {
     return ResponseEntity.ok(jsonResponse);
   }
 
-  // 피드 작성
-  // 입력 데이터 : boardId, userId, boardTitle, boardContent, boardThumbnail, tagName
-  // 썸네일 입력 예시 : "boardThumbnail" : ""
-  // 해시태그 입력 예시 : "tagName" : [ "태그1", "태그2", "태그3" ]
-  // 출력 데이터 : message, boardId, tagId
+  // 피드 작성 (완료)
+  // 입력 데이터 : boardId, userId, boardTitle, boardContent, boardThumbnail, hashtag
+  // 이미지 저장 경로 : C://Temp/upload
+  // 썸네일 입력 예시 : "boardThumbnail" : "testimages.jpg"
+  // 해시태그 입력 예시 : "hashtag" : [ "태그1", "태그2", "태그3" ]
+  // 출력 데이터 : message, boardId
   @PostMapping("/insertFeed")
   public ResponseEntity<Map<String, Object>> insertFeed(@RequestBody FeedDto feedDto) {
 
-    // 피드 작성
     feedService.insertFeed(feedDto);
-
     int boardId = feedDto.getBoardId();
-    int tagId = feedDto.getTagId();
-
-    /*
-     * // 해시태그 작성 List<String> hashtags = feedDto.getHashtag(); for (String tagName : hashtags) {
-     * feedService.insertHashtag(tagId, tagName); }
-     */
 
     Map<String, Object> jsonResponse = new HashMap<>();
-    jsonResponse.put("message", "Feed inserted successfully");
+    jsonResponse.put("message", "Feed Inserted successfully");
     jsonResponse.put("boardId", boardId);
     return ResponseEntity.ok(jsonResponse);
   }
 
   // 피드 수정
+  // 입력 데이터 : boardId, userId, boardTitle, boardContent, boardThumbnail, hashtag
+  // 출력 데이터 : message, boardId
   @PutMapping("/updateFeed")
-  public void updateFeed(@RequestBody FeedDto feedDto) {
+  public ResponseEntity<Map<String, Object>> updateFeed(@RequestBody FeedDto feedDto) {
     feedService.updateFeed(feedDto);
+    int boardId = feedDto.getBoardId();
+
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "Feed Update successfully");
+    jsonResponse.put("boardId", boardId);
+    return ResponseEntity.ok(jsonResponse);
   }
 
-  // 피드 삭제
+  // 피드 삭제 (완료)
+  // 입력 데이터 : boardId
+  // 출력 데이터 : message, boardId
   @DeleteMapping("/deleteFeed")
-  public void deleteFeed(@RequestBody FeedDto feedDto) {
+  public ResponseEntity<Map<String, Object>> deleteFeed(@RequestBody FeedDto feedDto) {
     feedService.deleteFeed(feedDto);
+    int boardId = feedDto.getBoardId();
+
+    Map<String, Object> jsonResponse = new HashMap<>();
+    jsonResponse.put("message", "Feed Delete successfully");
+    jsonResponse.put("boardId", boardId);
+    return ResponseEntity.ok(jsonResponse);
   }
 
 

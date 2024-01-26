@@ -37,11 +37,21 @@ public class FeedService {
   @Transactional
   public void insertFeed(FeedDto feedDto) {
     feedMapper.insertFeed(feedDto);
-    feedMapper.insertTag(feedDto);
-  }
+    int boardId = feedDto.getBoardId();
 
-  public void insertHashtag(int tagid, String hashtag) {
-    feedMapper.insertHashtag(tagid, hashtag);
+    // 해시태그 작성
+    List<String> hashtags = feedDto.getHashtag();
+    for (String tag : hashtags) {
+      int checkTagId = feedMapper.checkTagId(tag);
+      if (checkTagId == 0) {
+        feedMapper.insertTag(tag);
+      } else {
+        System.out.println("중복키 값이 있어요");
+      }
+      feedDto.setBoardId(boardId);
+      feedDto.setTagName(tag);
+      feedMapper.insertHashtag(feedDto);
+    }
   }
 
   // 피드 수정
@@ -49,6 +59,21 @@ public class FeedService {
   public void updateFeed(FeedDto feedDto) {
     feedMapper.updateFeed(feedDto);
     feedMapper.updateHashtag(feedDto);
+    int boardId = feedDto.getBoardId();
+
+    // 해당 글의 해시태그 삭제 후 작성
+    List<String> hashtags = feedDto.getHashtag();
+    for (String tag : hashtags) {
+      int checkTagId = feedMapper.checkTagId(tag);
+      if (checkTagId == 0) {
+        feedMapper.insertTag(tag);
+      } else {
+        System.out.println("중복키 값이 있어요");
+      }
+      feedDto.setBoardId(boardId);
+      feedDto.setTagName(tag);
+      feedMapper.insertHashtag(feedDto);
+    }
   }
 
   // 피드 삭제

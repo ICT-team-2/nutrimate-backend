@@ -22,9 +22,11 @@ public interface FeedMapper {
   // 피드 작성
   void insertFeed(FeedDto feedDto);
 
-  void insertTag(FeedDto feedDto);
+  int checkTagId(String tag);
 
-  void insertHashtag(int tagid, String hashtag);
+  void insertTag(String tag);
+
+  void insertHashtag(FeedDto feedDto);
 
   // 피드 수정
   void updateFeed(FeedDto feedDto);
@@ -90,6 +92,7 @@ public interface FeedMapper {
 
   // 신고된 댓글 보기 (관리자 페이지)
   List<FeedDto> findReportedComments();
+
 
 
 }

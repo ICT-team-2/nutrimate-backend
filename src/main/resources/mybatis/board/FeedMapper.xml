@@ -23,22 +23,10 @@
 	
 	<!-- 피드 상세보기 정보 가져오기 -->
 	<select id="findFeedDetail" resultType="FeedDto">
-	<!-- 
-	    SELECT B.BOARD_ID, M.USER_NICK, M.USER_PROFILE, B.CREATED_DATE, B.BOARD_THUMBNAIL, B.BOARD_VIEWCOUNT,
-	    (SELECT COUNT(LIKE_ID) FROM BOARDLIKE WHERE BOARD_ID = B.BOARD_ID) AS LIKE_COUNT,
-	    (SELECT h.TAG_NAME FROM HASHTAG H INNER JOIN BOARD_HASHTAG BH ON H.TAG_ID = BH.TAG_ID WHERE BH.BOARD_ID = B.BOARD_ID) AS HASHTAG
-	    FROM BOARD B
-	    RIGHT JOIN MEMBER M ON M.USER_ID = B.USER_ID
-	    WHERE B.BOARD_ID = #{boardId}
-	-->
-	<!-- 해시태그 여러개도 되는지 확인 필요 -->
 	SELECT B.BOARD_ID, M.USER_NICK, M.USER_PROFILE, B.CREATED_DATE, B.BOARD_THUMBNAIL, B.BOARD_VIEWCOUNT,
-	  (SELECT COUNT(LIKE_ID) FROM BOARDLIKE WHERE BOARD_ID = B.BOARD_ID) AS LIKE_COUNT,
-	  LISTAGG(h.TAG_NAME, ' ') WITHIN GROUP (ORDER BY h.TAG_NAME) AS HASHTAG
+	  (SELECT COUNT(LIKE_ID) FROM BOARDLIKE WHERE BOARD_ID = B.BOARD_ID) AS LIKE_COUNT
 	FROM BOARD B
 	RIGHT JOIN MEMBER M ON M.USER_ID = B.USER_ID
-	LEFT JOIN BOARD_HASHTAG BH ON B.BOARD_ID = BH.BOARD_ID
-	LEFT JOIN HASHTAG H ON h.TAG_ID = BH.TAG_ID
 	WHERE B.BOARD_ID = #{boardId}
 	GROUP BY B.BOARD_ID, M.USER_NICK, M.USER_PROFILE, B.CREATED_DATE, B.BOARD_THUMBNAIL, B.BOARD_VIEWCOUNT
 	</select>
@@ -56,54 +44,33 @@
 	    <selectKey keyProperty="boardId" resultType="int" order="BEFORE">
 	        SELECT SEQ_BOARD.NEXTVAL FROM DUAL
 	    </selectKey>
-	    INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', #{boardTitle}, #{boardContent}, #{boardThumbnail}, 0, SYSDATE, DEFAULT, DEFAULT)
+    	INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', #{boardTitle}, #{boardContent}, #{boardThumbnail}, 0, SYSDATE, DEFAULT, DEFAULT)
 	</insert>
-	
-	
-	
-	<!-- 게시글 작성 시 해시태그 추가 -->
-	<insert id="insertBoardWithTags" parameterType="map">
-	    <!-- 필요한 경우에 따라 다른 필드도 추가할 수 있습니다. -->
-	    <selectKey keyProperty="boardId" resultType="java.lang.Long" order="BEFORE">
-	        SELECT SEQ_BOARD.NEXTVAL FROM DUAL
-	    </selectKey>
-	    INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', #{boardTitle}, #{boardContent}, #{boardThumbnail}, 0, SYSDATE, 'N', 'N')
-	    
-	    
-	</insert>
-
-<!-- 게시글 수정 시 해시태그 갱신 -->
-<update id="updateBoardWithTags" parameterType="map">
-    UPDATE BOARD
-    SET BOARD_TITLE = #{boardTitle},
-        BOARD_CONTENT = #{boardContent},
-        BOARD_THUMBNAIL = #{boardThumbnail}
-    WHERE BOARD_ID = #{boardId}
-    
-    <!-- 기존 해시태그 삭제 -->
-    DELETE FROM BOARD_HASHTAG WHERE BOARD_ID = #{boardId}
-    
-    <!-- 새로운 해시태그 추가 -->
-    <foreach collection="tagIds" item="tagId" separator=";">
-        INSERT INTO BOARD_HASHTAG (BOARD_ID, TAG_ID) VALUES (#{boardId}, #{tagId})
-    </foreach>
-</update>
-
-
-
-
-
-
-
-
+	<!-- 해시태그 추가 -->
+	<select id="checkTagId" resultType="int">
+		SELECT count(tag_id) FROM hashtag WHERE tag_name = #{tag}
+	</select>
+	<!-- checkTagId가 0이면(중복이 아니면) 실행 -->
+	<insert id="insertTag" parameterType="FeedDto">
+   		INSERT INTO hashtag VALUES (SEQ_HASHTAG.NEXTVAL, #{tag})
+    </insert>
+	<!-- 게시글과 해시태그 연결 -->
+    <insert id="insertHashtag" parameterType="FeedDto">
+        INSERT INTO board_hashtag VALUES (#{boardId},
+        (SELECT tag_id FROM hashtag
+         WHERE tag_name = #{tagName}))
+    </insert>
 
 	<!-- 피드 수정 -->
 	<update id="updateFeed" parameterType="FeedDto">
 	    UPDATE BOARD SET BOARD_TITLE = #{boardTitle}, BOARD_CONTENT = #{boardContent}, BOARD_THUMBNAIL = #{boardThumbnail} WHERE BOARD_ID = #{boardId}
 	</update>
+	<!-- 해당글의 해시태그 전부 삭제 -->
 	<update id="updateHashtag" parameterType="FeedDto">
-	    UPDATE HASHTAG SET TAG_NAME = #{tagName} WHERE TAG_ID = (SELECT TAG_ID FROM BOARD_HASHTAG WHERE BOARD_ID = #{boardId})
+	    DELETE FROM board_hashtag 
+		WHERE board_id = #{boardId}
 	</update>
+	<!-- 삭제 후 insertTag와 insertHashtag 사용하여 해시태그 추가 -->
 	
 	<!-- 피드 삭제 -->
 	<update id="deleteFeed">

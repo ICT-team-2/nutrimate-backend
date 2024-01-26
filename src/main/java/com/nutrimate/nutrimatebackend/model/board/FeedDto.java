@@ -57,8 +57,9 @@ public class FeedDto {
   /** 해시태그 (검색) **/
   // private int boardId; // 글번호(+해시태그FK)
   private int tagId; // 태그 기본키
-  // private String tagName; // 태그 이름
+  private String tagName; // 태그 이름
   private List<String> hashtag; // 해시태그
+  private int checkTagId; // 해시태그 중복체크
 
   /** 신고 **/
   private int reportId; // 신고 기본키
