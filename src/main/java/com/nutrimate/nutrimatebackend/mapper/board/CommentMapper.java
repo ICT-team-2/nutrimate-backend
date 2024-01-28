@@ -23,6 +23,6 @@ public interface CommentMapper {
   void updateComment(CommentDto commentDto);
 
   // 댓글/대댓글 삭제
-  void deleteComment(CommentDto commentDto);
+  int deleteComment(CommentDto commentDto);
 
 }

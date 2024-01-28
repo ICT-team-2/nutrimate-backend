@@ -38,8 +38,8 @@ public class CommentService {
   }
 
   // 댓글/대댓글 삭제
-  public void deleteComment(CommentDto commentDto) {
-    commentMapper.deleteComment(commentDto);
+  public int deleteComment(CommentDto commentDto) {
+    return commentMapper.deleteComment(commentDto);
   }
 
 }

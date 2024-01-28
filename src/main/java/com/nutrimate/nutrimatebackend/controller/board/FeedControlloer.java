@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,7 @@ import com.nutrimate.nutrimatebackend.model.board.FileUtils;
 import com.nutrimate.nutrimatebackend.service.board.FeedService;
 
 @RestController
-@RequestMapping("/api/board/Feed")
+@RequestMapping("/board/feed")
 public class FeedControlloer {
 
   @Autowired
@@ -36,10 +35,10 @@ public class FeedControlloer {
   // 피드 글목록 가져오기 (완료)
   // 입력 데이터 : nowPage(디폴트1), receivePage(디폴트10)
   // 출력 데이터 : boardId, thumbnail, nowPage, receivePage, totalPages, totalRecordCount
-  @GetMapping("/FeedList")
+  @GetMapping("/list")
   public ResponseEntity<List<Map<String, Object>>> findFeedList(
-      @RequestParam(defaultValue = "1") int nowPage,
-      @RequestParam(defaultValue = "10") int receivePage) {
+      @RequestParam(name = "nowPage", defaultValue = "1") int nowPage,
+      @RequestParam(name = "receivePage", defaultValue = "10") int receivePage) {
     int totalRecordCount = feedService.findFeedtotalRecordCount();
     // 페이징 계산
     int totalPages = (int) Math.ceil((double) totalRecordCount / receivePage);
@@ -69,14 +68,14 @@ public class FeedControlloer {
   // 입력 데이터 : boardId
   // 출력 데이터 : boardId, userNick, userProfile, createdDate, boardThumbnail, boardViewCount,
   // LIKE_COUNT
-  @GetMapping("/findFeedDetail")
+  @GetMapping("/view")
   public ResponseEntity<List<Map<String, Object>>> findFeedDetail(@RequestBody FeedDto feedDto) {
     List<FeedDto> FeedList = feedService.findFeedDetail(feedDto);
     List<Map<String, Object>> detailfiedFeedList = new ArrayList<>();
     for (FeedDto feed : FeedList) {
       Map<String, Object> detailfiedFeed = new HashMap<>();
       detailfiedFeed.put("boardId", feed.getBoardId());
-      detailfiedFeed.put("userNick", feed.getBoardThumbnail());
+      detailfiedFeed.put("userNick", feed.getUserNick());
       detailfiedFeed.put("userProfile", feed.getUserProfile());
       detailfiedFeed.put("createdDate", feed.getCreatedDate());
       detailfiedFeed.put("Thumbnail", feed.getBoardThumbnail());
@@ -90,7 +89,7 @@ public class FeedControlloer {
   // 피드의 조회수를 +1하기 (완료)
   // 입력 데이터 : boardId
   // 출력 데이터 : message, boardViewCount
-  @PutMapping("/updateincreaseViewCount")
+  @PutMapping("/viewplus")
   public ResponseEntity<Map<String, Object>> updateincreaseViewCount(@RequestBody FeedDto feedDto) {
     feedService.updateincreaseViewCount(feedDto);
     int boardViewCount = feedDto.getBoardViewCount();
@@ -106,11 +105,10 @@ public class FeedControlloer {
   // 해시태그 입력 예시 : "hashtag" : "태그1, 태그2"
   // multipart/form-data로 보낸다
   // 출력 데이터 : message, boardId
-  @PostMapping(value = "/insertFeed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public Map insertFeed(FeedDto dto, @RequestParam String userId, HttpServletRequest req) {
+  @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public Map insertFeed(FeedDto dto) {
     String phisicalPath = "C://Temp/upload";
     StringBuffer fileNames = new StringBuffer();
-    System.out.println(phisicalPath);
     Map map = new HashMap();
     if (dto.getFiles() == null) {
       map.put("WriteOK", "사진을 올려주세요.");
@@ -137,18 +135,11 @@ public class FeedControlloer {
   }
 
   // 피드 수정
-  // 입력 데이터 : boardId, userId, boardTitle, boardContent, boardThumbnail, hashtag
+  // 입력 데이터 : boardId, boardTitle, boardContent, files, hashtag
   // 출력 데이터 : message, boardId
-  @PutMapping(value = "/updateFeed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public Map updateFeed(FeedDto dto, @RequestParam String userId, HttpServletRequest req) {
-    // feedService.updateFeed(feedDto);
-    // int boardId = feedDto.getBoardId();
-    // Map<String, Object> jsonResponse = new HashMap<>();
-    // jsonResponse.put("message", "Feed Update successfully");
-    // jsonResponse.put("boardId", boardId);
-    // return ResponseEntity.ok(jsonResponse);
+  @PutMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public Map updateFeed(FeedDto dto) {
     Map<String, Object> map = new HashMap<>();
-
     try {
       if (dto.getFiles() != null) {
         String phisicalPath = "C://Temp/upload";
@@ -157,10 +148,8 @@ public class FeedControlloer {
         fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
         dto.setBoardThumbnail(fileNames.toString());
       }
-
       feedService.updateFeed(dto);
       int boardId = dto.getBoardId();
-
       map.put("message", "Feed Update successfully");
       map.put("boardId", boardId);
     } catch (Exception e) {
@@ -172,14 +161,18 @@ public class FeedControlloer {
   // 피드 삭제 (완료)
   // 입력 데이터 : boardId
   // 출력 데이터 : message, boardId
-  @DeleteMapping("/deleteFeed")
+  @DeleteMapping("/delete")
   public ResponseEntity<Map<String, Object>> deleteFeed(@RequestBody FeedDto feedDto) {
-    feedService.deleteFeed(feedDto);
-    int boardId = feedDto.getBoardId();
+    int affectedRows = feedService.deleteFeed(feedDto);
     Map<String, Object> jsonResponse = new HashMap<>();
-    jsonResponse.put("message", "Feed Delete successfully");
-    jsonResponse.put("boardId", boardId);
-    return ResponseEntity.ok(jsonResponse);
+    if (affectedRows > 0) {
+      jsonResponse.put("message", "Feed deleted successfully");
+      jsonResponse.put("boardId", feedDto.getBoardId());
+      return ResponseEntity.ok(jsonResponse);
+    } else {
+      jsonResponse.put("message", "Feed delete failed");
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(jsonResponse);
+    }
   }
 
 
@@ -187,7 +180,7 @@ public class FeedControlloer {
   // 해당 글의 좋아요 수를 가져오기 (완료)
   // 입력 데이터 : boardId
   // 출력 데이터 : message, boardId, LIKE_COUNT
-  @GetMapping("/findLikeCount")
+  @GetMapping("/countlike")
   public ResponseEntity<Map<String, Object>> findLikeCount(@RequestBody FeedDto feedDto) {
     int likeCount = feedService.findLikeCount(feedDto);
     int boardId = feedDto.getBoardId();
@@ -201,7 +194,7 @@ public class FeedControlloer {
   // 유저가 좋아요 누른지 확인 (완료)
   // 입력 데이터 : userId, boardId
   // 출력 데이터 : message, boardId, userId
-  @GetMapping("/checkUserLike")
+  @GetMapping("/checklike")
   public ResponseEntity<Map<String, Object>> checkUserLike(@RequestBody FeedDto feedDto) {
     int checkUserLike = feedService.checkUserLike(feedDto);
     Map<String, Object> jsonResponse = new HashMap<>();
@@ -218,7 +211,7 @@ public class FeedControlloer {
   // 좋아요 추가/해제 (완료)
   // 입력 데이터 : userId, boardId
   // 출력 데이터 : message, boardId, userId
-  @PostMapping("/pushLike")
+  @PostMapping("/pushlike")
   public ResponseEntity<Map<String, Object>> insertLike(@RequestBody FeedDto feedDto) {
     int checkUserLike = feedService.checkUserLike(feedDto);
     Map<String, Object> jsonResponse = new HashMap<>();
@@ -239,7 +232,7 @@ public class FeedControlloer {
   // 유저가 북마크 누른지 확인 (완료)
   // 입력 데이터 : userId, boardId
   // 출력 데이터 : message, boardId, userId
-  @GetMapping("/checkUserBookmark")
+  @GetMapping("/checkbookmark")
   public ResponseEntity<Map<String, Object>> checkUserBookmark(@RequestBody FeedDto feedDto) {
     int checkUserBookmark = feedService.checkUserBookmark(feedDto);
     Map<String, Object> jsonResponse = new HashMap<>();
@@ -256,7 +249,7 @@ public class FeedControlloer {
   // 북마크 추가/해제 (완료)
   // 입력 데이터 : userId, boardId
   // 출력 데이터 : message, boardId, userId
-  @PostMapping("/pushBookmark")
+  @PostMapping("/pushbookmark")
   public ResponseEntity<Map<String, Object>> insertBookmark(@RequestBody FeedDto feedDto) {
     int checkUserBookmark = feedService.checkUserBookmark(feedDto);
     Map<String, Object> jsonResponse = new HashMap<>();
@@ -275,7 +268,7 @@ public class FeedControlloer {
   // 북마크된 글 목록 가져오기 (완료)
   // 입력 데이터 : userId
   // 출력 데이터 : boardId, boardThumbnail, commentCount
-  @GetMapping("/findBookmarkFeedByUserId")
+  @GetMapping("/bookmarklist")
   public ResponseEntity<List<Map<String, Object>>> findBookmarkFeedByUserId(
       @RequestBody FeedDto feedDto) {
     List<FeedDto> findBookmarks = feedService.findBookmarkFeedByUserId(feedDto);
@@ -301,7 +294,7 @@ public class FeedControlloer {
   // 해당 글의 해시태그 가져오기 (완료)
   // 입력 데이터 : boardId
   // 출력 데이터 : tagName or message(해시태그가 비어있거나 없는 게시글번호)
-  @GetMapping("/findHashtagsByBoardId")
+  @GetMapping("/hashtag")
   public ResponseEntity<List<Map<String, Object>>> findHashtagsByBoardId(
       @RequestBody FeedDto feedDto) {
     List<FeedDto> tagNames = feedService.findHashtagsByBoardId(feedDto);
@@ -323,7 +316,7 @@ public class FeedControlloer {
   // 해시태그로 글 검색 (완료)
   // 입력 데이터 : tagName
   // 출력 데이터 : BoardList or message(해당 해시태그로 검색된 글이 없음)
-  @GetMapping("/findBoardsByTagName")
+  @GetMapping("/hashtag/search")
   public ResponseEntity<List<Map<String, Object>>> findBoardsByTagName(
       @RequestBody FeedDto feedDto) {
     List<FeedDto> findBoardsByTagNames = feedService.findBoardsByTagName(feedDto);

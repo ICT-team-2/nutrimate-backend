@@ -77,8 +77,8 @@ public class FeedService {
   }
 
   // 피드 삭제
-  public void deleteFeed(FeedDto feedDto) {
-    feedMapper.deleteFeed(feedDto);
+  public int deleteFeed(FeedDto feedDto) {
+    return feedMapper.deleteFeed(feedDto);
   }
 
 

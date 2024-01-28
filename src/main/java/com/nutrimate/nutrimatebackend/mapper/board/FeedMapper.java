@@ -34,7 +34,7 @@ public interface FeedMapper {
   void updateHashtag(FeedDto feedDto);
 
   // 피드 삭제
-  void deleteFeed(FeedDto feedDto);
+  int deleteFeed(FeedDto feedDto);
 
 
   /** 좋아요 **/

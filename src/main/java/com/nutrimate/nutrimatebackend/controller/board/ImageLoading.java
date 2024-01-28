@@ -3,7 +3,6 @@ package com.nutrimate.nutrimatebackend.controller.board;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,7 @@ public class ImageLoading {
 
   @GetMapping("/imageLoading/{filename}")
   public ResponseEntity<byte[]> display(@PathVariable("filename") String filename,
-      HttpServletRequest req) {
+      jakarta.servlet.http.HttpServletRequest req) {
     String phisicalPath = "C://Temp/upload";
 
     // 파일이 저장된 경로
