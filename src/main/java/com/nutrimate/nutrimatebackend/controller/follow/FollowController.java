@@ -2,6 +2,7 @@ package com.nutrimate.nutrimatebackend.controller.follow;
 
 import com.nutrimate.nutrimatebackend.model.follow.FollowDto;
 import com.nutrimate.nutrimatebackend.service.follow.FollowService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/follow")
+@Log4j2
 public class FollowController {
 	
 	@Autowired
@@ -20,10 +22,12 @@ public class FollowController {
 	
 	@ExceptionHandler(SQLException.class)
 	public ResponseEntity<Map> handleSQLException(SQLException e) {
+		
+		log.info("SQLException Occured", e);
 		Map<String, String> response = new HashMap<>();
 		response.put("status", "400");
 		response.put("error", "SQLException");
-		response.put("message", e.getMessage());
+//        response.put("message", e.getMessage()); // 상용화 시 이건 숨기는 게 좋음
 		return ResponseEntity.badRequest().body(response);
 	}
 	
