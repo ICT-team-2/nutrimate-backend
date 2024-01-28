@@ -11,21 +11,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf(AbstractHttpConfigurer::disable)
-				.sessionManagement((sessionManagement) ->
-						sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				)
-				.authorizeHttpRequests((authorizeRequests) ->
-						authorizeRequests
-								.requestMatchers("/user/**").authenticated()
-								.requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-								.requestMatchers("/admin/**").hasAnyRole("ADMIN")
-								.anyRequest().permitAll()
-				);
-		return http.build();
-	}
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement((sessionManagement) -> sessionManagement
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests((authorizeRequests) -> authorizeRequests.requestMatchers("/user/**")
+            .authenticated().requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+            .requestMatchers("/admin/**").hasAnyRole("ADMIN").anyRequest().permitAll());
+    return http.build();
+  }
 }
