@@ -15,7 +15,7 @@ import com.nutrimate.nutrimatebackend.model.member.FollowDto;
 import com.nutrimate.nutrimatebackend.service.test.FollowService;
 
 @RestController
-@RequestMapping("/api/follow")
+@RequestMapping("/follow")
 public class FollowController {
 
   @Autowired
@@ -24,7 +24,7 @@ public class FollowController {
   // 회원을 위한 추천 팔로우(랜덤으로 5명의 회원정보 가져오기) (완료)
   // 입력 데이터 : 없음
   // 출력 데이터 : user_id,user_profile,user_nickname,user_intro... Dto정보 반환
-  @GetMapping("/Recommend")
+  @GetMapping("/recommend")
   public List<FollowDto> findRecommendedFollowersList() {
     return followservice.findRecommendedFollowersList();
   }
@@ -32,7 +32,7 @@ public class FollowController {
   // 내가 상대를 팔로우 하는 쿼리문 (내가 팔로워가 된다) (완료)
   // 입력 데이터 : followerId(내userId), followeeId(상대의userId)
   // 출력 데이터 : message, followerId, followeeId, recordId(follow_id)
-  @PostMapping("/insertFollowUser")
+  @PostMapping("/follow")
   public ResponseEntity<Map<String, Object>> insertFollowUser(@RequestBody FollowDto followDto) {
     followservice.insertFollowUser(followDto);
     int followerId = followDto.getFollowerId();
@@ -49,7 +49,7 @@ public class FollowController {
   // 내 팔로잉(내가 등록한 사람) 수를 가져오기 (완료)
   // 입력 데이터 : userId
   // 출력 데이터 : message, followingCount
-  @GetMapping("/FollowingCount")
+  @GetMapping("/followingCount")
   public ResponseEntity<Map<String, Object>> findFollowingCount(@RequestBody FollowDto followDto) {
     int followingCount = followservice.findFollowingCount(followDto);
     Map<String, Object> jsonResponse = new HashMap<>();
@@ -61,7 +61,7 @@ public class FollowController {
   // 내 팔로워(나를 등록한 사람) 수를 가져오기 (완료)
   // 입력 데이터 : userId
   // 출력 데이터 : message, followingCount
-  @GetMapping("/FollowerCount")
+  @GetMapping("/followerCount")
   public ResponseEntity<Map<String, Object>> findFollowerCount(@RequestBody FollowDto followDto) {
     int followerCount = followservice.findFollowerCount(followDto);
     Map<String, Object> jsonResponse = new HashMap<>();
@@ -73,7 +73,7 @@ public class FollowController {
   // 내 팔로잉(내가 등록한 사람) 목록을 가져오기 (완료)
   // 입력 데이터 : userId
   // 출력 데이터 : user_id,user_profile,user_nickname,user_intro... Dto정보 반환
-  @GetMapping("/FollowingList")
+  @GetMapping("/followingList")
   public List<FollowDto> findFollowingList(@RequestBody FollowDto followDto) {
     return followservice.findFollowingList(followDto);
   }
@@ -81,15 +81,15 @@ public class FollowController {
   // 내 팔로워(나를 등록한 사람) 목록을 가져오기 (완료)
   // 입력 데이터 : userId
   // 출력 데이터 : user_id,user_profile,user_nickname,user_intro... Dto정보 반환
-  @GetMapping("/FollowerList")
+  @GetMapping("/followerList")
   public List<FollowDto> findFollowerList(@RequestBody FollowDto followDto) {
     return followservice.findFollowerList(followDto);
   }
 
-  // 팔로우 유무 확인 (확인)
+  // 팔로우한 유저인지 확인 (완료)
   // 입력 데이터 : userId,followeeId
   // 출력 데이터 : message, followStatus
-  @GetMapping("/FollowStatus")
+  @GetMapping("/checkFollow")
   public ResponseEntity<Map<String, Object>> checkFollowStatus(@RequestBody FollowDto followDto) {
     Integer followStatus = followservice.checkFollowStatus(followDto);
     Map<String, Object> jsonResponse = new HashMap<>();
@@ -98,8 +98,8 @@ public class FollowController {
     return ResponseEntity.ok(jsonResponse);
   }
 
-  // 내가 등록한 사람 삭제. 팔로우 취소 (완료)
-  // 입력 데이터 : followId
+  // 팔로우 취소(내가 등록한 사람 삭제)
+  // 입력 데이터 : userId,followeeId
   // 출력 데이터 : message
   @DeleteMapping("/Unfollow")
   public ResponseEntity<Map<String, Object>> deletefollowUser(@RequestBody FollowDto followDto) {
