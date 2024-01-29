@@ -7,7 +7,7 @@
 
     
     
-    
+    <!--주간 가입자수 -->
     <resultMap id="weekMemberResult" type="StatisticsDto">
 		   <result property="count" column="count"/>
 		   <result property="day" column="day"/>
@@ -19,6 +19,7 @@
 				order by trunc(m.created_date)
 			  ]]>
     </select>
+    <!--월간 가입자수 -->
     <resultMap id="monthMemberResult" type="StatisticsDto">
 		   <result property="count" column="count"/>
 		   <result property="month" column="month"/>
@@ -29,11 +30,13 @@
 				group by TO_CHAR(m.created_date, 'YYYY-MM') order by TO_CHAR(m.created_date, 'YYYY-MM')
 			  ]]>
     </select>
+    <!--인기글-->
      <resultMap id="bestResult" type="StatisticsDto">
 		   <result property="count" column="count"/>
 		   <result property="usernick" column="user_nick"/>
 		   <result property="boardtitle" column="board_title"/>
 	</resultMap>
+
 	<select id="findBestBylikeAndBoardviewcount" resultMap="bestResult">
 			  <![CDATA[
 					    SELECT * 
@@ -54,7 +57,7 @@
     
     
     
-
+<!--주간 카테고리별-->
 	<resultMap id="categoryResult" type="StatisticsDto">
 			<result property="day" column="day"/>
 		   <result property="count" column="count"/>

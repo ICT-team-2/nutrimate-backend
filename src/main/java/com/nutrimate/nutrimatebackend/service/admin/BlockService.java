@@ -17,73 +17,41 @@ public class BlockService {
 	 @Autowired
       private BlockMapper blockmapper;
 
-      public int countboarder(BlockDto dto) {
-    	  
-    	  return blockmapper.findByUserIdAndBoarderId(dto);
-      }
-      
-      public int countcomment(BlockDto dto) {
-    	  
-    	  return blockmapper.findByUserIdAndCmtId(dto);
-      }
-      
-      @Transactional
-      public int saveBoardReport(BlockDto dto) {
-    	  try {
-    		  blockmapper.insertReport(dto);
-              return blockmapper.insertBorderReport(dto);
-    	    } catch (Exception e) {
-    	       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-    	       return -1;
-    	    }
-        
-      }
-      
-      
-      @Transactional
-      public int saveCommentReport(BlockDto dto) {
-    	  try {
-    		  blockmapper.insertReport(dto);
-              return blockmapper.insertCommentReport(dto);
-    	    } catch (Exception e) {
-    	       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-    	       return -1;
-    	    }
-        
-      }
 
+	//신고한 글 보기-게시글
 	public List<BlockDto> selectAllBoard(BlockDto dto) {
 		return blockmapper.findAllBoard(dto);
 	}
 	
-	
+	 //신고한 글 보기-댓글	
 	public List<BlockDto> selectAllComment(BlockDto dto) {
 		return blockmapper.findAllComment(dto);
 	}
-
+	//신고한 글 사유-게시글
 	public List<ReportDto> selectBoardReport(BlockDto dto) {
 		return blockmapper.findByBoarderId(dto);
 	}
-
+	//신고한 글 사유-댓글
 	public List<ReportDto> selectCommentReport(BlockDto dto) {
 		return blockmapper.findByCmtId(dto);
 	}
-
+	//신고한 게시글 차단
 	public int blockBoard(BlockDto dto) {
 		return blockmapper.updateBoarderBlockByBoardId(dto);
 	}
-
+	//신고한 댓글 차단
 	public int blockComment(BlockDto dto) {
 		return blockmapper.updateCommentBlockByBoardId(dto);
 	}
-
+    //신고한 게시글 차단 취소
 	public int blockCancelBoard(BlockDto dto) {
 		return blockmapper.updateBoarderBlockCancelByBoardId(dto);
 	}
-
+    //신고한 댓글 차단 취소
 	public int blockCancelComment(BlockDto dto) {
 		return blockmapper.updateCommentBlockCancelByBoardId(dto);
 	}
+    //게시글 신고 내역 삭제	
     @Transactional
     public int deleteBlockList(BlockDto dto) {
       try {
@@ -94,7 +62,8 @@ public class BlockService {
          return -1;
       }
     }
-
+    //댓글 신고 내역 삭제   
+    @Transactional
     public int deleteBlockListComment(BlockDto dto) {
       try {
         blockmapper.deleteCommentReportByReport_id(dto);

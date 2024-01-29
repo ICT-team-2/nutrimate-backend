@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.nutrimate.nutrimatebackend.model.admin.BlockDto;
@@ -23,47 +22,10 @@ public class BlockController {
   @Autowired
   private BlockService blockService;
   
-	  //한 게시글 or 댓글 당 한사람만 신고하도록 하기
-	  @PostMapping("/WriteBlock.do")
-	  public Map WriteBlock(@ModelAttribute BlockDto dto) {
-		  Map map = new HashMap();
-		  String searchKeyWord = dto.getSeachKeyWord();
-	       if(searchKeyWord.equals("BOARD")) {
-	         int count=blockService.countboarder(dto);//
-	           if(count == 0) {
-	        	   int affected= blockService.saveBoardReport(dto);
-	        	   if(affected == 1) {
-	        		   map.put("REPORTOK", "게시물 신고 완료했습니다.");
-	        	   }else {
-	        		   map.put("REPORTOK", "게시물 신고에 실패했습니다!");
-	        		   
-	        	   }
-	             	
-	           }else {
-	             map.put("REPORTOK", "이미 신고한 게시물입니다.");
-	           }
-	           return map;
-	       }else {
-	    	   int count=blockService.countcomment(dto);
-	    	   if(count == 0) {
-	    		   int affected= blockService.saveCommentReport(dto);
-	    		   if(affected == 1) {
-	    			   map.put("REPORTOK", "댓글 신고 완료했습니다.");
-	        	   }else {
-	        		   map.put("REPORTOK", "댓글 신고에 실패했습니다!");
-	        		   
-	        	   }
-	               	
-	             }else {
-	               map.put("REPORTOK", "이미 신고한 댓글입니다.");
-	             }
-	             return map;
-	          
-	       }
-	  }
+
 	  
 	  //신고한 글 보기-게시글
-	  @GetMapping("/BlockListBoard.do")
+	  @GetMapping("/blocklistboard")
 	  public List<BlockDto> BlockList(@ModelAttribute BlockDto dto) {
 		  List<BlockDto> blockList =blockService.selectAllBoard(dto);
 			return blockList;
@@ -72,7 +34,7 @@ public class BlockController {
 	  
 	  
 	  //신고한 글 보기-댓글
-	  @GetMapping("/BlockListComment.do")
+	  @GetMapping("/blocklistcomment")
 	  public List<BlockDto> CommentList(@ModelAttribute BlockDto dto) {
 		  List<BlockDto> blockList =blockService.selectAllComment(dto);
 		  
@@ -82,14 +44,14 @@ public class BlockController {
 	  
 	  
 	//신고한 글 사유-게시글
-	  @GetMapping("/BlockReasonBoard.do")
+	  @GetMapping("/blockreasonboard")
 	  public List<ReportDto> BlockReasonBoard(@ModelAttribute BlockDto dto) {
 		  List<ReportDto> blockList =blockService.selectBoardReport(dto);
 			return blockList;
 		  
 	  }
 	//신고한 글 사유-댓글
-	  @GetMapping("BlockReasonCommet.do")
+	  @GetMapping("/blockreasoncomment")
 	  public List<ReportDto> BlockReasonCommet(@ModelAttribute BlockDto dto) {
 		  List<ReportDto> blockList =blockService.selectCommentReport(dto);
 			return blockList;
@@ -97,7 +59,7 @@ public class BlockController {
 	  }
 	  
 	//신고한 게시글 차단
-	  @PutMapping("/BlockBoard.do")
+	  @PutMapping("/blockboard")
 	  public Map BlockBoard(@ModelAttribute BlockDto dto) {
 		  Map map = new HashMap();
 		  int affected= blockService.blockBoard(dto);
@@ -112,7 +74,7 @@ public class BlockController {
 	  }
 	  
 	//신고한 댓글 차단
-	  @PutMapping("/BlockComment.do")
+	  @PutMapping("/blockcomment")
 	  public Map BlockComment(@ModelAttribute BlockDto dto) {
 		  Map map = new HashMap();
 		  int affected= blockService.blockComment(dto);
@@ -126,7 +88,7 @@ public class BlockController {
 		  
 	  }
 	//신고한 게시글 차단 취소
-	  @PutMapping("/BlockCancelBoard.do")
+	  @PutMapping("/blockcancelboard")
 	  public Map BlockCancelBoard(@ModelAttribute BlockDto dto) {
 		  Map map = new HashMap();
 		  int affected= blockService.blockCancelBoard(dto);
@@ -140,7 +102,7 @@ public class BlockController {
 		  
 	  }
 	//신고한 댓글 차단 취소
-	  @PutMapping("/BlockCancelComment.do")
+	  @PutMapping("/blockcancelcomment")
 	  public Map BlockCancelComment(@ModelAttribute BlockDto dto) {
 		  Map map = new HashMap();
 		  int affected= blockService.blockCancelComment(dto);
@@ -154,7 +116,7 @@ public class BlockController {
 		  
 	  }
 	//게시글 신고 내역 삭제
-	 @DeleteMapping("/DeleteBlockList.do")
+	 @DeleteMapping("/deleteblocklist")
 	 public Map DeleteBlockList(@ModelAttribute BlockDto dto) {
        Map map = new HashMap();
        int affected= blockService.deleteBlockList(dto);
@@ -170,7 +132,7 @@ public class BlockController {
 	
    //댓글 신고 내역 삭제
 	 
-	 @DeleteMapping("/DeleteBlockListComment.do")
+	 @DeleteMapping("/deleteblocklistcomment")
      public Map DeleteBlockListComment(@ModelAttribute BlockDto dto) {
        Map map = new HashMap();
        int affected= blockService.deleteBlockListComment(dto);

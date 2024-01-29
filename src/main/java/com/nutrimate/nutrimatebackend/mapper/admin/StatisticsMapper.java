@@ -7,12 +7,12 @@ import com.nutrimate.nutrimatebackend.model.admin.StatisticsDto;
 @Mapper
 public interface StatisticsMapper {
 
-      List<StatisticsDto> findWeekMember();
+      List<StatisticsDto> findWeekMember();//주간 가입자수 
 
-      List<StatisticsDto> findByCategory();
+      List<StatisticsDto> findByCategory();//주간 카테고리별
 
-      List<StatisticsDto> findMonthMember();
+      List<StatisticsDto> findMonthMember();//월간 가입자수 
 
-      List<StatisticsDto> findBestBylikeAndBoardviewcount();
+      List<StatisticsDto> findBestBylikeAndBoardviewcount();//인기글
 
 }

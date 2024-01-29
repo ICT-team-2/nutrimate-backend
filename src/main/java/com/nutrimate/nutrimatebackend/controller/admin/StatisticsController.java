@@ -13,7 +13,7 @@ public class StatisticsController {
     private StatisticsService statisticsService;
     
     
-    @GetMapping("/BestList.do")//인기글
+    @GetMapping("/bestlist")//인기글
     public List<StatisticsDto> BestList() {
         List<StatisticsDto> bestList =statisticsService.selectBestList();
           return bestList;
@@ -21,19 +21,19 @@ public class StatisticsController {
     }
     
     
-    @GetMapping("/WeekMemberList.do")//주간 가입자수 
+    @GetMapping("/weekmemberlist")//주간 가입자수 
     public List<StatisticsDto> WeekMemberList() {
         List<StatisticsDto> weekList =statisticsService.selectMemeberWeek();
           return weekList;
         
     }
-    @GetMapping("/MonthMemberList.do")//월간 가입자수 
+    @GetMapping("/monthmemberlist")//월간 가입자수 
     public List<StatisticsDto> MonthMemberList() {
         List<StatisticsDto> weekList =statisticsService.selectMemeberMonth();
           return weekList;
         
     }
-    @GetMapping("/CategoryList.do")//주간 카테고리별
+    @GetMapping("/categorylist")//주간 카테고리별
     public List<StatisticsDto> CategoryList() {
       List<StatisticsDto> categoryList =statisticsService.selectCategoryList();
         return categoryList;

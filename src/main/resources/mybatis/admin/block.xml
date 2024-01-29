@@ -3,31 +3,9 @@
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- 매퍼파일 -->
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.admin.BlockMapper">
-	<select id="findByUserIdAndBoarderId" resultType="int" parameterType="blockDto">
-		SELECT COUNT(*) FROM report r join boardreport br on r.report_id=br.report_id where r.user_id=#{userid} and br.board_id=#{boardid}
-	</select>
-	
-	<select id="findByUserIdAndCmtId" resultType="int" parameterType="blockDto">
-		SELECT COUNT(*) FROM report r join commentreport cr on r.report_id=cr.report_id where r.user_id=#{userid} and cr.cmt_id=#{cmtid}
-	</select>
-	
-	<insert id="insertReport" parameterType="blockDto">
-		<selectKey keyProperty="reportid" resultType="int" order="BEFORE">
-			SELECT SEQ_REPORT.NEXTVAL FROM DUAL
-		</selectKey>
-		   INSERT INTO report VALUES(SEQ_REPORT.CURRVAL,#{userid}, SYSDATE,#{reportreason})
-	</insert>
-	
-	<insert id="insertCommentReport" parameterType="blockDto">
-		INSERT INTO commentreport VALUES(#{reportid},#{cmtid})
-	</insert>
-	
-	<insert id="insertBorderReport" parameterType="blockDto">
-		INSERT INTO boardreport VALUES(#{reportid},#{boardid})
-	</insert>
-	
+
 		
-	
+	<!-- //신고한 글 보기-게시글 -->
 	<resultMap id="boardResult" type="blockDto">
 	    <result property="boardid" column="board_id"/>
 	    <result property="userid" column="user_id"/>
@@ -36,26 +14,42 @@
 	    <result property="blocked" column="blocked"/>
 	    <result property="usernick" column="user_nick"/>
 	    <result property="count" column="COUNT"/>
+	    <result property="label" column="label"/>
+	    <result property="userprofile" column="user_profile"/>
+	    <result property="totalPage" column="totalpage"/>
+	    <result property="nowPage" column="nowPage"/>
+	    <result property="boardcategory" column="board_category"/>
 	</resultMap>
 	
 	
 	<select id="findAllBoard" resultMap="boardResult">
-	    SELECT DISTINCT b.*, m.user_nick, COUNT(*) OVER (PARTITION BY b.board_id) AS COUNT
-	    FROM boardreport br
-	    JOIN board b ON br.board_id = b.board_id
-	    JOIN member m ON b.user_id = m.user_id
-	    <where>
-			<if test="searchUser !=null">
-				m.user_nick LIKE '%' || #{searchUser} || '%'
-			</if>	
-			<if test="searchContent !=null">
-				b.board_title LIKE '%' || #{searchContent} || '%'
-			</if>		
-	   </where>
+	select * from(
+            SELECT user_id,user_profile,board_id,board_category,board_title,user_nick,COUNT,totalPage,
+                ROW_NUMBER() OVER (ORDER BY board_id DESC) AS label
+            FROM (
+                SELECT
+                    DISTINCT m.user_id, m.user_profile, b.board_id,board_category,b.board_title, m.user_nick,
+                    COUNT(*) OVER (PARTITION BY b.board_id) AS COUNT,
+                    CEIL((SELECT COUNT(*) FROM boardreport) / 10) AS totalpage
+                FROM boardreport br
+                JOIN  board b ON br.board_id = b.board_id
+                JOIN member m ON b.user_id = m.user_id
+                <where>
+			    <if test="searchUser !=null">
+				     m.user_nick LIKE '%' || #{searchUser} || '%'
+			    </if>	
+                    <if test="searchContent !=null">
+                        b.board_title LIKE '%' || #{searchContent} || '%'
+                    </if>		
+	           </where>
+            ))
+            WHERE label BETWEEN (#{nowPage}-1)*10+1 AND #{nowPage}*10
+            ORDER BY
+                board_id DESC
 	    
 	</select>
 	
-	
+	<!-- 신고한 글 보기-댓글 -->
 	<resultMap id="commentResult" type="blockDto">
 	    <result property="cmtid" column="cmt_id"/>
 	    <result property="userid" column="user_id"/>
@@ -63,46 +57,86 @@
 	    <result property="createddate" column="created_date"/>
 	    <result property="usernick" column="user_nick"/>
 	    <result property="blocked" column="blocked"/>
+	    <result property="userprofile" column="user_profile"/>
+	    <result property="totalPage" column="totalpage"/>
+	    <result property="nowPage" column="nowPage"/>
 	    <result property="count" column="COUNT"/>
 	</resultMap>
-	
 	<select id="findAllComment" resultMap="commentResult">
-	    SELECT DISTINCT c.*,m.user_nick, COUNT(*) OVER (PARTITION BY c.cmt_id) AS COUNT
-        FROM commentreport cr join comments c on cr.cmt_id=c.cmt_id join member m on c.user_id = m.user_id
-        <where>
-			<if test="searchUser !=null">
-				m.user_nick LIKE '%' || #{searchUser} || '%'
-			</if>	
-			<if test="searchContent !=null">
-				c.cmt_content LIKE '%' || #{searchContent} || '%'
-			</if>		
-	   </where>
+			select * from(
+            SELECT cmt_id,user_id,board_id,user_profile,user_nick,totalPage,cmt_content, COUNT,ROW_NUMBER() OVER (ORDER BY cmt_id DESC) AS label
+            FROM (
+                SELECT DISTINCT c.cmt_id,c.user_id,c.board_id,m.user_nick,m.user_profile,c.cmt_content, COUNT(*) OVER (PARTITION BY c.cmt_id) AS COUNT,CEIL(((select count(*) from commentreport)/10)) totalPage
+                 FROM commentreport cr join comments c on cr.cmt_id=c.cmt_id join member m on c.user_id = m.user_id
+                 <where>
+					<if test="searchUser !=null">
+						m.user_nick LIKE '%' || #{searchUser} || '%'
+					</if>	
+					<if test="searchContent !=null">
+						c.cmt_content LIKE '%' || #{searchContent} || '%'
+					</if>		
+	   			</where>
+            ))
+            WHERE label BETWEEN (#{nowPage}-1)*10+1 AND #{nowPage}*10
+            ORDER BY
+                cmt_id DESC
+	</select>
+    <!--/신고한 글 사유-게시글 -->
+    <resultMap id="reportResult" type="reportDto">
+	    <result property="reportid" column="report_id"/>
+	    <result property="reportreason" column="report_reason"/>
+	    <result property="cmt_content" column="cmt_content"/>
+	    <result property="createddate" column="created_date"/>
+	    <result property="userid" column="user_id"/>
+	    <result property="usernick" column="user_nick"/>
+	    <result property="totalPage" column="totalPage"/>
+	    <result property="nowPage" column="nowPage"/>
+	    <result property="label" column="label"/>
+	</resultMap>
+	<select id="findByBoarderId" resultMap="reportResult" parameterType="blockDto">
+		SELECT * FROM (
+		    SELECT m.user_nick,r.*,CEIL((SELECT COUNT(*) FROM boardreport where board_id=#{boardid}) / 5) AS totalPage,RANK() OVER (ORDER BY r.report_id desc) AS label
+		    FROM report r join boardreport br ON r.report_id=br.report_id
+		    JOIN member m ON r.user_id = m.user_id
+		    WHERE br.board_id=#{boardid}
+		    ORDER BY r.report_id DESC
+		 )  WHERE label BETWEEN (#{nowPage}-1)*5+1 AND #{nowPage}*5
 	</select>
 	
-	<select id="findByBoarderId" resultType="reportDto" parameterType="blockDto">
-		SELECT r.* FROM report r join boardreport br ON r.report_id=br.report_id WHERE br.board_id=#{boardid}
+	<!--/신고한 글 사유-댓글 -->
+	<select id="findByCmtId" resultMap="reportResult" parameterType="blockDto">
+		SELECT * FROM (
+			    SELECT m.user_nick,r.*,CEIL((SELECT COUNT(*) FROM commentreport where cmt_id=#{cmtid}) / 5) AS totalPage,RANK() OVER (ORDER BY r.report_id desc) AS label
+			    FROM report r join commentreport cr ON r.report_id=cr.report_id
+			    JOIN member m ON r.user_id = m.user_id WHERE cr.cmt_id=#{cmtid}
+			    ORDER BY r.report_id DESC
+			 )  WHERE label BETWEEN (#{nowPage}-1)*5+1 AND #{nowPage}*5
 	</select>
-	<select id="findByCmtId" resultType="reportDto" parameterType="blockDto">
-		SELECT r.* FROM report r join commentreport cr ON r.report_id=cr.report_id WHERE cr.cmt_id=#{cmtid}
-	</select>
+	<!-- 신고한 게시글 차단 -->
 	<update id="updateBoarderBlockByBoardId" parameterType="blockDto">
 		UPDATE board SET  blocked='Y' WHERE board_id=#{boardid}	
 	</update>
+	<!-- 신고한 댓글 차단-->
 	<update id="updateCommentBlockByBoardId" parameterType="blockDto">
 		 UPDATE comments SET blocked='Y' WHERE cmt_id=#{cmtid}
 	</update>
+	<!-- 신고한 게시글 차단 취소 -->
 	<update id="updateBoarderBlockCancelByBoardId" parameterType="blockDto">
 		UPDATE board SET blocked='N' WHERE board_id=#{boardid}	
 	</update>
+	<!-- 신고한 댓글 차단 취소 -->
 	<update id="updateCommentBlockCancelByBoardId" parameterType="blockDto">
-		 UPDATE comments SET blocked='Y' WHERE cmt_id=#{cmtid}
+		 UPDATE comments SET blocked='N' WHERE cmt_id=#{cmtid}
 	</update>
+	<!-- report에서 삭제 -->
 	<delete id="deleteReportByReport_id" parameterType="blockDto">
 	      DELETE report WHERE report_id=#{reportid}
 	</delete>
+	<!-- 게시글 신고 내역 삭제 -->
 	<delete id="deleteBoardReportByReport_id" parameterType="blockDto">
 	      DELETE boardreport WHERE report_id=#{reportid}
 	</delete>
+	<!-- 댓글 신고 내역 삭제 -->
 	<delete id="deleteCommentReportByReport_id" parameterType="blockDto">
 	      DELETE commentreport WHERE report_id=#{reportid}
 	</delete>
