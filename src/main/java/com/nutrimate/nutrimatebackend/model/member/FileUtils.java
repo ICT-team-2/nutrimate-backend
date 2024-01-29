@@ -85,6 +85,7 @@ public class FileUtils {
 	public static void deletes(StringBuffer fileNames, String saveDirectory, String delim) {
 		String[] files = fileNames.toString().split(delim);
 		for (String filename : files) {
+			filename=filename.replaceFirst("/imageLoading/","");
 			File f = new File(saveDirectory + File.separator + filename);
 			if (f.exists()) f.delete();
 		}
