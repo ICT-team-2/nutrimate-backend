@@ -40,6 +40,21 @@ public interface DietMapper {
     int InsertBookMarkByBoardIdANDuserId(DietDto dto);
     //북마트 삭제
     int DeleteBookMarkByBoardIdANDuserId(DietDto dto);
+    //해당 해시태그 갯수
+    int findHashTagCountByHashTagName(String tageName);
+    //해시태그 저장
+    int insertHashTag(DietDto dto);
+    //해시태그보드 저장
+    int insertBoardHashTagByBoardId(DietDto dto);
+    //해시태그아이디 얻어오기
+    int findHashTagIdByHashTagName(String tagName);
+    //해당하는 보드의 해시태그네임 얻어오기
+    List<DietDto> findHashTagByBoardId(DietDto dto);
+    //해당하는 보드의 해시태그 원래 저장값 삭제
+    int deleteBoardHashTagByBoardIDANDTAGID(DietDto dto);
+    //해당하는 보드의 해시태그 업데이트
+    int updateBoardHashTagByBoardId(DietDto dto);
+
  
 
 }

@@ -22,19 +22,45 @@ public class DietService {
 	public DietDto selectDietBoardOne(DietDto dto) {
 		return dietmapper.findDietBoardOne(dto);
 	}
-	
-	//게시글 입력
-	@Transactional
-	public int saveBoard(DietDto dto) {
-		try {
-			dietmapper.insertBoard(dto);
+    //게시글 입력
+    @Transactional
+    public int saveBoard(DietDto dto) {
+        try {
+            dietmapper.insertBoard(dto);
             return dietmapper.insertFoodBoard(dto);
-  	    } catch (Exception e) {
-  	       TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-  	       return -1;
-  	    }
-	}
-	
+        } catch (Exception e) {
+           TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+           return -1;
+        }
+    }
+    
+    //해시태그+게시글 저장
+    @Transactional
+    public int saveBoardANDHashBoardANDHashTag(DietDto dto) {
+        try {
+            dietmapper.insertBoard(dto);
+            dietmapper.insertFoodBoard(dto);
+            for (String tagName : dto.getTagNameList()) {
+              int count=dietmapper.findHashTagCountByHashTagName(tagName);
+              dto.setTagName(tagName);
+              if(count == 0) {
+                    dietmapper.insertHashTag(dto);
+                    return dietmapper.insertBoardHashTagByBoardId(dto);
+              }else {
+                  int tagId=dietmapper.findHashTagIdByHashTagName(tagName);
+                  dto.setTagId(tagId);
+                    return dietmapper.insertBoardHashTagByBoardId(dto);
+                 }
+    
+              }
+            return -1;
+        } catch (Exception e) {
+           TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+           return -1;
+        }
+
+    }
+    
 	 //게시글 수정
 	@Transactional
 	public int editBoard(DietDto dto) {
@@ -49,6 +75,41 @@ public class DietService {
 		
 	}
 	
+	
+   //해시보드 수정+글 수정
+    @Transactional
+    public int editBoardANDHashBoardANDHashTag(DietDto dto) {
+        try {
+            dietmapper.updateBoardByboardId(dto);
+            dietmapper.updateFoodBoardByboardId(dto);
+            List<DietDto> hashtagList =dietmapper.findHashTagByBoardId(dto);
+            if(hashtagList!=null) {
+              dietmapper.deleteBoardHashTagByBoardIDANDTAGID(dto);
+            } 
+            
+             for (String tagName : dto.getTagNameList()) {
+                  int count=dietmapper.findHashTagCountByHashTagName(tagName);
+                  dto.setTagName(tagName);
+                  
+              if(count == 0) {
+                    dietmapper.insertHashTag(dto);
+                    return dietmapper.insertBoardHashTagByBoardId(dto);
+              }else {
+                  int tagId=dietmapper.findHashTagIdByHashTagName(tagName);
+                  dto.setTagId(tagId);
+                    return dietmapper.insertBoardHashTagByBoardId(dto);
+                 }
+    
+              }
+            return -1;
+        } catch (Exception e) {
+           TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+           return -1;
+        }
+
+    }
+    
+
 	//게시글 삭제
 	public int deleteBoard(DietDto dto) {
 		return dietmapper.updateBoardDeleteByBoardId(dto);
@@ -92,6 +153,18 @@ public class DietService {
       return dietmapper.DeleteBookMarkByBoardIdANDuserId(dto);
     }
 
+    //해시태그 가지고 오기
+    public List<DietDto> selectHashTag(DietDto dto) {
+      return dietmapper.findHashTagByBoardId(dto);
+      
+    }
+
+
+ 
+    
+    
+
+    
 
 
 

@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +35,8 @@ public class DietController {
 		  
 	  }
 	  
+
+	  
 	 //게시글 상세 보기,이전글다음글
 	  @GetMapping("/infoboard/dietboards/{boardId}")
 	  public List<DietDto> DietBoardOne(@ModelAttribute DietDto dto) {
@@ -53,6 +57,23 @@ public class DietController {
 		  
 	  }
 	  
+	 //해당하는 보드의 해시태그네임 얻어오기
+	  @GetMapping("/infoboard/hashtags/{boardId}")
+	  public ResponseEntity<List<Map<String, Object>>> HashTagFind(@ModelAttribute DietDto dto) {
+	    List<DietDto> hashtagList_ =dietService.selectHashTag(dto);
+	    List<Map<String, Object>> hashtagList = new ArrayList<>();
+	    for (DietDto hashtag : hashtagList_) {
+	      Map<String, Object> hashtag_ = new HashMap<>();
+	      hashtag_.put("tagName", hashtag.getTagName());
+	      hashtag_.put("tagId", hashtag.getTagId());
+	      hashtagList.add(hashtag_);
+	    }
+        
+	    return new ResponseEntity<>(hashtagList, HttpStatus.OK);
+      
+     }
+	  
+	  
 	  //게시글 입력
 	  @PostMapping(value="/infoboard/dietboards",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)//@RequestBody
 	  public Map WriteBlock(DietDto dto,@RequestParam String userId,HttpServletRequest req,List<MultipartFile> files) {
@@ -72,18 +93,32 @@ public class DietController {
              
            }
 	       dto.setUserId(userId);
-	   	   int affected= dietService.saveBoard(dto);
-	   	   if(affected == 1) {
-	   		   map.put("WriteOK", "게시물 입력을 성공했습니다.");
-	   	   }else {
-	   	       FileUtils.deletes(fileNames, phisicalPath, ",");
-	   		   map.put("WriteOK", "게시물 입력을 실패했습니다!");
-	   		   
-	   	   }
+	       if(dto.getTagNameList()!=null) {	  
+	         int affected=dietService.saveBoardANDHashBoardANDHashTag(dto);
+	         if(affected == 1) {
+               map.put("WriteOK", "게시물 입력을 성공했습니다.");
+             }else {
+                 FileUtils.deletes(fileNames, phisicalPath, ",");
+                 map.put("WriteOK", "게시물 입력을 실패했습니다!");
+                 return map;         
+             }
+
+	       }else {
+    	   	   int affected= dietService.saveBoard(dto);
+    	   	   if(affected == 1) {
+    	   		   map.put("WriteOK", "게시물 입력을 성공했습니다.");
+    	   	   }else {
+    	   	       FileUtils.deletes(fileNames, phisicalPath, ",");
+    	   		   map.put("WriteOK", "게시물 입력을 실패했습니다!");
+    	   		   return map;
+    	   		   
+    	   	   }
+	       }
 	   	   return map;
+
       }
-	  
-	  //게시글 수정
+
+    //게시글 수정
 	  @PutMapping(value="/infoboard/dietboards/{boardId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	  public Map EditBoard(DietDto dto,@RequestParam String userId,@RequestParam int boardId,HttpServletRequest req,List<MultipartFile> files) {
 		  Map map = new HashMap();
@@ -102,21 +137,33 @@ public class DietController {
                 
                 
                 }catch(Exception e) {//파일용량 초과시
-                    map.put("WriteOK", "게시물 수정을 실패했습니다!");
+                    map.put("EDITOK", "게시물 수정을 실패했습니다!");
                     return map;
             
                 }
 		  }
-		   int affected= dietService.editBoard(dto);
-		   if(affected == 1) {
-				  map.put("EDITOK", "게시물 수정을 성공했습니다.");
-	   	   }else {
-	   	       FileUtils.deletes(fileNames, phisicalPath, ",");
-	   		   map.put("EDITOK", "게시물 수정에 실패했습니다!!");
-	   		   
-	   	   }
-		   return map;
-		  
+    	if(dto.getTagNameList()!=null) {
+    		    int affected=dietService.editBoardANDHashBoardANDHashTag(dto);
+    		    if(affected == 1) {
+                  map.put("EDITOK", "게시물 수정을 성공했습니다.");
+                }else {
+                    FileUtils.deletes(fileNames, phisicalPath, ",");
+                    map.put("EDITOK", "게시물 수정을 실패했습니다!");
+                    return map;         
+                }
+    		   
+          }else {
+    		   int affected= dietService.editBoard(dto);
+    		   if(affected == 1) {
+    				  map.put("EDITOK", "게시물 수정을 성공했습니다.");
+    	   	   }else {
+    	   	       FileUtils.deletes(fileNames, phisicalPath, ",");
+    	   		   map.put("EDITOK", "게시물 수정에 실패했습니다!!");
+    	   		   
+    	   	   }
+          }
+    		   return map;
+    		  
 	  }
 	  
 	  
