@@ -19,16 +19,20 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 
-
+@Slf4j
 @Component
 public class JWTOkens {
 
-  private static SecretKey secretKey;
+  private static SecretKey accessKey;
+  private static SecretKey refreshKey;
+
+  public static final int ACCESS = 1;
+  public static final int REFRESH = 2;
 
   private static String secret;
-
 
   // static {
   // byte[]
@@ -39,10 +43,13 @@ public class JWTOkens {
   public void init() {
     byte[] secretTobytes =
         Base64.getEncoder().encodeToString(secret.getBytes()).getBytes(StandardCharsets.UTF_8);
-    secretKey = Keys.hmacShaKeyFor(secretTobytes);
+    accessKey = Keys.hmacShaKeyFor(secretTobytes);
+    secretTobytes =
+        Base64.getEncoder().encodeToString(secret.getBytes()).getBytes(StandardCharsets.UTF_8);
+    refreshKey = Keys.hmacShaKeyFor(secretTobytes);
   }
 
-  @Value("${secret-key}")
+  @Value("{$access-key,refresh-key}")
   private void setSecret(String secret) {
     this.secret = secret;
   }
@@ -56,8 +63,9 @@ public class JWTOkens {
    * @param expirationTime 토큰 만료 시간(15분에서 몇 시간이 적당).단위는 천분의 1초
    * @return
    */
+
   public static String createToken(String username, Map<String, Object> payloads,
-      long expirationTime) {
+      long expirationTime, int status) {
 
     // JWT 토큰의 만료 시간 설정
     long currentTimeMillis = System.currentTimeMillis();// 토큰의 생성시간
@@ -68,23 +76,23 @@ public class JWTOkens {
     headers.put("typ", "JWT");
     headers.put("alg", "HS256");
 
-    /*
-     * 아래 세줄 사용시 .setClaims(payloads)->.setClaims(claims로 변경) Claims claims=
-     * Jwts.claims().setSubject(username); claims.putAll(payloads); claims.put("roles", "권한");
-     * 
-     */
+
+    // * 아래 세줄 사용시 .setClaims(payloads)->.setClaims(claims로 변경) Claims claims=
+    // * Jwts.claims().setSubject(username); claims.putAll(payloads); claims.put("roles", "권한");
+
 
     JwtBuilder builder = Jwts.builder().header().add(headers).and()// Headers 설정
         .claims(payloads)// Claims 설정(기타 페이로드)
         .subject(username)// 사용자 ID 설정
         .issuedAt(new Date())// 생성 시간을 설정
         .expiration(new Date(expirationTime))// 만료 시간 설정(필수로 설정하자.왜냐하면 토큰(문자열이라)은 세션처럼 제어가 안된다)
-        .signWith(secretKey, Jwts.SIG.HS256);// 비밀 키로 JWT를 서명
+        .signWith(status == ACCESS ? accessKey : refreshKey, Jwts.SIG.HS256);// 비밀 키로 JWT를 서명
 
     // JWT 생성
     String jwt = builder.compact();
     return jwt;
   }
+
 
   /**
    * 발급한 토큰의 payloads부분을 반환하는 메소드
@@ -93,13 +101,15 @@ public class JWTOkens {
    * @return 토큰의 payloads부분 반환
    */
 
-  public static Map<String, Object> getTokenPayloads(String token) {
+
+  public static Map<String, Object> getTokenPayloads(String token, int status) {
 
     Map<String, Object> claims = new HashMap<>();
 
     try {
       // JWT토큰 파싱 및 검증
-      claims = Jwts.parser().verifyWith(secretKey).build()// 서명한 비밀키로 검증
+      claims = Jwts.parser().verifyWith(status == ACCESS ? accessKey : refreshKey).build()// 서명한
+                                                                                          // 비밀키로 검증
           .parseSignedClaims(token)// parseClaimsJws메소드는 만기일자 체크
           .getPayload();
       return claims;
@@ -110,6 +120,7 @@ public class JWTOkens {
     return claims;
   }/////////////////////////////////
 
+
   /**
    * 유효한 토큰인지 검증하는 메소드
    * 
@@ -117,11 +128,13 @@ public class JWTOkens {
    * @return 유효한 토큰이면 true,만료가됬거나 변조된 토큰인 경우 false반환
    */
 
-  public static boolean verifyToken(String token) {
+
+  public static boolean verifyToken(String token, int status) {
     try {
       // JWT토큰 파싱 및 검증
-      Jws<Claims> claims = Jwts.parser().verifyWith(secretKey).build()// 서명한 비밀키로 검증
-          .parseSignedClaims(token);// parseClaimsJws메소드는 만기일자 체크
+      Jws<Claims> claims =
+          Jwts.parser().verifyWith(status == ACCESS ? accessKey : refreshKey).build()// 서명한 비밀키로 검증
+              .parseSignedClaims(token);// parseClaimsJws메소드는 만기일자 체크
       // 토큰의 유효성과 만료일자 확인
       System.out.println("만기일자:" + claims.getPayload().getExpiration());
       return true;
@@ -133,6 +146,7 @@ public class JWTOkens {
   }/////////////////////////////////
 
 
+
   /**
    * 문자열인 발급된 토큰을 요청헤더의 쿠키에서 읽어오는 메소드
    * 
@@ -140,6 +154,7 @@ public class JWTOkens {
    * @param cookieName 토큰 발급시 설정한 쿠키명
    * @return 발급된 토큰
    */
+
 
   public static String getToken(HttpServletRequest request, String cookieName) {
     // 발급한 토큰 가져오기
@@ -153,7 +168,8 @@ public class JWTOkens {
       }
     }
     return token;
-  }///////////
+  }//
+
 
   /**
    * 토큰을 삭제하는 메소드
@@ -162,11 +178,16 @@ public class JWTOkens {
    * @param response HttpServletRequest객체
    */
 
+
   public static void removeToken(HttpServletRequest request, HttpServletResponse response) {
-    Cookie cookie = new Cookie(request.getServletContext().getInitParameter("COOKIE-NAME"), "");
-    cookie.setPath(request.getContextPath());
-    cookie.setMaxAge(0);
-    response.addCookie(cookie);
+    Cookie accessCookie = new Cookie(request.getServletContext().getInitParameter("ACCESS"), "");
+    accessCookie.setPath("/");
+    accessCookie.setMaxAge(0);
+    Cookie refreshCookie = new Cookie(request.getServletContext().getInitParameter("REFRESH"), "");
+    accessCookie.setPath(request.getContextPath());
+    accessCookie.setMaxAge(0);
+    response.addCookie(accessCookie);
+    response.addCookie(refreshCookie);
   }//
 
 

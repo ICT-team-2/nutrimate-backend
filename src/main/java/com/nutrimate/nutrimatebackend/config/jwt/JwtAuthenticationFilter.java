@@ -73,14 +73,24 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     log.info("successfulAuthentication 실행 : 인증 완료 뜻");
     PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
-
     Map<String, Object> payloads = new HashMap<>();// 사용자 임의 데이타 추가
-    long expirationTime = 1000 * 60 * 60 * 3;// 토큰의 만료시간 설정(3시간)
-    String token = JWTOkens.createToken(principalDetails.getMemberDto().getUserUid(), payloads,
-        expirationTime);
-    Cookie cookie = new Cookie("Authorization", token);
-    log.info(cookie);
-    response.addCookie(cookie);
+    long expirationTime = 1000 * 60 * 3;// 토큰의 만료시간 설정(30)
+    int status = 1;
+    String accessToken = JWTOkens.createToken(principalDetails.getMemberDto().getUserUid(),
+        payloads, expirationTime, JWTOkens.ACCESS);
+    Cookie accessCookie = new Cookie("ACCESS", accessToken);
+    accessCookie.setPath("/");
+    log.info(accessCookie);
+    response.addCookie(accessCookie);
 
+    if (status == JWTOkens.ACCESS) {
+      expirationTime = 1000 * 60 * 60 * 3;// 토큰의 만료시간 설정(3시간)
+      String refreshToken = JWTOkens.createToken(principalDetails.getMemberDto().getUserUid(),
+          payloads, expirationTime, JWTOkens.REFRESH);
+      Cookie refreshCookie = new Cookie("REFRESH", refreshToken);
+      refreshCookie.setPath("/");
+      log.info(refreshCookie);
+      response.addCookie(refreshCookie);
+    }
   }
 }

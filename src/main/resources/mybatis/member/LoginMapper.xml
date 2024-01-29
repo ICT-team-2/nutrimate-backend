@@ -12,11 +12,11 @@
 		INSERT INTO
 		member(user_id, user_nick, user_height, user_weight,
 		user_email, user_gender, user_sport_hard,
-		user_cal,user_name,user_uid,user_pwd)
+		user_cal,user_name,user_uid,user_pwd,user_phone)
 		VALUES (#{userId}, #{userNick}, #{userHeight},
 		#{userWeight}, #{userEmail}, #{userGender},
 		#{userSportHard}, #{userCal}, #{userName},
-		#{userUid}, #{userPwd})
+		#{userUid}, #{userPwd}, #{userPhone})
 	</insert>
 	<insert id="insertMemberWithOAuth" parameterType="MemberDto">
 		<selectKey keyProperty="userId"
@@ -24,8 +24,8 @@
 			SELECT SEQ_MEMBER.NEXTVAL userId
 				FROM DUAL
 		</selectKey>
-		INSERT INTO member(user_id, user_email,user_uid,user_pwd)
-		VALUES (#{userId},#{userEmail},#{userUid},#{userPwd})
+		INSERT INTO member(user_id, user_uid,user_pwd)
+		VALUES (#{userId},#{userUid},#{userPwd})
 	</insert>
 	<insert id="insertOAuth" parameterType="MemberDto">
 		INSERT INTO oauth(user_id, provider, provider_id)
@@ -33,11 +33,12 @@
 	</insert>
 	
 	
-	<select id="findCommonMemberByUid" parameterType="string"
+	<select id="findCommonMemberByUid" parameterType="String"
 	        resultType="MemberDto">
 		SELECT *
-			FROM member m
-			WHERE m.deleted = 'N'
+			FROM member
+			WHERE deleted = 'N'
+			AND user_uid = #{userUid}
 	</select>
 	
 	<select id="findOAuthMemberByProviderId" parameterType="String" resultType="MemberDto">
@@ -50,4 +51,37 @@
 			  AND m.deleted = 'N'
 	
 	</select>
+		
+	<select id="findMemberInfoById" parameterType="Long" resultType="MemberDto">
+		SELECT user_id,
+				user_nick, 
+				user_height, 
+				user_weight,
+				user_email, 
+				user_gender, 
+				user_sport_hard,
+				user_cal,
+				user_name,
+				user_uid,
+				user_phone,
+				user_role
+			FROM member
+			WHERE user_id =  #{userId}
+				AND deleted = 'N'
+	</select>
+	<update id="updateMemberInfo" parameterType="MemberDto">	
+		UPDATE member 
+		SET user_nick=#{userNick},
+		user_height=#{userHeight},
+		user_weight=#{userWeight},
+		user_email=#{userEmail},
+		user_gender=#{userGender}, 
+		user_sport_hard=#{userSportHard},
+		user_cal=#{userCal},
+		user_name=#{userName},
+		user_uid=#{userUid},
+		user_pwd=#{userPwd},
+		user_phone=#{userPhone}
+		WHERE user_id=#{userId}	
+	</update> 
 </mapper>
