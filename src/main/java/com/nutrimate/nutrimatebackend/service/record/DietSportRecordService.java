@@ -14,8 +14,8 @@ public class DietSportRecordService {
   private DietSportRecordMapper dietSportRecordMapper;
 
   // 음식 목록 가져오기
-  public List<DietSportRecordDto> findFoodList() {
-    return dietSportRecordMapper.findFoodList();
+  public List<DietSportRecordDto> findFoodList(String searchWord) {
+    return dietSportRecordMapper.findFoodList(searchWord);
   }
 
   // 자신이 먹은 음식 기록하기 (식단DB 데이터 사용)
@@ -46,8 +46,8 @@ public class DietSportRecordService {
   }
 
   // 운동 목록 가져오기
-  public List<DietSportRecordDto> findSportList() {
-    return dietSportRecordMapper.findSportList();
+  public List<DietSportRecordDto> findSportList(String searchWord) {
+    return dietSportRecordMapper.findSportList(searchWord);
   }
 
   // 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용)
@@ -61,7 +61,7 @@ public class DietSportRecordService {
   @Transactional
   public void insertCustomSportRecord(DietSportRecordDto dietSportRecordDto) {
     dietSportRecordMapper.insertRecordSp(dietSportRecordDto);
-    // dietSportRecordMapper.insertRecordSport(dietSportRecordDto);
+    dietSportRecordMapper.insertRecordSport(dietSportRecordDto);
     dietSportRecordMapper.insertRecordCustomSport(dietSportRecordDto);
     dietSportRecordMapper.insertCustomSportRecord(dietSportRecordDto);
   }

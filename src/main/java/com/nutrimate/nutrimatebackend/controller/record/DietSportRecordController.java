@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.nutrimate.nutrimatebackend.model.record.DietSportRecordDto;
 import com.nutrimate.nutrimatebackend.service.record.DietSportRecordService;
@@ -23,11 +24,12 @@ public class DietSportRecordController {
   private DietSportRecordService dietSportRecordService;
 
   // 음식 목록 가져오기 (완료)
-  // 입력 데이터 : 없음
+  // 입력 데이터 : 없음, [searchWord]
   // 출력 데이터 : foodId, foodName, foodCal
   @GetMapping("/foodlist")
-  public ResponseEntity<List<Map<String, Object>>> findFoodList() {
-    List<DietSportRecordDto> foodList = dietSportRecordService.findFoodList();
+  public ResponseEntity<List<Map<String, Object>>> findFoodList(
+      @RequestParam(required = false) String searchWord) {
+    List<DietSportRecordDto> foodList = dietSportRecordService.findFoodList(searchWord);
     List<Map<String, Object>> simplifiedFoodList = new ArrayList<>();
     for (DietSportRecordDto food : foodList) {
       Map<String, Object> simplifiedFood = new HashMap<>();
@@ -99,11 +101,12 @@ public class DietSportRecordController {
   }
 
   // 운동 목록 가져오기 (완료)
-  // 입력 데이터 : 없음
+  // 입력 데이터 : 없음, [searchWord]
   // 출력 데이터 : sportId, sportName, sportMet
   @GetMapping("/sportlist")
-  public ResponseEntity<List<Map<String, Object>>> findSportList() {
-    List<DietSportRecordDto> sportList = dietSportRecordService.findSportList();
+  public ResponseEntity<List<Map<String, Object>>> findSportList(
+      @RequestParam(required = false) String searchWord) {
+    List<DietSportRecordDto> sportList = dietSportRecordService.findSportList(searchWord);
     List<Map<String, Object>> simplifiedsportList = new ArrayList<>();
     for (DietSportRecordDto sport : sportList) {
       Map<String, Object> simplifiedSport = new HashMap<>();
@@ -115,7 +118,7 @@ public class DietSportRecordController {
     return new ResponseEntity<>(simplifiedsportList, HttpStatus.OK);
   }
 
-  // 운동으로 소모한 칼로리를 기록하기 (운동DB 데이터 사용) (완료)
+  // 운동으로 소모한 칼로리를 기록하기 (관리자가 입력한 운동DB 데이터 사용) (완료)
   // 입력 데이터 : userId, sportName, sportTime
   // 출력 데이터 : message, recordId, exerciseId
   @PostMapping("/sport")
@@ -158,6 +161,8 @@ public class DietSportRecordController {
     // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     // }
   }
+
+
 
   // 오늘 자신이 소모한 칼로리를 열람하기 (완료)
   // 하루동안 소모한 칼로리 값이 없을시 값을 0처리
