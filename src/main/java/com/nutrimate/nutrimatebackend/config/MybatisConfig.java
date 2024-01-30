@@ -13,10 +13,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.log4j.Log4j2;
 
 @Configuration
-@MapperScan(value = {"com.nutrimate.nutrimatebackend.mapper"})
+@MapperScan(
+    value = {"com.nutrimate.nutrimatebackend.mapper", "com.nutrimate.nutrimatebackend.mapper.test"},
+    sqlSessionFactoryRef = "sqlSessionFactory")
 @Log4j2
 @EnableTransactionManagement
 public class MybatisConfig {
+
   // https://mybatis.org/spring/ko/factorybean.html
 
   // 생성자 인젝션을 통해 ApplicationContext를 컨테이너로부터 받는다
