@@ -1,7 +1,7 @@
 package com.nutrimate.nutrimatebackend.controller.test;
 
 
-import com.nutrimate.nutrimatebackend.model.user.MemberDto;
+import com.nutrimate.nutrimatebackend.model.member.MemberDto;
 import com.nutrimate.nutrimatebackend.service.test.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

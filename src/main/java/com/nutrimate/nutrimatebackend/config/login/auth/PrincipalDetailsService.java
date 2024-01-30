@@ -1,6 +1,6 @@
-package com.nutrimate.nutrimatebackend.config.auth;
+package com.nutrimate.nutrimatebackend.config.login.auth;
 
-import com.nutrimate.nutrimatebackend.model.user.MemberDto;
+import com.nutrimate.nutrimatebackend.model.member.MemberDto;
 import com.nutrimate.nutrimatebackend.service.MemberService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UserDetails;
