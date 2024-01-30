@@ -14,13 +14,18 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @MapperScan(
-		value = {"com.nutrimate.nutrimatebackend.mapper", "com.nutrimate.nutrimatebackend.mapper.test"},
+		value = {"com.nutrimate.nutrimatebackend.mapper",
+				"com.nutrimate.nutrimatebackend.mapper.test",
+				"com.nutrimate.nutrimatebackend.mapper.board.feed",
+				"com.nutrimate.nutrimatebackend.mapper.board.sport",
+				"com.nutrimate.nutrimatebackend.mapper.board"},
 		sqlSessionFactoryRef = "sqlSessionFactory")
 @Log4j2
 @EnableTransactionManagement
 public class MybatisConfig {
 	
 	// https://mybatis.org/spring/ko/factorybean.html
+	
 	// 생성자 인젝션을 통해 ApplicationContext를 컨테이너로부터 받는다
 	private final ApplicationContext applicationContext;
 	
@@ -32,7 +37,6 @@ public class MybatisConfig {
 	// 마이바티스 관련 빈
 	@Bean
 	public SqlSessionFactory sqlSessionFactory(HikariDataSource hikariDataSource) {
-		log.info("Creating SqlSessionFactory...");
 		
 		SqlSessionFactory factory = null;
 		try {
@@ -48,10 +52,9 @@ public class MybatisConfig {
 			factoryBean.setConfiguration(configuration);
 			factory = factoryBean.getObject();
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(e.getMessage(), e);
 			log.error("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
 			throw new RuntimeException("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
-			
 		}
 		return factory;
 		
