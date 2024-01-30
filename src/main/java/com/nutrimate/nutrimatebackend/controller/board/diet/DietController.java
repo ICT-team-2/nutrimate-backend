@@ -1,7 +1,7 @@
 package com.nutrimate.nutrimatebackend.controller.board.diet;
 
+import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
-import com.nutrimate.nutrimatebackend.model.board.diet.FileUtils;
 import com.nutrimate.nutrimatebackend.service.board.diet.DietService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
