@@ -1,17 +1,17 @@
 package com.nutrimate.nutrimatebackend.controller.board.sport;
 
+import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.sport.BookmarkDto;
-import com.nutrimate.nutrimatebackend.model.board.sport.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.sport.LikeDto;
 import com.nutrimate.nutrimatebackend.model.board.sport.SportBoardDto;
 import com.nutrimate.nutrimatebackend.service.board.sport.SportBoardService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

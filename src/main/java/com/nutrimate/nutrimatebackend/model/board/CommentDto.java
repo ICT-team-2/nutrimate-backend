@@ -1,4 +1,4 @@
-package com.nutrimate.nutrimatebackend.model.board.feed;
+package com.nutrimate.nutrimatebackend.model.board;
 
 import lombok.*;
 import org.apache.ibatis.type.Alias;
@@ -11,8 +11,8 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @Builder
-@Alias("FeedCommentDto")
-public class FeedCommentDto {
+@Alias("CommentDto")
+public class CommentDto {
 	
 	/** 댓글+대댓글 **/
 	private int cmtId; // 댓글번호
