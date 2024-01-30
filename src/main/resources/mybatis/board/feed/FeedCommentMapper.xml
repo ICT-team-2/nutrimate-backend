@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.nutrimate.nutrimatebackend.mapper.board.feed.CommentMapper">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.board.feed.FeedCommentMapper">
 	
 	<!-- ResultMap 정의 -->
-	<resultMap id="CommentDto" type="com.nutrimate.nutrimatebackend.model.board.feed.CommentDto">
+	<resultMap id="CommentDto"
+	           type="com.nutrimate.nutrimatebackend.model.board.feed.FeedCommentDto">
 		<id column="cmt_id" property="cmtId"/>
 		<result column="board_id" property="boardId"/>
 		<result column="user_id" property="userId"/>
@@ -43,7 +44,7 @@
 	</select>
 	
 	<!-- 댓글 작성 -->
-	<insert id="insertComment" parameterType="CommentDto">
+	<insert id="insertComment" parameterType="FeedCommentDto">
 		<selectKey keyProperty="cmtId" resultType="int" order="BEFORE">
 			SELECT SEQ_COMMENTS.NEXTVAL AS cmtId
 				FROM DUAL
@@ -55,7 +56,7 @@
 	</insert>
 	
 	<!-- 대댓글 작성 -->
-	<insert id="insertReply" parameterType="CommentDto">
+	<insert id="insertReply" parameterType="FeedCommentDto">
 		<selectKey keyProperty="mycmtId" resultType="int" order="BEFORE">
 			SELECT SEQ_COMMENTS.NEXTVAL AS cmtId
 				FROM DUAL
@@ -67,14 +68,14 @@
 	</insert>
 	
 	<!-- 댓글/대댓글 수정 -->
-	<update id="updateComment" parameterType="CommentDto">
+	<update id="updateComment" parameterType="FeedCommentDto">
 		UPDATE comments
 		SET cmt_content = #{cmtContent}
 			WHERE cmt_id = #{cmtId}
 	</update>
 	
 	<!-- 댓글/대댓글 삭제 -->
-	<update id="deleteComment" parameterType="CommentDto">
+	<update id="deleteComment" parameterType="FeedCommentDto">
 		UPDATE comments
 		SET deleted = 'Y'
 			WHERE cmt_id = #{cmtId}

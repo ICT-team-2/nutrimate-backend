@@ -11,8 +11,8 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @Builder
-@Alias("CommentDto")
-public class CommentDto {
+@Alias("FeedCommentDto")
+public class FeedCommentDto {
 	
 	/** 댓글+대댓글 **/
 	private int cmtId; // 댓글번호
