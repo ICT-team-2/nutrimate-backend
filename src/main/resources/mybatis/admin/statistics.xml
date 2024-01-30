@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 매퍼파일 -->
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.admin.StatisticsMapper">
+
+
+    
+    
+    <!--주간 가입자수 -->
+    <resultMap id="weekMemberResult" type="StatisticsDto">
+		   <result property="count" column="count"/>
+		   <result property="day" column="day"/>
+	</resultMap>
+	<select id="findWeekMember" resultMap="weekMemberResult">
+			  <![CDATA[
+			    select trunc(m.created_date) day,count(*) as count FROM member m where trunc(m.created_date)<=TRUNC(sysdate) and trunc(m.created_date)>=trunc(sysdate-6) and deleted = 'N'
+				group by trunc(m.created_date)
+				order by trunc(m.created_date)
+			  ]]>
+    </select>
+    <!--월간 가입자수 -->
+    <resultMap id="monthMemberResult" type="StatisticsDto">
+		   <result property="count" column="count"/>
+		   <result property="month" column="month"/>
+	</resultMap>
+	<select id="findMonthMember" resultMap="monthMemberResult">
+			  <![CDATA[
+			    select TO_CHAR(m.created_date, 'YYYY-MM') as month,count(*) as count FROM member m where  TO_CHAR(m.created_date, 'YYYY-MM') <=TO_CHAR(sysdate, 'YYYY-MM') and TO_CHAR(m.created_date, 'YYYY-MM')>=TO_CHAR(add_months(sysdate, -11), 'YYYY-MM') and deleted = 'N' 
+				group by TO_CHAR(m.created_date, 'YYYY-MM') order by TO_CHAR(m.created_date, 'YYYY-MM')
+			  ]]>
+    </select>
+    <!--인기글-->
+     <resultMap id="bestResult" type="StatisticsDto">
+		   <result property="count" column="count"/>
+		   <result property="usernick" column="user_nick"/>
+		   <result property="boardtitle" column="board_title"/>
+	</resultMap>
+
+	<select id="findBestBylikeAndBoardviewcount" resultMap="bestResult">
+			  <![CDATA[
+					    SELECT * 
+						FROM (
+						  SELECT DISTINCT b.board_title, m.user_nick, COUNT(*) OVER (PARTITION BY b.board_id) + b.board_viewcount AS COUNT FROM boardlike li
+						  JOIN board b ON li.board_id = b.board_id
+						  JOIN member m ON m.user_id = b.user_id where trunc(b.created_date)<=trunc(sysdate) and trunc(b.created_date)>=trunc(sysdate-6) and b.deleted = 'N' and  b.blocked='N' and board_category ='FEED'
+						  ORDER BY COUNT DESC
+						)
+						WHERE ROWNUM BETWEEN 1 AND 10
+
+			  ]]>
+    </select>
+    
+    
+    
+    
+    
+    
+    
+<!--주간 카테고리별-->
+	<resultMap id="categoryResult" type="StatisticsDto">
+			<result property="day" column="day"/>
+		   <result property="count" column="count"/>
+		   <result property="boardcategory" column="board_category"/>
+	</resultMap>
+	<select id="findByCategory" resultMap="categoryResult">
+		<![CDATA[		  
+	    select DISTINCT trunc(created_date) as day,board_category, COUNT(*) OVER (PARTITION BY trunc(created_date),board_category) as count 
+	    from board
+	    where trunc(created_date)<=TRUNC(SYSDATE) and trunc(created_date)>=trunc(sysdate-6) 
+	    and deleted = 'N' and blocked = 'N' and  board_category !='FEED'
+        order by trunc(created_date)
+		]]>
+	
+	</select>
+	
+</mapper>
