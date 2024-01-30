@@ -45,26 +45,24 @@
 	<!-- 댓글 작성 -->
 	<insert id="insertComment" parameterType="CommentDto">
 		<selectKey keyProperty="cmtId" resultType="int" order="BEFORE">
-
-			SELECT seq_comments.nextval AS cmtid
-				FROM dual
+			SELECT SEQ_COMMENTS.NEXTVAL AS cmtId
+				FROM DUAL
 		</selectKey>
-		INSERT INTO comments (CMT_ID, USER_ID, BOARD_ID, CMT_CONTENT, CREATED_DATE, DELETED,
-		BLOCKED, CMT_DEPTH, CMT_REF)
-		VALUES (#{cmtId}, #{userId}, #{boardId}, #{cmtContent}, SYSDATE, DEFAULT, DEFAULT, DEFAULT,
-
+		INSERT INTO comments (cmt_id, user_id, board_id, cmt_content, created_date, deleted,
+		blocked, cmt_depth, cmt_ref)
+		VALUES (#{cmtId}, #{userId}, #{boardId}, #{cmtContent}, sysdate, DEFAULT, DEFAULT, DEFAULT,
 		DEFAULT)
 	</insert>
 	
 	<!-- 대댓글 작성 -->
 	<insert id="insertReply" parameterType="CommentDto">
 		<selectKey keyProperty="mycmtId" resultType="int" order="BEFORE">
-			SELECT seq_comments.nextval AS cmtid
-				FROM dual
+			SELECT SEQ_COMMENTS.NEXTVAL AS cmtId
+				FROM DUAL
 		</selectKey>
-		INSERT INTO comments (CMT_ID, USER_ID, BOARD_ID, CMT_CONTENT, CREATED_DATE, DELETED,
-		BLOCKED, CMT_DEPTH, CMT_REF)
-		VALUES (#{mycmtId}, #{userId}, #{boardId}, #{cmtContent}, SYSDATE, DEFAULT, DEFAULT,
+		INSERT INTO comments (cmt_id, user_id, board_id, cmt_content, created_date, deleted,
+		blocked, cmt_depth, cmt_ref)
+		VALUES (#{mycmtId}, #{userId}, #{boardId}, #{cmtContent}, sysdate, DEFAULT, DEFAULT,
 		(SELECT cmt_depth FROM comments WHERE cmt_id = #{cmtId})+1, #{cmtId})
 	</insert>
 	

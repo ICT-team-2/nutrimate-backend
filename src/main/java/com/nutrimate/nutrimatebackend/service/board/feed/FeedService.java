@@ -113,7 +113,7 @@ public class FeedService {
 	
 	// 북마크 추가
 	public void insrtBookmark(FeedDto feedDto) {
-		feedMapper.insrtBookmark(feedDto);
+		feedMapper.insertBookmark(feedDto);
 	}
 	
 	// 북마크 해제
