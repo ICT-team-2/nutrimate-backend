@@ -12,17 +12,18 @@ public class SecurityConfig {
 	
 	
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf(AbstractHttpConfigurer::disable);
-		http.authorizeRequests()
-				//url에 접근 권한 설정
-//				.antMatchers("/user/**").authenticated()
-//				.antMatchers("/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-//				.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
-				.anyRequest().permitAll()
-		;
-		
-		
+
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(AbstractHttpConfigurer::disable)
+				.sessionManagement((sessionManagement) -> sessionManagement
+						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				// 실행 에러 해결을 위해 requestMatchers -> antMatchers로 바꿨습니다 (학원 pc에서만 오류남..)
+				.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+//                .antMatchers("/user/**")
+//            .authenticated().antMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+//            .antMatchers("/admin/**").hasAnyRole("ADMIN")
+						.anyRequest().permitAll());
+
 		return http.build();
 	}
 }
