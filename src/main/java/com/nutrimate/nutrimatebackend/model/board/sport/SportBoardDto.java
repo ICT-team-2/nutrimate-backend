@@ -1,20 +1,18 @@
-package com.nutrimate.nutrimatebackend.model.member;
+package com.nutrimate.nutrimatebackend.model.board.sport;
 
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.ibatis.type.Alias;
+
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Alias("BoardDto")
+@Alias("SportBoardDto")
 @ToString
-public class BoardDto {
+public class SportBoardDto {
 	private int boardId;
 	private long userId;
 	private String boardCategory;
@@ -33,15 +31,15 @@ public class BoardDto {
 	private String searchUser;
 	private String searchTitle;
 	private String searchTag;
-
+	
 	//private int pageNum; //현재 페이지
 	//private int pageSize=10; //한페이지에 10개씩
 	//private int totalPage; //총 페이지 수
 	//private List<MultipartFile> files;
 	
 	private int tagId; // 태그 기본키
-    private String tagName; // 태그 이름
-    private List<String> hashtag; // 해시태그
-    private int checkTagId; // 해시태그 중복체크
+	private String tagName; // 태그 이름
+	private List<String> hashtag; // 해시태그
+	private int checkTagId; // 해시태그 중복체크
 }
 

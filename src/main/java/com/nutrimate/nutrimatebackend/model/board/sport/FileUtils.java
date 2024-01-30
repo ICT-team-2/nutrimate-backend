@@ -1,4 +1,4 @@
-package com.nutrimate.nutrimatebackend.model.member;
+package com.nutrimate.nutrimatebackend.model.board.sport;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,7 +85,7 @@ public class FileUtils {
 	public static void deletes(StringBuffer fileNames, String saveDirectory, String delim) {
 		String[] files = fileNames.toString().split(delim);
 		for (String filename : files) {
-			filename=filename.replaceFirst("/imageLoading/","");
+			filename = filename.replaceFirst("/imageLoading/", "");
 			File f = new File(saveDirectory + File.separator + filename);
 			if (f.exists()) f.delete();
 		}

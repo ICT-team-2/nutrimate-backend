@@ -1,10 +1,10 @@
-package com.nutrimate.nutrimatebackend.controller.test;
+package com.nutrimate.nutrimatebackend.controller.board.sport;
 
-import com.nutrimate.nutrimatebackend.model.member.BoardDto;
-import com.nutrimate.nutrimatebackend.model.member.BookmarkDto;
-import com.nutrimate.nutrimatebackend.model.member.FileUtils;
-import com.nutrimate.nutrimatebackend.model.member.LikeDto;
-import com.nutrimate.nutrimatebackend.service.test.BoardService;
+import com.nutrimate.nutrimatebackend.model.board.sport.BookmarkDto;
+import com.nutrimate.nutrimatebackend.model.board.sport.FileUtils;
+import com.nutrimate.nutrimatebackend.model.board.sport.LikeDto;
+import com.nutrimate.nutrimatebackend.model.board.sport.SportBoardDto;
+import com.nutrimate.nutrimatebackend.service.board.sport.SportBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,22 +12,21 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/boards")
-public class BoardController {
+@RequestMapping("/boards/sport")
+public class SportBoardController {
 	
 	@Autowired
-	private BoardService boardService;
+	private SportBoardService sportBoardService;
 	
 	//글 생성
 	@PostMapping()
-	public BoardDto createBoard(BoardDto board, HttpServletRequest req, List<MultipartFile> files) {
+	public SportBoardDto createBoard(SportBoardDto board, HttpServletRequest req, List<MultipartFile> files) {
 		String phisicalPath = "C:\\Temp\\upload";
 		StringBuffer fileNames = new StringBuffer();
 		try {
@@ -37,25 +36,25 @@ public class BoardController {
 		} catch (Exception e) { //파일용량 초과시
 			System.out.println("문제생김");
 		}
-		return boardService.createBoard(board);
+		return sportBoardService.createBoard(board);
 	}
 	
 	//글 조회(상세)
 	@GetMapping("/{id}")
 	public ResponseEntity<Map<String, Object>> getBoardWithPrevAndNext(@PathVariable("id") int id) {
 		Map<String, Object> response = new HashMap<>();
-		BoardDto board = boardService.getBoard(id);
+		SportBoardDto board = sportBoardService.getBoard(id);
 		if (board != null) {
-			boardService.updateBoardViewcount(id); //조회수 증가
+			sportBoardService.updateBoardViewcount(id); //조회수 증가
 			response.put("current", board);
 		}
 		
-		BoardDto prevBoard = boardService.getPrevBoard(id);
+		SportBoardDto prevBoard = sportBoardService.getPrevBoard(id);
 		if (prevBoard != null) {
 			response.put("prev", prevBoard);
 		}
 		
-		BoardDto nextBoard = boardService.getNextBoard(id);
+		SportBoardDto nextBoard = sportBoardService.getNextBoard(id);
 		if (nextBoard != null) {
 			response.put("next", nextBoard);
 		}
@@ -72,49 +71,49 @@ public class BoardController {
 			@RequestParam(required = false) String searchTitle,
 			@RequestParam(required = false) String searchTag) {
 		
-		Map<String, Object> boards = boardService.getBoards(pageNum, searchUser, searchTitle, searchTag);
+		Map<String, Object> boards = sportBoardService.getBoards(pageNum, searchUser, searchTitle, searchTag);
 		return new ResponseEntity<>(boards, HttpStatus.OK);
 	}
 	
 	//글 수정
 	@PutMapping("/{id}")
-	public BoardDto updateBoard(@PathVariable("id") int id, BoardDto board, HttpServletRequest req, List<MultipartFile> files) {
+	public SportBoardDto updateBoard(@PathVariable("id") int id, SportBoardDto board, HttpServletRequest req, List<MultipartFile> files) {
 		board.setBoardId(id);
 		String phisicalPath = "C:\\Temp\\upload";
-		StringBuffer fileNames=new StringBuffer();
-		if(files!=null) {
-		try {
-		    		   
-			BoardDto titledto=boardService.getBoard(id);
-		    System.out.println(titledto);
-            StringBuffer titledto_ = new StringBuffer(titledto.getMapImg());
-            fileNames= FileUtils.upload(files, phisicalPath);
-            FileUtils.deletes(titledto_, phisicalPath, ",");
-            board.setMapImg(fileNames.toString());
-            }catch(Exception e) {//파일용량 초과시
-                
-            }
+		StringBuffer fileNames = new StringBuffer();
+		if (files != null) {
+			try {
+				
+				SportBoardDto titledto = sportBoardService.getBoard(id);
+				System.out.println(titledto);
+				StringBuffer titledto_ = new StringBuffer(titledto.getMapImg());
+				fileNames = FileUtils.upload(files, phisicalPath);
+				FileUtils.deletes(titledto_, phisicalPath, ",");
+				board.setMapImg(fileNames.toString());
+			} catch (Exception e) {//파일용량 초과시
+			
+			}
 		}
-		return boardService.updateBoard(board);
+		return sportBoardService.updateBoard(board);
 	}
 	
 	//글 삭제
 	@DeleteMapping("/{id}")
 	public void deleteBoard(@PathVariable("id") int id) {
-		boardService.deleteBoard(id);
+		sportBoardService.deleteBoard(id);
 	}
 	
 	//좋아요 수 조회
 	@GetMapping("/{boardId}/likes")
 	public int countLikes(@PathVariable String boardId) {
-		return boardService.countLikes(boardId);
+		return sportBoardService.countLikes(boardId);
 	}
 	
 	//좋아요 생성
 	@PostMapping("/{boardId}/likes")
 	public ResponseEntity<Void> insertLike(@PathVariable String boardId, @RequestBody LikeDto likeDto) {
 		likeDto.setBoardId(boardId);
-		boolean isCreated = boardService.insertLike(likeDto);
+		boolean isCreated = sportBoardService.insertLike(likeDto);
 		
 		if (isCreated) {
 			return new ResponseEntity<>(HttpStatus.CREATED);
@@ -127,7 +126,7 @@ public class BoardController {
 	@DeleteMapping("/{boardId}/likes")
 	public ResponseEntity<Void> deleteLike(@PathVariable String boardId, @RequestBody LikeDto likeDto) {
 		likeDto.setBoardId(boardId);
-		int affectedRows = boardService.deleteLike(likeDto);
+		int affectedRows = sportBoardService.deleteLike(likeDto);
 		
 		if (affectedRows > 0) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -164,7 +163,7 @@ public class BoardController {
 	@PostMapping("/{boardId}/bookmark")
 	public ResponseEntity<Void> insertBookmark(@PathVariable String boardId, @RequestBody BookmarkDto bookmarkDto) {
 		bookmarkDto.setBoardId(boardId);
-		boolean isCreated = boardService.insertBookmark(bookmarkDto);
+		boolean isCreated = sportBoardService.insertBookmark(bookmarkDto);
 		
 		if (isCreated) {
 			return new ResponseEntity<>(HttpStatus.CREATED);
@@ -177,7 +176,7 @@ public class BoardController {
 	@DeleteMapping("/{boardId}/bookmark")
 	public ResponseEntity<Void> deleteBookmark(@PathVariable String boardId, @RequestBody BookmarkDto bookmarkDto) {
 		bookmarkDto.setBoardId(boardId);
-		int affectedRows = boardService.deleteBookmark(bookmarkDto);
+		int affectedRows = sportBoardService.deleteBookmark(bookmarkDto);
 		
 		if (affectedRows > 0) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -185,29 +184,29 @@ public class BoardController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	
 	/** 해시태그 **/
 	// 해당 글의 해시태그 가져오기 (완료)
 	// 입력 데이터 : boardId
 	// 출력 데이터 : tagName or message(해시태그가 비어있거나 없는 게시글번호)
 	@GetMapping("/hashtag")
-	public ResponseEntity<List<Map<String, Object>>> findHashtagsByBoardId(@RequestBody BoardDto board) {
-		List<BoardDto> tagNames = boardService.findHashtagsByBoardId(board);
-	    List<Map<String, Object>> tagNameList = new ArrayList<>();
-	    for (BoardDto tagName : tagNames) {
-	      Map<String, Object> tagNameBoard = new HashMap<>();
-	      tagNameBoard.put("tagName", tagName.getTagName());
-	      tagNameList.add(tagNameBoard);
-	    }
-	    if (tagNameList.isEmpty()) {
-	      Map<String, Object> tagNameBoard = new HashMap<>();
-	      tagNameBoard.put("message", "해시태그가 없어요");
-	      tagNameList.add(tagNameBoard);
-	      return new ResponseEntity<>(tagNameList, HttpStatus.OK);
-	    }
-	    return new ResponseEntity<>(tagNameList, HttpStatus.OK);
+	public ResponseEntity<List<Map<String, Object>>> findHashtagsByBoardId(@RequestBody SportBoardDto board) {
+		List<SportBoardDto> tagNames = sportBoardService.findHashtagsByBoardId(board);
+		List<Map<String, Object>> tagNameList = new ArrayList<>();
+		for (SportBoardDto tagName : tagNames) {
+			Map<String, Object> tagNameBoard = new HashMap<>();
+			tagNameBoard.put("tagName", tagName.getTagName());
+			tagNameList.add(tagNameBoard);
+		}
+		if (tagNameList.isEmpty()) {
+			Map<String, Object> tagNameBoard = new HashMap<>();
+			tagNameBoard.put("message", "해시태그가 없어요");
+			tagNameList.add(tagNameBoard);
+			return new ResponseEntity<>(tagNameList, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(tagNameList, HttpStatus.OK);
 	}
-
+	
 	// 해시태그로 글 검색 (완료)
 	// 입력 데이터 : tagName
 	// 출력 데이터 : BoardList or message(해당 해시태그로 검색된 글이 없음)
