@@ -47,8 +47,10 @@
 	<!-- 피드 작성 -->
 	<insert id="insertFeed" parameterType="FeedDto">
 		<selectKey keyProperty="boardId" resultType="int" order="BEFORE">
+
 			SELECT seq_board.nextval
 				FROM dual
+
 		</selectKey>
 		INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', #{boardTitle}, #{boardContent},
 		#{boardThumbnail}, 0, SYSDATE, DEFAULT, DEFAULT)
@@ -142,7 +144,9 @@
 	</select>
 	
 	<!-- 북마크 추가 -->
+
 	<insert id="insrtBookmark">
+
 		INSERT INTO bookmark
 			VALUES (#{userId}, #{boardId}, sysdate)
 	</insert>

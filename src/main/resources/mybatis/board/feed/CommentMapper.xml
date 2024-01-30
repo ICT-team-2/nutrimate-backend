@@ -45,12 +45,14 @@
 	<!-- 댓글 작성 -->
 	<insert id="insertComment" parameterType="CommentDto">
 		<selectKey keyProperty="cmtId" resultType="int" order="BEFORE">
+
 			SELECT seq_comments.nextval AS cmtid
 				FROM dual
 		</selectKey>
 		INSERT INTO comments (CMT_ID, USER_ID, BOARD_ID, CMT_CONTENT, CREATED_DATE, DELETED,
 		BLOCKED, CMT_DEPTH, CMT_REF)
 		VALUES (#{cmtId}, #{userId}, #{boardId}, #{cmtContent}, SYSDATE, DEFAULT, DEFAULT, DEFAULT,
+
 		DEFAULT)
 	</insert>
 	
