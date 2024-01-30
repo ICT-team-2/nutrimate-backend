@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.board.feed.CommentMapper">
+	
+	<!-- ResultMap 정의 -->
+	<resultMap id="CommentDto" type="com.nutrimate.nutrimatebackend.model.board.feed.CommentDto">
+		<id column="cmt_id" property="cmtId"/>
+		<result column="board_id" property="boardId"/>
+		<result column="user_id" property="userId"/>
+		<result column="cmt_content" property="cmtContent"/>
+		<result column="created_date" property="createdDate"/>
+		<result column="cmt_depth" property="cmtDepth"/>
+		<result column="deleted" property="deleted"/>
+		<result column="cmt_ref" property="cmtRef"/>
+		<result column="user_name" property="userName"/>
+		<result column="user_nick" property="userNick"/>
+	</resultMap>
+	
+	<!-- 글번호에 따른 댓글+대댓글 목록 조회 -->
+	<select id="findCommentsByBoardId" resultMap="CommentDto">
+		SELECT c.*, m.user_name, m.user_nick
+			FROM comments c
+				     JOIN member m
+				          ON c.user_id = m.user_id
+			WHERE board_id = #{boardId}
+			START WITH cmt_depth = 0
+			CONNECT BY PRIOR cmt_id = cmt_ref
+			ORDER SIBLINGS BY c.created_date
+	</select>
+	<!--
+		삭제된 댓글 중 대댓글이 있다면 "삭제된 댓글입니다" 표시,
+		삭제된 댓글 중 대댓글이 없다면 삭제하여 미표시
+	 -->
+	
+	<!-- 대댓글 수 확인 -->
+	<select id="countReplies" resultType="int">
+		SELECT count(*)
+			FROM comments
+			START WITH cmt_id = #{cmtId}
+			CONNECT BY PRIOR cmt_id = cmt_ref
+			ORDER SIBLINGS BY created_date DESC
+	</select>
+	
+	<!-- 댓글 작성 -->
+	<insert id="insertComment" parameterType="CommentDto">
+		<selectKey keyProperty="cmtId" resultType="int" order="BEFORE">
+			SELECT seq_comments.nextval AS cmtid
+				FROM dual
+		</selectKey>
+		INSERT INTO comments (CMT_ID, USER_ID, BOARD_ID, CMT_CONTENT, CREATED_DATE, DELETED,
+		BLOCKED, CMT_DEPTH, CMT_REF)
+		VALUES (#{cmtId}, #{userId}, #{boardId}, #{cmtContent}, SYSDATE, DEFAULT, DEFAULT, DEFAULT,
+		DEFAULT)
+	</insert>
+	
+	<!-- 대댓글 작성 -->
+	<insert id="insertReply" parameterType="CommentDto">
+		<selectKey keyProperty="mycmtId" resultType="int" order="BEFORE">
+			SELECT seq_comments.nextval AS cmtid
+				FROM dual
+		</selectKey>
+		INSERT INTO comments (CMT_ID, USER_ID, BOARD_ID, CMT_CONTENT, CREATED_DATE, DELETED,
+		BLOCKED, CMT_DEPTH, CMT_REF)
+		VALUES (#{mycmtId}, #{userId}, #{boardId}, #{cmtContent}, SYSDATE, DEFAULT, DEFAULT,
+		(SELECT cmt_depth FROM comments WHERE cmt_id = #{cmtId})+1, #{cmtId})
+	</insert>
+	
+	<!-- 댓글/대댓글 수정 -->
+	<update id="updateComment" parameterType="CommentDto">
+		UPDATE comments
+		SET cmt_content = #{cmtContent}
+			WHERE cmt_id = #{cmtId}
+	</update>
+	
+	<!-- 댓글/대댓글 삭제 -->
+	<update id="deleteComment" parameterType="CommentDto">
+		UPDATE comments
+		SET deleted = 'Y'
+			WHERE cmt_id = #{cmtId}
+	</update>
+
+</mapper>
