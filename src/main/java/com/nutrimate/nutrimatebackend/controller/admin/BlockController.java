@@ -1,7 +1,7 @@
 package com.nutrimate.nutrimatebackend.controller.admin;
 
+import com.nutrimate.nutrimatebackend.model.admin.AdminReportDto;
 import com.nutrimate.nutrimatebackend.model.admin.BlockDto;
-import com.nutrimate.nutrimatebackend.model.admin.ReportDto;
 import com.nutrimate.nutrimatebackend.service.admin.BlockService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +41,15 @@ public class BlockController {
 	
 	//신고한 글 사유-게시글
 	@GetMapping("/block/reason/board")
-	public List<ReportDto> BlockReasonBoard(@ModelAttribute BlockDto dto) {
-		List<ReportDto> blockList = blockService.selectBoardReport(dto);
+	public List<AdminReportDto> BlockReasonBoard(@ModelAttribute BlockDto dto) {
+		List<AdminReportDto> blockList = blockService.selectBoardReport(dto);
 		return blockList;
 		
 	}
 	//신고한 글 사유-댓글
 	@GetMapping("/block/reason/comment")
-	public List<ReportDto> BlockReasonCommet(@ModelAttribute BlockDto dto) {
-		List<ReportDto> blockList = blockService.selectCommentReport(dto);
+	public List<AdminReportDto> BlockReasonCommet(@ModelAttribute BlockDto dto) {
+		List<AdminReportDto> blockList = blockService.selectCommentReport(dto);
 		return blockList;
 		
 	}
