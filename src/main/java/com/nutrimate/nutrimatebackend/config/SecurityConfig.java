@@ -1,30 +1,94 @@
 package com.nutrimate.nutrimatebackend.config;
 
+import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthenticationFilter;
+import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthorizationFilter;
+import com.nutrimate.nutrimatebackend.config.login.oauth.OAuth2SuccessHandler;
+import com.nutrimate.nutrimatebackend.config.login.oauth.PrincipalOauth2UserService;
+import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.web.filter.CorsFilter;
 
-//todo: 아래 내용 수정하여 사용할 것!!
+
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@Log4j2
 public class SecurityConfig {
 	
+	@Autowired
+	ClientRegistrationRepository clientRegistrationRepository;
+	@Autowired
+	OAuth2AuthorizedClientService authorizedClientService;
+	
+	
+	private PrincipalOauth2UserService principalOauth2UserService;
+	private CorsFilter corsFilter;
+	private MemberMapper memberMapper;
+	
+	public SecurityConfig(CorsFilter corsFilter,
+	                      PrincipalOauth2UserService principalOauth2UserService, MemberMapper memberMapper) {
+		this.corsFilter = corsFilter;
+		this.principalOauth2UserService = principalOauth2UserService;
+		this.memberMapper = memberMapper;
+	}
 	
 	@Bean
+	static BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 	
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(AbstractHttpConfigurer::disable)
+	@Bean
+	AuthenticationManager authenticationManager(
+			AuthenticationConfiguration authenticationConfiguration) throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
+	
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http,
+	                                        AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder)
+			throws Exception {
+		
+		
+		http.addFilterBefore(corsFilter, ChannelProcessingFilter.class);
+		http.csrf(t -> t.disable())
 				.sessionManagement((sessionManagement) -> sessionManagement
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				// 실행 에러 해결을 위해 requestMatchers -> antMatchers로 바꿨습니다 (학원 pc에서만 오류남..)
-				.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-//                .antMatchers("/user/**")
-//            .authenticated().antMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-//            .antMatchers("/admin/**").hasAnyRole("ADMIN")
-						.anyRequest().permitAll());
+				.addFilter(corsFilter) // @CrossOrigin(인증 x), 시큐리티 필터에 등록인증(o)
+				.addFilter(new JwtAuthenticationFilter(authenticationManager)) // AuthenticationManager
+				.addFilter(new JwtAuthorizationFilter(authenticationManager, memberMapper, passwordEncoder)) // AuthenticationManager
+				.authorizeHttpRequests(t -> t.requestMatchers("/api/v1/user/**").authenticated()
+						.requestMatchers("/api/v1/user/**").hasAnyRole("USER", "MANAGER", "ADMIN")
+						.requestMatchers("/api/v1/manager/**").hasAnyRole("MANAGER", "ADMIN")
+						.requestMatchers("/api/v1/admin/**").hasRole("ADMIN").anyRequest().permitAll())
+				.formLogin(t -> t
+						// .loginPage("/loginForm")
+						.loginProcessingUrl("/login").defaultSuccessUrl("/"))
+				.oauth2Login(t -> t
+						// .loginPage("/loginForm")
+						.userInfoEndpoint(endpoint -> endpoint.userService(principalOauth2UserService))
+						.failureHandler((request, response, exception) -> {
+							log.info("exception: ", exception);
+							response.getWriter().println(exception.getMessage());
+						}).successHandler((request, response, authentication) -> {
+							log.info("authentication: ", authentication);
+							response.getWriter().println("success");
+						}).successHandler(new OAuth2SuccessHandler()));
 		
 		return http.build();
 	}
+	
 }
