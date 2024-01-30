@@ -112,7 +112,7 @@ public class IndexController {
 	}
 	
 	
-	@PutMapping("/member/mypageupdate")
+	@PutMapping("/member/mypage")
 	public Map<String, Object> updateMemberInfo(@RequestBody MemberDto memberDto) {
 		memberService.updateMemberInfo(memberDto);
 		memberDto.setUserPwd(passwordEncoder.encode(memberDto.getUserPwd()));
