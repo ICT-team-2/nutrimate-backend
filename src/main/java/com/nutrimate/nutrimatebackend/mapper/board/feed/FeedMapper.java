@@ -57,7 +57,8 @@ public interface FeedMapper {
 	int checkUserBookmark(FeedDto feedDto);
 	
 	// 북마크 추가
-	void insertBookmark(FeedDto feedDto);
+	void insrtBookmark(FeedDto feedDto);
+
 	
 	// 북마크 해제
 	void deleteBookmark(FeedDto feedDto);
