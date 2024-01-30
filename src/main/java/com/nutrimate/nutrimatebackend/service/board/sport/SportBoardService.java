@@ -27,6 +27,9 @@ public class SportBoardService {
 		sportBoardMapper.insertSportBoard(board);
 		// 해시태그 작성
 		List<String> hashtags = board.getHashtag();
+		if (hashtags == null) {
+			return board;
+		}
 		for (String tag : hashtags) {
 			int checkTagId = sportBoardMapper.checkTagId(tag);
 			if (checkTagId == 0) {
