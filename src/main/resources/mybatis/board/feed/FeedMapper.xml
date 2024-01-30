@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.board.feed.FeedMapper">
+	
+	<!-- 피드 글목록 가져오기 -->
+	<select id="findFeedList" resultType="FeedDto" parameterType="map">
+		SELECT *
+			FROM (SELECT board_id, board_thumbnail,
+			             row_number() OVER (ORDER BY board_id DESC) AS rnum
+				      FROM board
+				      WHERE deleted = 'N' AND blocked = 'N'
+					    AND board_category = 'FEED')
+			WHERE rnum BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<!-- 피드 총 페이지 수 가져오기(페이징 시 필요) -->
+	<select id="findFeedtotalRecordCount" resultType="int">
+		SELECT count(*)
+			FROM board
+			WHERE deleted = 'N' AND blocked = 'N'
+			  AND board_category = 'FEED'
+	</select>
+	
+	<!-- 피드 상세보기 정보 가져오기 -->
+	<select id="findFeedDetail" resultType="FeedDto">
+		SELECT b.board_id, m.user_nick, m.user_profile, b.created_date, b.board_thumbnail,
+		       b.board_viewcount,
+		       (SELECT count(like_id) FROM boardlike WHERE board_id = b.board_id) AS like_count
+			FROM board b
+				     RIGHT JOIN member m ON m.user_id = b.user_id
+			WHERE b.board_id = #{boardId}
+			GROUP BY b.board_id, m.user_nick, m.user_profile, b.created_date, b.board_thumbnail,
+			         b.board_viewcount
+	</select>
+	
+	<!-- 피드의 조회수를 +1하기 -->
+	<update id="updateincreaseViewCount">
+		UPDATE BOARD SET BOARD_VIEWCOUNT = BOARD_VIEWCOUNT + 1 WHERE BOARD_ID = #{boardId}
+		<selectKey keyProperty="boardViewCount" order="AFTER" resultType="int">
+			SELECT board_viewcount
+				FROM board
+				WHERE board_id = #{boardId}
+		</selectKey>
+	</update>
+	
+	<!-- 피드 작성 -->
+	<insert id="insertFeed" parameterType="FeedDto">
+		<selectKey keyProperty="boardId" resultType="int" order="BEFORE">
+			SELECT SEQ_BOARD.NEXTVAL
+				FROM DUAL
+		</selectKey>
+		INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', #{boardTitle}, #{boardContent},
+		#{boardThumbnail}, 0, SYSDATE, DEFAULT, DEFAULT)
+	</insert>
+	<!-- 해시태그 추가 -->
+	<select id="checkTagId" resultType="int">
+		SELECT count(tag_id)
+			FROM hashtag
+			WHERE tag_name = #{tag}
+	</select>
+	<!-- checkTagId가 0이면(중복이 아니면) 실행 -->
+	<insert id="insertTag" parameterType="FeedDto">
+		INSERT INTO hashtag
+			VALUES (seq_hashtag.nextval, #{tag})
+	</insert>
+	<!-- 게시글과 해시태그 연결 -->
+	<insert id="insertHashtag" parameterType="FeedDto">
+		INSERT INTO board_hashtag
+			VALUES (#{boardId},
+			        (SELECT tag_id
+				         FROM hashtag
+				         WHERE tag_name = #{tagName}))
+	</insert>
+	
+	<!-- 피드 수정 -->
+	<update id="updateFeed" parameterType="FeedDto">
+		UPDATE board
+		SET board_title = #{boardTitle}, board_content = #{boardContent},
+		    board_thumbnail = #{boardThumbnail}
+			WHERE board_id = #{boardId}
+	</update>
+	<!-- 해당글의 해시태그 전부 삭제 -->
+	<update id="updateHashtag" parameterType="FeedDto">
+		DELETE
+			FROM board_hashtag
+			WHERE board_id = #{boardId}
+	</update>
+	<!-- 삭제 후 insertTag와 insertHashtag 사용하여 해시태그 추가 -->
+	
+	<!-- 피드 삭제 -->
+	<update id="deleteFeed">
+		UPDATE board
+		SET deleted = 'Y'
+			WHERE board_id = #{boardId}
+	</update>
+	
+	
+	<!-- 좋아요 -->
+	<!-- 해당 글의 좋아요 수 -->
+	<select id="findLikeCount" resultType="int">
+		SELECT count(like_id)
+			FROM boardlike b
+				     RIGHT JOIN board d
+				                ON b.board_id = d.board_id
+			WHERE d.board_id = #{boardId}
+	</select>
+	
+	<!-- 유저가 좋아요 누른지 확인(0일시 안누름) -->
+	<select id="checkUserLike" resultType="int">
+		SELECT count(like_id)
+			FROM boardlike b
+				     RIGHT JOIN board d
+				                ON b.board_id = d.board_id
+			WHERE b.user_id = #{userId} AND d.board_id = #{boardId}
+	</select>
+	
+	<!-- 좋아요 추가 -->
+	<insert id="insertLike" parameterType="FeedDto">
+		INSERT INTO boardlike
+			VALUES (seq_like.nextval, #{boardId}, #{userId}, sysdate)
+	</insert>
+	
+	<!-- 좋아요 해제 -->
+	<delete id="deleteLike" parameterType="FeedDto">
+		DELETE
+			FROM boardlike
+			WHERE like_id = (SELECT like_id
+				                 FROM boardlike
+				                 WHERE user_id = #{userId} AND board_id = #{boardId})
+	</delete>
+	
+	
+	<!-- 북마크 -->
+	<!-- 유저가 북마크 누른지 확인(0일시 안누름) -->
+	<select id="checkUserBookmark" resultType="int">
+		SELECT count(b.created_date)
+			FROM bookmark b
+				     RIGHT JOIN board d
+				                ON b.board_id = d.board_id
+			WHERE b.user_id = #{userId} AND d.board_id = #{boardId}
+	</select>
+	
+	<!-- 북마크 추가 -->
+	<insert id="insertBookmark">
+		INSERT INTO bookmark
+			VALUES (#{userId}, #{boardId}, sysdate)
+	</insert>
+	
+	<!-- 북마크 해제 -->
+	<delete id="deleteBookmark">
+		DELETE
+			FROM bookmark
+			WHERE user_id = #{userId} AND board_id = #{boardId}
+	</delete>
+	
+	<!-- 북마크한 확인+댓글수(마이페이지) -->
+	<select id="findBookmarkFeedByUserId" resultType="FeedDto">
+		SELECT b.board_id, b.board_thumbnail, count(c.cmt_id) AS commentcount
+			FROM board b
+				     LEFT JOIN comments c
+				               ON b.board_id = c.board_id
+			WHERE b.board_id IN (SELECT board_id
+				                     FROM bookmark
+				                     WHERE user_id = #{userId})
+			GROUP BY b.board_id, b.board_thumbnail
+	</select>
+	
+	
+	<!-- 해시태그 -->
+	<!-- 해당 글의 해시태그 가져오기 -->
+	<select id="findHashtagsByBoardId" resultType="FeedDto">
+		SELECT h.tag_name
+			FROM hashtag h
+				     INNER JOIN board_hashtag b
+				                ON h.tag_id = b.tag_id
+			WHERE b.board_id = #{boardId}
+	</select>
+	
+	<!-- 해시태그로 글 검색 -->
+	<select id="findBoardsByTagName" resultType="FeedDto">
+		SELECT board_id, board_thumbnail
+			FROM board
+			WHERE deleted = 'N' AND blocked = 'N'
+			  AND board_id IN (SELECT board_id
+				                   FROM hashtag h
+					                        RIGHT JOIN board_hashtag b
+					                                   ON h.tag_id = b.tag_id
+				                   WHERE tag_name = #{tagName})
+	</select>
+
+</mapper>
