@@ -142,6 +142,7 @@
 	</select>
 	
 	<!-- 북마크 추가 -->
+	
 	<insert id="insertBookmark">
 		INSERT INTO bookmark
 			VALUES (#{userId}, #{boardId}, sysdate)
