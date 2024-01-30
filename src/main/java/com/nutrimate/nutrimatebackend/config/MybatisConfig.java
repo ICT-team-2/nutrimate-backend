@@ -37,6 +37,7 @@ public class MybatisConfig {
 	// 마이바티스 관련 빈
 	@Bean
 	public SqlSessionFactory sqlSessionFactory(HikariDataSource hikariDataSource) {
+		
 		SqlSessionFactory factory = null;
 		try {
 			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
@@ -52,6 +53,8 @@ public class MybatisConfig {
 			factory = factoryBean.getObject();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			log.error("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
+			throw new RuntimeException("SqlSessionFactory is null. Cannot create SqlSessionTemplate.");
 		}
 		return factory;
 		
@@ -59,6 +62,7 @@ public class MybatisConfig {
 	
 	@Bean
 	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+		
 		return new SqlSessionTemplate(sqlSessionFactory);
 	}////////////////
 }

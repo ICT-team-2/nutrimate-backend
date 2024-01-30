@@ -11,15 +11,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement((sessionManagement) -> sessionManagement
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests((authorizeRequests) -> authorizeRequests.requestMatchers("/user/**")
-            .authenticated().requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-            .requestMatchers("/admin/**").hasAnyRole("ADMIN").anyRequest().permitAll());
-    return http.build();
-  }
+	
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(AbstractHttpConfigurer::disable)
+				.sessionManagement((sessionManagement) -> sessionManagement
+						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				// 실행 에러 해결을 위해 requestMatchers -> antMatchers로 바꿨습니다 (학원 pc에서만 오류남..)
+				.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+//                .antMatchers("/user/**")
+//            .authenticated().antMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+//            .antMatchers("/admin/**").hasAnyRole("ADMIN")
+						.anyRequest().permitAll());
+		return http.build();
+	}
 }
