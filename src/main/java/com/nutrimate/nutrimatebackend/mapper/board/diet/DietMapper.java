@@ -1,9 +1,8 @@
 package com.nutrimate.nutrimatebackend.mapper.board.diet;
 
-import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
-import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
 
 @Mapper
 public interface DietMapper {
@@ -33,10 +32,10 @@ public interface DietMapper {
 	int findLikeBoardContByBoardIdAndUserId(DietDto dto);
 	
 	//좋아요
-	int InsertLikeBoardContByBoardIdAndUserId(DietDto dto);
+	int insertLikeBoardContByBoardIdAndUserId(DietDto dto);
 	
 	//좋아요 삭제
-	int DeleteLikeBoardContByBoardIdAndUserId(DietDto dto);
+	int deleteLikeBoardContByBoardIdAndUserId(DietDto dto);
 	
 	int updateViewCountByBoardId(DietDto dto);
 	
@@ -50,10 +49,10 @@ public interface DietMapper {
 	int findBookMarkByBoardIdANDuserId(DietDto dto);
 	
 	//북마크 입력
-	int InsertBookMarkByBoardIdANDuserId(DietDto dto);
+	int insertBookMarkByBoardIdAndUserId(DietDto dto);
 	
 	//북마트 삭제
-	int DeleteBookMarkByBoardIdANDuserId(DietDto dto);
+	int deleteBookMarkByBoardIdANDuserId(DietDto dto);
 	
 	//해당 해시태그 갯수
 	int findHashTagCountByHashTagName(String tageName);
@@ -71,7 +70,7 @@ public interface DietMapper {
 	List<DietDto> findHashTagByBoardId(DietDto dto);
 	
 	//해당하는 보드의 해시태그 원래 저장값 삭제
-	int deleteBoardHashTagByBoardIDANDTAGID(DietDto dto);
+	int deleteBoardHashTagByBoardIdAndTagId(DietDto dto);
 	
 	//해당하는 보드의 해시태그 업데이트
 	int updateBoardHashTagByBoardId(DietDto dto);

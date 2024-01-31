@@ -17,6 +17,12 @@
 		<if test="searchTitle !=null">
 			AND b.board_title LIKE '%' || #{searchTitle} || '%'
 		</if>
+		<if test="searchUser !=null">
+			AND m.user_nick LIKE '%' || #{searchUser} || '%'
+		</if>
+		<if test="searchContent !=null">
+			AND b.board_content LIKE '%' || #{searchContent} || '%'
+		</if>
 		<if test="searchHashTag !=null">
 			AND h.tag_name LIKE '%' || #{searchHashTag} || '%'
 		</if>
@@ -86,11 +92,11 @@
 			FROM boardlike
 			WHERE board_id = #{boardId} AND user_id = #{userId}
 	</select>
-	<insert id="InsertLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
+	<insert id="insertLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
 		INSERT INTO boardlike
 			VALUES (seq_like.nextval, #{boardId}, #{userId}, sysdate)
 	</insert>
-	<delete id="DeleteLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
+	<delete id="deleteLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
 		DELETE boardlike
 			WHERE board_id = #{boardId} AND user_id = #{userId}
 	</delete>
@@ -122,11 +128,11 @@
 			FROM bookmark
 			WHERE board_id = #{boardId} AND user_id = #{userId}
 	</select>
-	<insert id="InsertBookMarkByBoardIdANDuserId" parameterType="dietDto">
+	<insert id="insertBookMarkByBoardIdAndUserId" parameterType="dietDto">
 		INSERT INTO bookmark
 			VALUES (#{userId}, #{boardId}, sysdate)
 	</insert>
-	<delete id="DeleteBookMarkByBoardIdANDuserId" parameterType="dietDto">
+	<delete id="deleteBookMarkByBoardIdANDuserId" parameterType="dietDto">
 		DELETE bookmark
 			WHERE board_id = #{boardId} AND user_id = #{userId}
 	</delete>
@@ -162,7 +168,7 @@
 				     JOIN hashtag h ON h.tag_id = bh.tag_id
 			WHERE bh.board_id = #{boardId}
 	</select>
-	<delete id="deleteBoardHashTagByBoardIDANDTAGID" parameterType="dietDto">
+	<delete id="deleteBoardHashTagByBoardIdAndTagId" parameterType="dietDto">
 		DELETE board_hashtag
 			WHERE board_id = #{boardId}
 	</delete>

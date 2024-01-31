@@ -1,7 +1,12 @@
 package com.nutrimate.nutrimatebackend.model.board.diet;
 
-import lombok.*;
 import org.apache.ibatis.type.Alias;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 
 @Getter
@@ -28,7 +33,9 @@ public class DietDto {
 	private String deleted;
 	private String blocked;
 	private String likeCount;
-	private String searchTitle;//제목으로 찾는 키워드
+	private String searchUser;
+	private String searchContent;
+    private String searchTitle;//제목으로 찾는 키워드
 	private String searchHashTag;//해시태그로 찾는 키워드
 	private String BOARD;
 	private String intakeUnit;

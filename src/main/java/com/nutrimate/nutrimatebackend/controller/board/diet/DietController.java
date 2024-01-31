@@ -1,21 +1,25 @@
 package com.nutrimate.nutrimatebackend.controller.board.diet;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
 import com.nutrimate.nutrimatebackend.service.board.diet.DietService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @Log4j2
@@ -25,7 +29,7 @@ public class DietController {
 	private DietService dietService;
 	//게시글 전체 리스트
 	@GetMapping("/infoboard/dietboards")
-	public List<DietDto> DietBoardList(@ModelAttribute DietDto dto) {
+	public List<DietDto> dietBoardList(@ModelAttribute DietDto dto) {
 		List<DietDto> dietList = dietService.selectListDietBoard(dto);
 		return dietList;
 		
@@ -55,7 +59,7 @@ public class DietController {
 	
 	//해당하는 보드의 해시태그네임 얻어오기
 	@GetMapping("/infoboard/hashtags/{boardId}")
-	public ResponseEntity<List<Map<String, Object>>> HashTagFind(@ModelAttribute DietDto dto) {
+	public ResponseEntity<List<Map<String, Object>>> hashTagFind(@ModelAttribute DietDto dto) {
 		List<DietDto> hashtagList_ = dietService.selectHashTag(dto);
 		List<Map<String, Object>> hashtagList = new ArrayList<>();
 		for (DietDto hashtag : hashtagList_) {
@@ -73,7 +77,7 @@ public class DietController {
 	//게시글 입력
 	@PostMapping(value = "/infoboard/dietboards", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //@RequestBody
-	public Map WriteBlock(DietDto dto, @RequestParam String userId, HttpServletRequest req, List<MultipartFile> files) {
+	public Map writeBlock(DietDto dto, @RequestParam String userId, HttpServletRequest req, List<MultipartFile> files) {
 		StringBuffer fileNames = new StringBuffer();
 		Map map = new HashMap();
 		if (dto.getFoodId() == null) {
@@ -117,7 +121,7 @@ public class DietController {
 	
 	//게시글 수정
 	@PutMapping(value = "/infoboard/dietboards/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public Map EditBoard(DietDto dto, @RequestParam String userId, @RequestParam int boardId, HttpServletRequest req, List<MultipartFile> files) {
+	public Map editBoard(DietDto dto, @RequestParam String userId, @RequestParam int boardId, HttpServletRequest req, List<MultipartFile> files) {
 		Map map = new HashMap();
 		StringBuffer fileNames = new StringBuffer();
 		dto.setUserId(userId);
@@ -166,7 +170,7 @@ public class DietController {
 	
 	//게시글 삭제
 	@PutMapping("/infoboard/dietboards-deleted/{boardId}")
-	public Map DeleteBoard(@ModelAttribute DietDto dto) {
+	public Map deleteBoard(@ModelAttribute DietDto dto) {
 		Map map = new HashMap();
 		
 		int affected = dietService.deleteBoard(dto);
@@ -181,30 +185,52 @@ public class DietController {
 	}
 	//좋아요 입력 삭제
 	@PostMapping("/infoboard/likeboard/{boardId}")
-	public Map WriteLike(@ModelAttribute DietDto dto) {
+	public Map writeLike(@ModelAttribute DietDto dto) {
 		Map map = new HashMap();
 		int count = dietService.countLike(dto);//
 		if (count == 0) {
 			int affected = dietService.saveLikeBoard(dto);
+		     if (affected == 1) {
+	            map.put("LIKEOK", "좋아요 입력에 성공했습니다.");
+	        } else {
+	            map.put("LIKEOK", "종아요 입력에 실패했습니다!");
+	            
+	        }
 			
 		} else {
-			int affected = dietService.DeleteLikeBoard(dto);
+			int affected = dietService.deleteLikeBoard(dto);
+	          if (affected == 1) {
+                map.put("LIKEOK", "좋아요 입력 쥐소에 성공했습니다.");
+            } else {
+                map.put("LIKEOK", "종아요 입력 취소에 실패했습니다!");
+                
+            }
 		}
 		return map;
 	}
 	
 	//북마크 입력 삭제
 	@PostMapping("/infoboard/bookmark/{boardId}")
-	public Map WriteBookmark(@ModelAttribute DietDto dto) {
+	public Map writeBookmark(@ModelAttribute DietDto dto) {
 		Map map = new HashMap();
 		int count = dietService.countBookMark(dto);//
 		if (count == 0) {
 			int affected = dietService.saveBookMarkBoard(dto);
-			System.out.println("입력");
+	          if (affected == 1) {
+                map.put("BOOKMARKOK", "북마크 입력에 성공했습니다.");
+            } else {
+                map.put("BOOKMARKOK", "북마크 입력에 실패했습니다!");
+                
+            }
 			
 		} else {
-			int affected = dietService.DeleteBookMarkBoard(dto);
-			System.out.println("삭제");
+			int affected = dietService.deleteBookMarkBoard(dto);
+	           if (affected == 1) {
+	                map.put("BOOKMARKOK", "북마크 취소에 성공했습니다.");
+	            } else {
+	                map.put("BOOKMARKOK", "북마크 취소에 실패했습니다!");
+	                
+	            }
 		}
 		return map;
 	}

@@ -1,13 +1,12 @@
 package com.nutrimate.nutrimatebackend.service.board.diet;
 
-import com.nutrimate.nutrimatebackend.mapper.board.diet.DietMapper;
-import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-
-import java.util.List;
+import com.nutrimate.nutrimatebackend.mapper.board.diet.DietMapper;
+import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
 
 @Service
 public class DietService {
@@ -85,7 +84,7 @@ public class DietService {
 			dietmapper.updateFoodBoardByboardId(dto);
 			List<DietDto> hashtagList = dietmapper.findHashTagByBoardId(dto);
 			if (hashtagList != null) {
-				dietmapper.deleteBoardHashTagByBoardIDANDTAGID(dto);
+				dietmapper.deleteBoardHashTagByBoardIdAndTagId(dto);
 			}
 			
 			for (String tagName : dto.getTagNameList()) {
@@ -122,11 +121,11 @@ public class DietService {
 	}
 	//좋아요
 	public int saveLikeBoard(DietDto dto) {
-		return dietmapper.InsertLikeBoardContByBoardIdAndUserId(dto);
+		return dietmapper.insertLikeBoardContByBoardIdAndUserId(dto);
 	}
 	//좋아요 취소
-	public int DeleteLikeBoard(DietDto dto) {
-		return dietmapper.DeleteLikeBoardContByBoardIdAndUserId(dto);
+	public int deleteLikeBoard(DietDto dto) {
+		return dietmapper.deleteLikeBoardContByBoardIdAndUserId(dto);
 	}
 	//방문자수
 	public int saveViewCount(DietDto dto) {
@@ -147,11 +146,11 @@ public class DietService {
 	}
 	//북마크 입력
 	public int saveBookMarkBoard(DietDto dto) {
-		return dietmapper.InsertBookMarkByBoardIdANDuserId(dto);
+		return dietmapper.insertBookMarkByBoardIdAndUserId(dto);
 	}
 	//북마크 삭제
-	public int DeleteBookMarkBoard(DietDto dto) {
-		return dietmapper.DeleteBookMarkByBoardIdANDuserId(dto);
+	public int deleteBookMarkBoard(DietDto dto) {
+		return dietmapper.deleteBookMarkByBoardIdANDuserId(dto);
 	}
 	
 	//해시태그 가지고 오기
