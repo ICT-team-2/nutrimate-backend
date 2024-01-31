@@ -29,11 +29,13 @@
 			CONNECT BY PRIOR cmt_id = cmt_ref
 			ORDER SIBLINGS BY c.created_date
 	</select>
-	<!--
-		삭제된 댓글 중 대댓글이 있다면 "삭제된 댓글입니다" 표시,
-		삭제된 댓글 중 대댓글이 없다면 삭제하여 미표시
-	 -->
-	
+	<!-- 대댓글을 가져오는 도우미 메소드 -->
+	<select id="findRepliesByParentId" resultType="FeedCommentDto">
+		SELECT *
+		FROM comments
+		WHERE cmt_ref = #{parentCommentId}
+	</select>
+	 
 	<!-- 대댓글 수 확인 -->
 	<select id="countReplies" resultType="int">
 		SELECT count(*)
