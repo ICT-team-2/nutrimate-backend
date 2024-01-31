@@ -19,7 +19,7 @@ public interface SportBoardMapper {
 	SportBoardDto selectBoard(int boardId);
 	
 	//모든 게시글 조회(전체)
-	List<SportBoardDto> selectAllBoards(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("searchUser") String searchUser, @Param("searchTitle") String searchTitle, @Param("searchTag") String searchTag);
+	List<SportBoardDto> selectAllBoards(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("searchUser") String searchUser, @Param("searchTitle") String searchTitle, @Param("searchContent") String searchContent, @Param("searchTag") String searchTag);
 	
 	//게시글 수정
 	int updateBoard(SportBoardDto board);
@@ -45,8 +45,6 @@ public interface SportBoardMapper {
 	//조회수 증가
 	int updateBoardViewcount(int boardId);
 	
-	//검색
-	//List<BoardDto> searchBoards(@Param("type") String type, @Param("keyword") String keyword);
 	//이전글/다음글
 	SportBoardDto selectPrevBoard(int boardId); //이전글 조회
 	
@@ -55,23 +53,24 @@ public interface SportBoardMapper {
 	//총 페이지 수
 	int countBoards();
 	
-	//북마크
+	//북마크 저장여부 확인시
+	int countBookmarks(BookmarkDto bookmarkDto);
+	
+	//북마크 추가
 	int insertBookmark(BookmarkDto bookmarkDto);
 	
+	//북마크 삭제
 	int deleteBookmark(BookmarkDto bookmarkDto);
 	
 	//해당 글의 해시태그 가져오기
 	List<SportBoardDto> findHashtagsByBoardId(SportBoardDto board);
 	
-	//해시태그로 글 검색
-	//List<BoardDto> findBoardsByTagName(BoardDto board);
 	//해시태그 입력시
-	int checkTagId(String tag);
-	
-	void insertTag(String tag);
-	
+	int checkTagId(String tag);	
+	void insertTag(String tag);	
 	void insertHashtag(SportBoardDto board);
 	
 	//해시태그 수정시
 	void updateHashtag(SportBoardDto board);
+	
 }

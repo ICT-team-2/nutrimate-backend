@@ -49,9 +49,9 @@ public class SportBoardService {
 	}
 	
 	//게시글 조회(전체)
-	public Map<String, Object> getBoards(int pageNum, String searchUser, String searchTitle, String searchTag) {
+	public Map<String, Object> getBoards(int pageNum, String searchUser, String searchTitle, String searchContent, String searchTag) {
 		int pageSize = 10; //페이지당 보여줄 게시글의 수
-		List<SportBoardDto> boards = sportBoardMapper.selectAllBoards(pageNum, pageSize, searchUser, searchTitle, searchTag);
+		List<SportBoardDto> boards = sportBoardMapper.selectAllBoards(pageNum, pageSize, searchUser, searchTitle, searchContent, searchTag);
 		log.info("boards: " + boards);
 		int totalPosts = sportBoardMapper.countBoards(); //총 게시글 수
 		int totalPage = (totalPosts % pageSize == 0) ? totalPosts / pageSize : totalPosts / pageSize + 1; //총 페이지 수를 계산
@@ -128,6 +128,11 @@ public class SportBoardService {
 		return board;
 	}
 	
+	//북마크 저장 여부 확인
+	public boolean isBookmarked(BookmarkDto bookmarkDto) {
+	    return sportBoardMapper.countBookmarks(bookmarkDto) > 0;
+	}
+
 	//북마크 생성
 	public boolean insertBookmark(BookmarkDto bookmarkDto) {
 		return sportBoardMapper.insertBookmark(bookmarkDto) == 1;
@@ -138,15 +143,9 @@ public class SportBoardService {
 		return sportBoardMapper.deleteBookmark(bookmarkDto);
 	}
 	
-	// 해당 글의 해시태그 가져오기
+	//해당 글의 해시태그 가져오기
 	public List<SportBoardDto> findHashtagsByBoardId(SportBoardDto board) {
 		return sportBoardMapper.findHashtagsByBoardId(board);
 	}
-	
-	// 해시태그로 글 검색
-    /*
-    public List<BoardDto> findBoardsByTagName(BoardDto board) {
-      return boardMapper.findBoardsByTagName(board);
-    }
-    */
+
 }

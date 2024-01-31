@@ -69,6 +69,9 @@
 		<if test="searchTitle !=null">
 			AND b.board_title LIKE '%' || #{searchTitle} || '%'
 		</if>
+		<if test="searchContent !=null">
+			AND b.board_content LIKE '%' || #{searchContent} || '%'
+		</if>
 		<if test="searchTag !=null">
 			AND h.tag_name LIKE '%' || #{searchTag} || '%'
 		</if>
@@ -189,6 +192,13 @@
 			WHERE b.deleted = 'N' AND m.deleted = 'N'
 	</select>
 	
+	<!-- 북마크 저장여부 확인 -->
+	<select id="countBookmarks" parameterType="com.nutrimate.nutrimatebackend.model.board.sport.BookmarkDto" resultType="int">
+	    SELECT COUNT(*)
+	    FROM BOOKMARK
+	    WHERE board_id = #{boardId} AND user_id = #{userId}
+	</select>
+	
 	<!-- Insert bookmark -->
 	<insert id="insertBookmark" parameterType="BookmarkDto">
 		INSERT INTO bookmark (user_id, board_id, created_date)
@@ -206,7 +216,6 @@
 			WHERE board_id = #{boardId} AND user_id = #{userId}
 	</delete>
 	
-	<!-- 해시태그 -->
 	<!-- 해당 글의 해시태그 가져오기 -->
 	<select id="findHashtagsByBoardId" resultType="SportBoardDto">
 		SELECT h.tag_name
@@ -216,17 +225,4 @@
 			WHERE b.board_id = #{boardId}
 	</select>
 	
-	<!-- 해시태그로 글 검색
-	<select id="findBoardsByTagName" resultType="BoardDto">
-		SELECT BOARD_ID
-		FROM board
-		WHERE DELETED = 'N' AND BLOCKED = 'N'
-		AND board_id IN (
-			SELECT board_id
-			FROM hashtag H RIGHT JOIN board_hashtag B
-			ON H.tag_id = B.tag_id
-			WHERE tag_name = #{tagName}
-		)
-	</select>
-	-->
 </mapper>

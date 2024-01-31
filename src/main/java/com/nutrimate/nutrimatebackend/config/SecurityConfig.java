@@ -17,9 +17,12 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
         .sessionManagement((sessionManagement) -> sessionManagement
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests((authorizeRequests) -> authorizeRequests.requestMatchers("/user/**")
-            .authenticated().requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-            .requestMatchers("/admin/**").hasAnyRole("ADMIN").anyRequest().permitAll());
+        .authorizeHttpRequests((authorizeRequests) -> 
+        authorizeRequests
+        .requestMatchers("/user/**").authenticated()
+        .requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
+            .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+            .anyRequest().permitAll());
     return http.build();
   }
 }
