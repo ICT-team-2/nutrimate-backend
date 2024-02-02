@@ -9,7 +9,7 @@
 			        #{chatMessage}, #{roomType});
 	</insert>
 	
-	
+	<!--룸타입을 구하고-->
 	<select id="findAllChatByRoomType"
 	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
 		SELECT *

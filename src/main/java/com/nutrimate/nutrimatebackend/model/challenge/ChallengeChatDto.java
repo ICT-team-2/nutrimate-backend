@@ -1,10 +1,14 @@
 package com.nutrimate.nutrimatebackend.model.challenge;
 
-import lombok.*;
-import lombok.extern.log4j.Log4j2;
-import org.apache.ibatis.type.Alias;
-
 import java.sql.Date;
+import org.apache.ibatis.type.Alias;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 
 @Builder
 @Setter
@@ -16,13 +20,17 @@ import java.sql.Date;
 @Alias("ChallengeChatDto")
 public class ChallengeChatDto {
 	
-	private Long chatId;
-	private MessageType messageType;
-	private RoomType roomType;
+	
+
+	private String channelId;
+	private String messageId;
+	
+	private Long chatroomId;
 	private Long userId;
+	private MessageType messageType;
 	private String chatMessage;
 	private String challengeNick;
-	private String userNick;
+	private RoomType roomType;
 	private Date createdDate;
 	
 	public enum MessageType {
@@ -39,5 +47,7 @@ public class ChallengeChatDto {
 		RoomType(String roomName) {
 			this.roomName = roomName;
 		}
+		
+		
 	}
 }

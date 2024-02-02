@@ -1,10 +1,9 @@
 package com.nutrimate.nutrimatebackend.service.challenge;
 
+import java.util.List;
+import org.springframework.stereotype.Service;
 import com.nutrimate.nutrimatebackend.mapper.challenge.ChallengeChatMapper;
 import com.nutrimate.nutrimatebackend.model.challenge.ChallengeChatDto;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ChallengeChatService {
@@ -33,6 +32,6 @@ public class ChallengeChatService {
 	public int deleteChat(ChallengeChatDto dto) {
 		return challengeChatMapper.deleteChat(dto);
 	}
-	
+
 	
 }
