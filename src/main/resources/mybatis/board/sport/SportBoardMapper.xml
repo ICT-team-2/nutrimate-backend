@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.board.sport.SportBoardMapper">
+	
+	<!-- Create -->
+	<insert id="insertBoard" parameterType="SportBoardDto">
+		<selectKey order="BEFORE" keyProperty="boardId" resultType="int">
+			SELECT seq_board.nextval
+				FROM dual
+		</selectKey>
+		INSERT INTO board VALUES(#{boardId}, #{userId}, #{boardCategory}, #{boardTitle},
+		#{boardContent}, #{boardThumbnail}, #{boardViewcount}, DEFAULT, DEFAULT, DEFAULT)
+	</insert>
+	<!-- 해시태그 추가 -->
+	<select id="checkTagId" resultType="int">
+		SELECT count(tag_id)
+			FROM hashtag
+			WHERE tag_name = #{tag}
+	</select>
+	<!-- checkTagId가 0이면(중복이 아니면) 실행 -->
+	<insert id="insertTag" parameterType="SportBoardDto">
+		INSERT INTO hashtag
+			VALUES (seq_hashtag.nextval, #{tag})
+	</insert>
+	<!-- 게시글과 해시태그 연결 -->
+	<insert id="insertHashtag" parameterType="SportBoardDto">
+		INSERT INTO board_hashtag
+			VALUES (#{boardId},
+			        (SELECT tag_id
+				         FROM hashtag
+				         WHERE tag_name = #{tagName}))
+	</insert>
+	
+	<!-- Read -->
+	<select id="selectBoard" parameterType="int" resultType="SportBoardDto">
+		SELECT b.*, s.map_img, coalesce(count(*), 0) AS like_count, m.user_nick, h.tag_id,
+		       h.tag_name
+			FROM board b
+				     LEFT JOIN sportboard s ON b.board_id = s.board_id
+				     LEFT JOIN boardlike bl ON b.board_id = bl.board_id
+				     LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
+				     LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
+				     LEFT JOIN member m ON b.user_id = m.user_id
+			WHERE b.board_id = #{boardId} AND b.deleted = 'N' AND m.deleted = 'N'
+			GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+			         b.board_category, b.board_title, b.board_content,
+			         b.board_thumbnail, b.board_viewcount, b.created_date,
+			         b.deleted, b.blocked, m.user_nick, h.tag_id, h.tag_name
+	</select>
+	
+	<select id="selectAllBoards" resultType="SportBoardDto">
+		SELECT * FROM (
+		SELECT b.*, rank() OVER (ORDER BY b.board_id) id_rank, s.map_img,
+		COALESCE(count(*), 0) as like_count, m.user_nick, h.tag_id, h.tag_name,
+		ROW_NUMBER() OVER (ORDER BY
+		b.board_id DESC) rn
+		FROM board b
+		LEFT JOIN sportboard s ON b.board_id = s.board_id
+		LEFT JOIN boardlike bl ON b.board_id = bl.board_id
+		LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
+		LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
+		LEFT JOIN member m on b.user_id = m.user_id
+		WHERE b.deleted = 'N' AND m.deleted = 'N' AND b.board_category = 'exercise'
+		<if test="searchUser !=null">
+			AND m.user_nick LIKE '%' || #{searchUser} || '%'
+		</if>
+		<if test="searchTitle !=null">
+			AND b.board_title LIKE '%' || #{searchTitle} || '%'
+		</if>
+		<if test="searchTag !=null">
+			AND h.tag_name LIKE '%' || #{searchTag} || '%'
+		</if>
+		GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+		b.board_category, b.board_title, b.board_content,
+		b.board_thumbnail, b.board_viewcount, b.created_date,
+		b.deleted, b.blocked, m.user_nick, h.tag_id, h.tag_name
+		ORDER BY b.board_id DESC
+		) WHERE rn BETWEEN (#{pageNum} - 1) * #{pageSize} + 1 AND #{pageNum} * #{pageSize}
+	</select>
+	
+	<!-- Increase board viewcount -->
+	<update id="updateBoardViewcount" parameterType="int">
+		UPDATE board
+		SET board_viewcount = board_viewcount + 1
+			WHERE board_id = #{boardId}
+	</update>
+	
+	<!-- Update -->
+	<update id="updateBoard" parameterType="SportBoardDto">
+		UPDATE board
+		SET board_title = #{boardTitle},
+		    board_content = #{boardContent},
+		    board_thumbnail = #{boardThumbnail}
+			WHERE board_id = #{boardId}
+	</update>
+	<!-- 해당글의 해시태그 전부 삭제 -->
+	<update id="updateHashtag" parameterType="SportBoardDto">
+		DELETE
+			FROM board_hashtag
+			WHERE board_id = #{boardId}
+	</update>
+	<!-- 삭제 후 insertTag와 insertHashtag 사용하여 해시태그 추가 -->
+	
+	<!-- Delete -->
+	<update id="deleteBoard" parameterType="int">
+		UPDATE board
+		SET deleted= 'Y'
+			WHERE board_id = #{boardId}
+	</update>
+	
+	<!-- Insert into sportboard -->
+	<insert id="insertSportBoard">
+		INSERT INTO sportboard
+			VALUES (#{boardId}, #{mapImg})
+	</insert>
+	
+	<!-- Update sportboard -->
+	<update id="updateSportBoard">
+		UPDATE sportboard
+		SET map_img = #{mapImg}
+			WHERE board_id = #{boardId}
+	</update>
+	
+	<!-- Count likes -->
+	<select id="countLikes" resultType="int" parameterType="LikeDto">
+		SELECT count(*)
+			FROM boardlike
+			WHERE board_id = #{boardId}
+	</select>
+	
+	<!-- Insert like -->
+	<insert id="insertLike" parameterType="LikeDto">
+		INSERT INTO boardlike (like_id, board_id, user_id, created_date)
+		SELECT seq_like.nextval, #{boardId}, #{userId}, sysdate
+			FROM dual
+			WHERE NOT exists (SELECT 1
+				                  FROM boardlike
+				                  WHERE board_id = #{boardId} AND user_id = #{userId})
+	</insert>
+	
+	<!-- Delete like -->
+	<delete id="deleteLike" parameterType="LikeDto">
+		DELETE
+			FROM boardlike
+			WHERE like_id = #{likeId} AND user_id = #{userId}
+	</delete>
+	
+	<!-- Previous board -->
+	<select id="selectPrevBoard" parameterType="int" resultType="SportBoardDto">
+		SELECT *
+			FROM (SELECT b.*, s.map_img, coalesce(count(bl.board_id), 0) AS like_count, m.user_nick,
+			             row_number() OVER (ORDER BY b.board_id DESC) AS rn
+				      FROM board b
+					           LEFT JOIN sportboard s ON b.board_id = s.board_id
+					           LEFT JOIN boardlike bl ON b.board_id = bl.board_id
+					           LEFT JOIN member m ON b.user_id = m.user_id
+				      WHERE b.board_id &lt; #{boardId} AND b.deleted = 'N' AND m.deleted = 'N'
+				      GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+				               b.board_category, b.board_title, b.board_content,
+				               b.board_thumbnail, b.board_viewcount, b.created_date,
+				               b.deleted, b.blocked, m.user_nick)
+			WHERE rn = 1
+	</select>
+	
+	<!-- Next board -->
+	<select id="selectNextBoard" parameterType="int" resultType="SportBoardDto">
+		SELECT *
+			FROM (SELECT b.*, s.map_img, coalesce(count(bl.board_id), 0) AS like_count, m.user_nick,
+			             row_number() OVER (ORDER BY b.board_id ASC) AS rn
+				      FROM board b
+					           LEFT JOIN sportboard s ON b.board_id = s.board_id
+					           LEFT JOIN boardlike bl ON b.board_id = bl.board_id
+					           LEFT JOIN member m ON b.user_id = m.user_id
+				      WHERE b.board_id &gt; #{boardId} AND b.deleted = 'N' AND m.deleted = 'N'
+				      GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+				               b.board_category, b.board_title, b.board_content,
+				               b.board_thumbnail, b.board_viewcount, b.created_date,
+				               b.deleted, b.blocked, m.user_nick)
+			WHERE rn = 1
+	</select>
+	
+	<!-- Count pages -->
+	<select id="countBoards" resultType="int">
+		SELECT count(DISTINCT b.board_id)
+			FROM board b
+				     LEFT JOIN member m ON b.user_id = m.user_id AND b.board_category = 'exercise'
+			WHERE b.deleted = 'N' AND m.deleted = 'N'
+	</select>
+	
+	<!-- Insert bookmark -->
+	<insert id="insertBookmark" parameterType="BookmarkDto">
+		INSERT INTO bookmark (user_id, board_id, created_date)
+		SELECT #{userId}, #{boardId}, sysdate
+			FROM dual
+			WHERE NOT exists (SELECT 1
+				                  FROM bookmark
+				                  WHERE board_id = #{boardId} AND user_id = #{userId})
+	</insert>
+	
+	<!-- Delete bookmark -->
+	<delete id="deleteBookmark" parameterType="BookmarkDto">
+		DELETE
+			FROM bookmark
+			WHERE board_id = #{boardId} AND user_id = #{userId}
+	</delete>
+	
+	<!-- 해시태그 -->
+	<!-- 해당 글의 해시태그 가져오기 -->
+	<select id="findHashtagsByBoardId" resultType="SportBoardDto">
+		SELECT h.tag_name
+			FROM hashtag h
+				     INNER JOIN board_hashtag b
+				                ON h.tag_id = b.tag_id
+			WHERE b.board_id = #{boardId}
+	</select>
+	
+	<!-- 해시태그로 글 검색
+	<select id="findBoardsByTagName" resultType="BoardDto">
+		SELECT BOARD_ID
+		FROM board
+		WHERE DELETED = 'N' AND BLOCKED = 'N'
+		AND board_id IN (
+			SELECT board_id
+			FROM hashtag H RIGHT JOIN board_hashtag B
+			ON H.tag_id = B.tag_id
+			WHERE tag_name = #{tagName}
+		)
+	</select>
+	-->
+</mapper>
