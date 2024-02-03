@@ -11,6 +11,8 @@ public interface CommentMapper {
 	// 글번호에 따른 댓글+대댓글 목록 조회
 	List<CommentDto> findCommentsByBoardId(int boardId);
 	
+	List<CommentDto> findRepliesByParentId(int parentCommentId);
+	
 	// 대댓글 수 확인
 	int countReplies(int commentId);
 	
@@ -25,5 +27,6 @@ public interface CommentMapper {
 	
 	// 댓글/대댓글 삭제
 	int deleteComment(CommentDto commentDto);
+	
 	
 }
