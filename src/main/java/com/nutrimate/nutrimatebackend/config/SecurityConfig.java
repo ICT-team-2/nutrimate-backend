@@ -1,5 +1,6 @@
 package com.nutrimate.nutrimatebackend.config;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthenticationFilter;
 import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthorizationFilter;
@@ -7,6 +8,7 @@ import com.nutrimate.nutrimatebackend.config.login.oauth.OAuth2SuccessHandler;
 import com.nutrimate.nutrimatebackend.config.login.oauth.PrincipalOauth2UserService;
 import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,12 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.web.filter.CorsFilter;
+import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthenticationFilter;
+import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthorizationFilter;
+import com.nutrimate.nutrimatebackend.config.login.oauth.OAuth2SuccessHandler;
+import com.nutrimate.nutrimatebackend.config.login.oauth.PrincipalOauth2UserService;
+import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
+import lombok.extern.log4j.Log4j2;
 
 
 @Configuration
@@ -96,5 +104,7 @@ public class SecurityConfig {
 		
 		return http.build();
 	}
+	
+	
 	
 }
