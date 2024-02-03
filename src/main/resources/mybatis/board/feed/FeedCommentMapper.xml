@@ -31,8 +31,9 @@
 	</select>
 	<!-- 대댓글을 가져오는 도우미 메소드 -->
 	<select id="findRepliesByParentId" resultType="FeedCommentDto">
-		SELECT *
-		FROM comments
+		SELECT c.*, m.user_name, m.user_nick
+		FROM comments c
+		JOIN member m ON c.user_id = m.user_id
 		WHERE cmt_ref = #{parentCommentId}
 	</select>
 	 

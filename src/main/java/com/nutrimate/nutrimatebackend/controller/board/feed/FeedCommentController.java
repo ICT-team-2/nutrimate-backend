@@ -35,17 +35,19 @@ public class FeedCommentController {
     List<FeedCommentDto> jsonResponse = new ArrayList<>();
     Map<String, Object> replies = new HashMap<>();
     for (FeedCommentDto comment : comments) {
-      if ("Y".equals(comment.getDeleted())
-          && 1 < feedCommentService.countReplies(comment.getCmtId())) {
-        // 삭제된 댓글이면서 대댓글이 없으면 출력하지 않음
-        // 삭제된 댓글이면서 대댓글이 있는 경우 "삭제된 댓글입니다" 출력
-        comment.setCmtContent("삭제된 댓글입니다");
-        // 삭제된 댓글에 대댓글이 있으면 대댓글을 포함시킴
-        comment.setReplies(getReplies(comment.getCmtId()));
-      } else {
-        // 삭제되지 않은 댓글과 해당 댓글의 대댓글을 포함시킴
-        comment.setReplies(getReplies(comment.getCmtId()));
+      // 삭제된 댓글에 대한 처리
+      if ("Y".equals(comment.getDeleted())) {
+        // 대댓글이 있는 경우에 대한 처리
+        if (1 < feedCommentService.countReplies(comment.getCmtId())) {
+          // 삭제된 댓글에 대댓글이 있는 경우는 "삭제된 댓글입니다"를 출력하고 대댓글을 포함시킴
+          comment.setCmtContent("삭제된 댓글입니다");
+          comment.setReplies(getReplies(comment.getCmtId()));
+        } else {
+          // 삭제된 댓글에 대댓글이 없는 경우는 출력하지 않음
+          continue;
+        }
       }
+      comment.setReplies(getReplies(comment.getCmtId()));
       jsonResponse.add(comment);
     }
     return ResponseEntity.ok(jsonResponse);
