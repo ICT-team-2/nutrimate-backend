@@ -1,6 +1,6 @@
 package com.nutrimate.nutrimatebackend.controller.board.feed;
 
-import com.nutrimate.nutrimatebackend.model.board.FileUtils;
+import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.feed.FeedDto;
 import com.nutrimate.nutrimatebackend.service.board.feed.FeedService;
 import org.springframework.beans.factory.annotation.Autowired;
