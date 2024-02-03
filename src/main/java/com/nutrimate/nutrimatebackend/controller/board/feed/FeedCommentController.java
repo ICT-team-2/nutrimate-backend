@@ -56,18 +56,24 @@ public class FeedCommentController {
   // 주어진 댓글 ID에 대한 대댓글을 가져오는 도우미 메소드
   private List<FeedCommentDto> getReplies(int parentCommentId) {
     List<FeedCommentDto> replies = feedCommentService.findRepliesByParentId(parentCommentId);
+    List<FeedCommentDto> jsonResponse = new ArrayList<>();
     for (FeedCommentDto reply : replies) {
-      // 대댓글을 재귀적으로 처리
-      if ("Y".equals(reply.getDeleted()) && 1 < feedCommentService.countReplies(reply.getCmtId())) {
-        // 삭제된 대댓글에 대댓글이 있으면 대댓글을 포함시킴
-        reply.setCmtContent("삭제된 댓글입니다");
-        reply.setReplies(getReplies(reply.getCmtId()));
-      } else {
-        // 삭제되지 않은 대댓글을 포함시킴
-        reply.setReplies(getReplies(reply.getCmtId()));
+      // 삭제된 댓글에 대한 처리
+      if ("Y".equals(reply.getDeleted())) {
+        // 대댓글이 있는 경우에 대한 처리
+        if (1 < feedCommentService.countReplies(reply.getCmtId())) {
+          // 삭제된 댓글에 대댓글이 있는 경우는 "삭제된 댓글입니다"를 출력하고 대대댓글을 포함시킴
+          reply.setCmtContent("삭제된 댓글입니다");
+          reply.setReplies(getReplies(reply.getCmtId()));
+        } else {
+          // 삭제된 댓글에 대댓글이 없는 경우는 출력하지 않음
+          continue;
+        }
       }
+      reply.setReplies(getReplies(reply.getCmtId()));
+      jsonResponse.add(reply);
     }
-    return replies;
+    return jsonResponse;
   }
 
   // 대댓글 수 확인 (delete='Y'시 확인용) (완료)
