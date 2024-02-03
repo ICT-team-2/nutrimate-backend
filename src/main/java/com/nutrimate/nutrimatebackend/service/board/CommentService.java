@@ -1,4 +1,4 @@
-package com.nutrimate.nutrimatebackend.service.board.feed;
+package com.nutrimate.nutrimatebackend.service.board;
 
 import com.nutrimate.nutrimatebackend.mapper.board.CommentMapper;
 import com.nutrimate.nutrimatebackend.model.board.CommentDto;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class FeedCommentService {
+public class CommentService {
 	
 	@Autowired
 	private CommentMapper commentMapper;
