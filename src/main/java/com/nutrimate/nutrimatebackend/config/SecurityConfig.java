@@ -1,5 +1,14 @@
 package com.nutrimate.nutrimatebackend.config;
 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthenticationFilter;
+import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthorizationFilter;
+import com.nutrimate.nutrimatebackend.config.login.oauth.OAuth2SuccessHandler;
+import com.nutrimate.nutrimatebackend.config.login.oauth.PrincipalOauth2UserService;
+import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +42,8 @@ public class SecurityConfig {
 	ClientRegistrationRepository clientRegistrationRepository;
 	@Autowired
 	OAuth2AuthorizedClientService authorizedClientService;
+	@Autowired
+	ObjectMapper objectMapper;
 	
 	
 	private PrincipalOauth2UserService principalOauth2UserService;
@@ -58,8 +69,10 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http,
-	                                        AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder)
+	SecurityFilterChain securityFilterChain(
+			HttpSecurity http,
+			AuthenticationManager authenticationManager,
+			BCryptPasswordEncoder passwordEncoder)
 			throws Exception {
 		
 		
@@ -68,7 +81,7 @@ public class SecurityConfig {
 				.sessionManagement((sessionManagement) -> sessionManagement
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilter(corsFilter) // @CrossOrigin(인증 x), 시큐리티 필터에 등록인증(o)
-				.addFilter(new JwtAuthenticationFilter(authenticationManager)) // AuthenticationManager
+				.addFilter(new JwtAuthenticationFilter(authenticationManager, objectMapper)) // AuthenticationManager
 				.addFilter(new JwtAuthorizationFilter(authenticationManager, memberMapper, passwordEncoder)) // AuthenticationManager
 				.authorizeHttpRequests(t -> t.requestMatchers("/api/v1/user/**").authenticated()
 						.requestMatchers("/api/v1/user/**").hasAnyRole("USER", "MANAGER", "ADMIN")
@@ -76,7 +89,8 @@ public class SecurityConfig {
 						.requestMatchers("/api/v1/admin/**").hasRole("ADMIN").anyRequest().permitAll())
 				.formLogin(t -> t
 						// .loginPage("/loginForm")
-						.loginProcessingUrl("/login").defaultSuccessUrl("/"))
+						.loginProcessingUrl("/login")
+						.defaultSuccessUrl("/"))
 				.oauth2Login(t -> t
 						// .loginPage("/loginForm")
 						.userInfoEndpoint(endpoint -> endpoint.userService(principalOauth2UserService))
