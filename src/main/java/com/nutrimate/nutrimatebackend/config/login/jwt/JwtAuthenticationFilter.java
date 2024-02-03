@@ -24,14 +24,19 @@ import java.util.Map;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
 	private AuthenticationManager authenticationManager;
+	private ObjectMapper objectMapper = new ObjectMapper();
 	
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
+	                               ObjectMapper objectMapper) {
 		this.authenticationManager = authenticationManager;
+		this.objectMapper = objectMapper;
 	}
 	
+	
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request,
-	                                            HttpServletResponse response) throws AuthenticationException {
+	public Authentication attemptAuthentication(
+			HttpServletRequest request,
+			HttpServletResponse response) throws AuthenticationException {
 		log.info("JwtAuthenticationFilter : 로그인 시도 중");
 		
 		ObjectMapper om = new ObjectMapper();
@@ -42,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			loginRequestDto = om.readValue(request.getInputStream(), LoginRequestDto.class);
 			log.info("loginRequestDto : " + loginRequestDto);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("로그인 시도 실패", e);
 		}
 		
 		UsernamePasswordAuthenticationToken authenticationToken =
@@ -69,8 +74,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	
 	
 	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-	                                        FilterChain chain, Authentication authResult) throws IOException, ServletException {
+	protected void successfulAuthentication(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			FilterChain chain, Authentication authResult) throws IOException, ServletException {
 		log.info("successfulAuthentication 실행 : 인증 완료 뜻");
 		PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 		
@@ -93,5 +100,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			log.info(refreshCookie);
 			response.addCookie(refreshCookie);
 		}
+		Map<String, String> result = new HashMap<>();
+		result.put("message", "success");
+		String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+		response.getWriter().print(json);
 	}
 }
