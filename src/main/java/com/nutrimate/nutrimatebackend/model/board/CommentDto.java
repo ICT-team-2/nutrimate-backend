@@ -4,6 +4,7 @@ import lombok.*;
 import org.apache.ibatis.type.Alias;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,6 +27,7 @@ public class CommentDto {
 	private String userName;
 	private String userNick;
 	
+	private List<CommentDto> replies; // 대댓글 리스트 가져오기 위한 변수
 	private int mycmtId; // 대댓글 입력시 cmtId 받기위한 변수
 	
 }

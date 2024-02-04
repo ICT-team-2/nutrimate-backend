@@ -18,6 +18,10 @@ public class CommentService {
 		return commentMapper.findCommentsByBoardId(boardId);
 	}
 	
+	public List<CommentDto> findRepliesByParentId(int parentCommentId) {
+		return commentMapper.findRepliesByParentId(parentCommentId);
+	}
+	
 	// 대댓글 수 확인
 	public int countReplies(int commentId) {
 		return commentMapper.countReplies(commentId);
@@ -42,5 +46,6 @@ public class CommentService {
 	public int deleteComment(CommentDto commentDto) {
 		return commentMapper.deleteComment(commentDto);
 	}
+	
 	
 }
