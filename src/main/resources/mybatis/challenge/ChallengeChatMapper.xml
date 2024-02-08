@@ -2,18 +2,63 @@
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.challenge.ChallengeChatMapper">
-	<insert id="insertChat">
-		INSERT INTO challengechat (chat_id, user_id, message_type, chat_message, room_type)
+
+
+
+	    <!--채팅에 참여해 본적이 있는지 확인-->
+		<select id="findChatMemberbyUseridAndUserRoom" resultType="int" parameterType="ChallengeChatDto">
+			SELECT count(*) from challengeuserChatRoom where user_id=#{userId} AND chatroom_id=#{chatroomId}
+		</select>
+		
+		<!-- 채팅에 참여 정보 가지고 오기-->
+		<select id="findChatMemberInfoByUserIdAndUserRoom" resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
+			SELECT * from challengeuserChatRoom ccr JOIN challengeuser cu ON ccr.user_id=cu.user_id LEFT JOIN chatroom cr ON ccr.chatroom_id=cr.chatroom_id  WHERE ccr.user_id=#{userId} AND cr.chatroom_id=#{chatroomId}
+		</select>
+	    
+	   <!-- 챌린지 참여 여부 확인-->
+		<select id="findChallengeMemberByUserId" resultType="int" parameterType="ChallengeChatDto">
+			SELECT count(*) from challengeuser where user_id=#{userId}
+		</select>
+		
+		<!-- 챌린지 계정의 중복 여부 확인-->
+		<select id="findChallengeAccount" resultType="int" parameterType="ChallengeChatDto">
+			SELECT count(*) FROM challengeuser WHERE challenge_nick=#{challengeNick}
+		</select>
+		
+
+		
+		<!--챌린지 계정 생성-->
+		<insert id="insertAccountChallengeMemeber" parameterType="ChallengeChatDto">
+			INSERT INTO challengeuser VALUES (#{userId},#{challengeNick})
+		</insert>
+		
+		
+	    <!--채팅 참여 계정 생성-->
+		<insert id="insertAccountChatroom" parameterType="ChallengeChatDto">
+			INSERT INTO challengeuserchatroom VALUES (#{userId},#{chatroomId})
+		</insert>
+	
+	 <!--채팅 메세지 저장-->
+	<insert id="insertChatMessage" parameterType="ChallengeChatDto">
+		INSERT INTO challengechat (chat_id, user_id, message_type, chat_message, chatroom_Id)
 			VALUES (seq_challenge_chat.nextval,
-			        #{userId}, #{messageType},
-			        #{chatMessage}, #{roomType});
+				       #{userId}, #{messageType},
+				       #{chatMessage}, #{chatroomId})
 	</insert>
 	
-	<!--룸타입을 구하고-->
+	
+	<!-- 채팅 닉네임 아이디 구하기(임시)-->
+		<select id="findUser" resultType="int" parameterType="ChallengeChatDto">
+			select USER_ID from challengeUser where challenge_nick=#{challengeNick}
+		</select>
+	
 	<select id="findAllChatByRoomType"
 	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
-		SELECT *
-			FROM challengechat
-			WHERE room_type = #{roomType}
+		select * from challengechat cc JOIN challengeuser cu ON cc.user_Id=cu.user_Id
+			WHERE CHATROOM_ID = #{chatroomId}
 	</select>
+	
+	
+	
+	
 </mapper>

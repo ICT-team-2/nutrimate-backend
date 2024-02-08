@@ -30,6 +30,7 @@ public class ChallengeChatDto {
 	private MessageType messageType;
 	private String chatMessage;
 	private String challengeNick;
+	private String chatRoomType;
 	private RoomType roomType;
 	private Date createdDate;
 	
@@ -39,6 +40,9 @@ public class ChallengeChatDto {
 		LEAVE//채탕 나가기
 	}
 	
+	
+
+
 	public enum RoomType {
 		FIRST_ROOM("FIRST_ROOM"),
 		SECOND_ROOM("SECOND_ROOM");
@@ -47,7 +51,9 @@ public class ChallengeChatDto {
 		RoomType(String roomName) {
 			this.roomName = roomName;
 		}
-		
+   
 		
 	}
+
+
 }
