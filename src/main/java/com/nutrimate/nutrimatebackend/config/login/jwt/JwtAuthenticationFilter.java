@@ -23,12 +23,13 @@ import lombok.extern.log4j.Log4j2;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private AuthenticationManager authenticationManager;
-  private ObjectMapper objectMapper = new ObjectMapper();
+  // private ObjectMapper objectMapper = new ObjectMapper();
 
-  public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
-      ObjectMapper objectMapper) {
+  public JwtAuthenticationFilter(AuthenticationManager authenticationManager
+  // ,ObjectMapper objectMapper
+  ) {
     this.authenticationManager = authenticationManager;
-    this.objectMapper = objectMapper;
+    // this.objectMapper = objectMapper;
   }
 
 
@@ -78,7 +79,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
     Map<String, Object> payloads = new HashMap<>();// 사용자 임의 데이타 추가
-    long expirationTime = 1000 * 30;// 토큰의 만료시간 설정(30)
+    payloads.put("userInfo", principalDetails.getMemberDto());
+    long expirationTime = 1000 * 60 * 30;// 토큰의 만료시간 설정(30)
     int status = 1;
     String accessToken = JWTOkens.createToken(principalDetails.getMemberDto().getUserUid(),
         payloads, expirationTime, JWTOkens.ACCESS);
@@ -98,9 +100,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
       log.info(refreshCookie);
       response.addCookie(refreshCookie);
     }
-    Map<String, String> result = new HashMap<>();
-    result.put("message", "success");
-    String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-    response.getWriter().print(json);
   }
 }

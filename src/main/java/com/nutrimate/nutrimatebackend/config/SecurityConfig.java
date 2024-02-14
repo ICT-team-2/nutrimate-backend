@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.CorsFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nutrimate.nutrimatebackend.config.login.jwt.JwtAuthenticationFilter;
@@ -29,6 +30,7 @@ import lombok.extern.log4j.Log4j2;
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Log4j2
+@CrossOrigin("http://localhost:5555")
 public class SecurityConfig {
 
   @Autowired
@@ -64,6 +66,24 @@ public class SecurityConfig {
     return authenticationConfiguration.getAuthenticationManager();
   }
 
+  // @Bean
+  // public CorsConfigurationSource corsConfigurationSource() {
+  // CorsConfiguration configuration = new CorsConfiguration();
+  // configuration.setAllowedOrigins(Arrays.asList("http://localhost:5555")); // 허용할 출처 목록
+  // configuration
+  // .setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // 허용할
+  // // HTTP
+  // // 메소드
+  // configuration
+  // .setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With")); // 허용할
+  // // 헤더
+  // configuration.setAllowCredentials(true); // 쿠키를 포함할지 여부
+  // UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  // source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 이 정책을 적용
+  // return source;
+  // }
+
+
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http,
       AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder)
@@ -75,7 +95,7 @@ public class SecurityConfig {
         .sessionManagement((sessionManagement) -> sessionManagement
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilter(corsFilter) // @CrossOrigin(인증 x), 시큐리티 필터에 등록인증(o)
-        .addFilter(new JwtAuthenticationFilter(authenticationManager, objectMapper)) // AuthenticationManager
+        .addFilter(new JwtAuthenticationFilter(authenticationManager)) // AuthenticationManager
         .addFilter(new JwtAuthorizationFilter(authenticationManager, memberMapper, passwordEncoder,
             objectMapper)) // AuthenticationManager
         .authorizeHttpRequests(t -> t.requestMatchers("/api/v1/user/**").authenticated()
@@ -95,7 +115,12 @@ public class SecurityConfig {
             }).successHandler((request, response, authentication) -> {
               log.info("authentication: ", authentication);
               response.getWriter().println("success");
-            }).successHandler(new OAuth2SuccessHandler()));
+            }).successHandler(new OAuth2SuccessHandler()))
+        // .defaultSuccessUrl("http://localhost:5555/")
+        .logout(t -> t.logoutUrl("/logout").logoutSuccessUrl("http://localhost:5555/")
+            .invalidateHttpSession(true)// 세션 clear
+        );
+
 
     return http.build();
   }

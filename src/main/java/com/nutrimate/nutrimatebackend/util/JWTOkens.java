@@ -15,7 +15,6 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
@@ -176,8 +175,8 @@ public class JWTOkens {
     accessCookie.setPath("/");
     accessCookie.setMaxAge(0);
     Cookie refreshCookie = new Cookie("REFRESH", "");
-    accessCookie.setPath(request.getContextPath());
-    accessCookie.setMaxAge(0);
+    refreshCookie.setPath("/");
+    refreshCookie.setMaxAge(0);
     response.addCookie(accessCookie);
     response.addCookie(refreshCookie);
   }//
@@ -191,10 +190,10 @@ public class JWTOkens {
   public void init() {
     byte[] secretTobytes =
         Base64.getEncoder().encodeToString(secret.getBytes()).getBytes(StandardCharsets.UTF_8);
-    accessKey = Keys.hmacShaKeyFor(secretTobytes);
+    accessKey = Jwts.SIG.HS256.key().build();
     secretTobytes =
         Base64.getEncoder().encodeToString(secret.getBytes()).getBytes(StandardCharsets.UTF_8);
-    refreshKey = Keys.hmacShaKeyFor(secretTobytes);
+    refreshKey = Jwts.SIG.HS256.key().build();
   }
 
   @Value("{$access-key,refresh-key}")

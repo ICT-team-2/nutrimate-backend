@@ -16,6 +16,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
+
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
@@ -24,7 +25,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
     Map<String, Object> payloads = new HashMap<>();// 사용자 임의 데이타 추가
-    long expirationTime = 1000 * 30;// 토큰의 만료시간 설정(30)
+    payloads.put("userInfo", principalDetails.getMemberDto());
+    long expirationTime = 1000 * 60 * 30;// 토큰의 만료시간 설정(30)
     int status = 1;
     String accessToken = JWTOkens.createToken(principalDetails.getMemberDto().getUserUid(),
         payloads, expirationTime, JWTOkens.ACCESS);
@@ -39,11 +41,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
           payloads, expirationTime, JWTOkens.REFRESH);
       Cookie refreshCookie = new Cookie("REFRESH", refreshToken);
       refreshCookie.setPath("/");
+      refreshCookie.setHttpOnly(true);
+      refreshCookie.setSecure(true);
       log.info(refreshCookie);
       response.addCookie(refreshCookie);
     }
-    response.sendRedirect("http://localhost:5555/");
-    // response.getWriter().println("success123");
+    response.sendRedirect("http://localhost:5555");
   }
 
 }

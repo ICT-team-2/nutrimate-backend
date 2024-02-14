@@ -1,7 +1,6 @@
 package com.nutrimate.nutrimatebackend.config.login.jwt;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +17,6 @@ import com.nutrimate.nutrimatebackend.service.MemberService;
 import com.nutrimate.nutrimatebackend.util.JWTOkens;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -71,6 +69,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     // JWT 토큰을 검증해서 정상적인 사용자인지 확인
     String accessToken = request.getHeader("ACCESS");
     log.info("accessToken : " + accessToken);
+    accessToken = JWTOkens.getToken(request, "ACCESS");
     String refreshToken = JWTOkens.getToken(request, "REFRESH");
 
 
@@ -97,8 +96,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
       // String refreshToken =
       // JWTOkens.getToken(request, request.getServletContext().getInitParameter("REFRESH"));
 
-      System.out.println("accessToken1111111111 :" + accessToken);
-      System.out.println("refreshToken2222222222 :" + refreshToken);
+      // System.out.println("accessToken1111111111 :" + accessToken);
+      // System.out.println("refreshToken2222222222 :" + refreshToken);
       if (!accessToken.isEmpty()) {
         int accessVerifyStatus = JWTOkens.verifyToken(accessToken, JWTOkens.ACCESS);
 
@@ -128,31 +127,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
               case JWTOkens.UNSIGNED:
                 JWTOkens.removeToken(request, response);
                 loginFail(response);
+                return;
             }
             break;
           case JWTOkens.UNSIGNED: {
             JWTOkens.removeToken(request, response);
             loginFail(response);
+            return;
           }
         }
       }
-
-
-
-      // log.info("인증이나 권한이 필요한 주소 요청이 됨");
-      //
-      // String jwtHeader = JWTOkens.getToken(request, "ACCESS");
-      // log.info("jwtHeader :" + jwtHeader);
-      //
-      // // // header가 있는지 확인
-      // if (jwtHeader == null) {
-      // chain.doFilter(request, response);
-      // return;
-      // }
-      //
-      // // JWT 토큰을 검증해서 정상적인 사용자인지 확인
-      // accessToken = request.getHeader("ACCESS");
-      // log.info("accessToken : " + accessToken);
 
 
 
@@ -194,13 +178,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     chain.doFilter(request, response);
   }
 
-  public void loginFail(ServletResponse resp) throws IOException {
-    resp.setContentType("text/html; charset=UTF-8");
-    PrintWriter writer = resp.getWriter();
-    writer.write("<script>");
-    writer.write("alert('로그인 후 이용하세요')");
-    writer.write("location.replace('/login')");
-    writer.write("<script>");
+  public void loginFail(HttpServletResponse response) throws IOException {
+    Map<String, String> result = new HashMap<>();
+    result.put("message", "fail");
+    String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+    response.getWriter().print(json);
   }
 
   // public void setUserInfo(String refreshToken, HttpServletRequest request,
