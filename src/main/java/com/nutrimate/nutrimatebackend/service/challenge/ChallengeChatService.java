@@ -76,6 +76,23 @@ public class ChallengeChatService {
       return challengeChatMapper.findAllChatByRoomType(dto);
     }
 
+    //챌린지 등수
+    public List<ChallengeChatDto> getChallengeSuccessList(ChallengeChatDto dto) {
+      return challengeChatMapper.findChallengeSuccessList(dto);
+    }
+
+    //당일 챌린지 성공 횟수
+    public int countChallengeSuccess(ChallengeChatDto dto) {
+      return challengeChatMapper.findChallengeSuccessCount(dto);
+    }
+
+    //챌린지 성공 저장
+    public int saveChallengeSuccess(ChallengeChatDto dto) {     
+      return challengeChatMapper.insertChallengeSuccessCount(dto);
+    }
+
+
+
 
 
 	

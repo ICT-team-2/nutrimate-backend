@@ -35,8 +35,17 @@ public interface ChallengeChatMapper {
     //채팅 저장
     int insertChatMessage(ChallengeChatDto message);
     
+
     //이전의 모든 메세지를 가져오기
     List<ChallengeChatDto> findAllChatByRoomType(ChallengeChatDto dto);
+    
+    //챌린지 등수
+    List<ChallengeChatDto> findChallengeSuccessList(ChallengeChatDto dto);
+    
+    //당일 챌린지 성공 횟수
+    int findChallengeSuccessCount(ChallengeChatDto dto);
+    //챌린지 성공 기록하기
+    int insertChallengeSuccessCount(ChallengeChatDto dto);
 
 
    

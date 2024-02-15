@@ -24,6 +24,7 @@ public class ChallengeChatDto {
 
 	private String channelId;
 	private String messageId;
+	private int COUNT;
 	
 	private Long chatroomId;
 	private Long userId;
@@ -37,7 +38,8 @@ public class ChallengeChatDto {
 	public enum MessageType {
 		CHAT,//채팅
 		ENTER,//채팅 입장
-		LEAVE//채탕 나가기
+		LEAVE,//채탕 나가기
+		CHALLENGE
 	}
 	
 	

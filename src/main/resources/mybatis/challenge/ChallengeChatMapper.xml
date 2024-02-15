@@ -38,25 +38,53 @@
 			INSERT INTO challengeuserchatroom VALUES (#{userId},#{chatroomId})
 		</insert>
 	
-	 <!--채팅 메세지 저장-->
-	<insert id="insertChatMessage" parameterType="ChallengeChatDto">
-		INSERT INTO challengechat (chat_id, user_id, message_type, chat_message, chatroom_Id)
-			VALUES (seq_challenge_chat.nextval,
-				       #{userId}, #{messageType},
-				       #{chatMessage}, #{chatroomId})
-	</insert>
-	
+		 <!--채팅 메세지 저장-->
+		<insert id="insertChatMessage" parameterType="ChallengeChatDto">
+			INSERT INTO challengechat (chat_id, user_id, message_type, chat_message, chatroom_Id)
+				VALUES (seq_challenge_chat.nextval,
+					       #{userId}, #{messageType},
+					       #{chatMessage}, #{chatroomId})
+		</insert>
+		
+		
+		 <!--챌린지 등수 출력-->
+		 <select id="findChallengeSuccessList" resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
+		  <![CDATA[
+					SELECT * 
+				        FROM (
+				                SELECT DISTINCT cu.challenge_nick, COUNT(*) OVER (PARTITION BY cs.user_id) AS COUNT FROM ChallengeSuccess cs
+				                JOIN Challengeuser cu ON cu.user_id = cs.user_id where trunc(cs.success_date)<=trunc(sysdate) and trunc(cs.success_date)>=trunc(sysdate-6)  and CHATROOM_ID=#{chatroomId}
+				                ORDER BY COUNT DESC
+										)
+				   WHERE ROWNUM BETWEEN 1 AND 5 
+				   ]]>
+		 </select>
+		 <!--챌린지 등수 출력-->
+		<select id="findChallengeSuccessCount" resultType="int" parameterType="ChallengeChatDto">
+		     SELECT COUNT(*) from ChallengeSuccess WHERE USER_ID = #{userId} AND trunc(success_date) = trunc(sysdate) AND chatroom_id=#{chatroomId}
+		 </select>
+		 
+		 <!--챌린지 성공 기록하기-->
+		<insert id="insertChallengeSuccessCount" parameterType="ChallengeChatDto">
+		    INSERT INTO ChallengeSuccess VALUES(#{userId},#{chatroomId},sysdate,SEQ_BOARD.NEXTVAL)
+		 </insert>
+		<select id="findAllChatByRoomType"
+		        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
+		 <![CDATA[
+			select cc.*, cu.*,m.user_profile from challengechat cc JOIN challengeuser cu ON cc.user_Id=cu.user_Id
+          		JOIN member m ON cc.user_Id=m.user_Id
+				WHERE CHATROOM_ID = #{chatroomId} AND TRUNC(cc.created_date)>=TRUNC(sysdate)-1
+				
+				]]>
+		</select>
+		
 	
 	<!-- 채팅 닉네임 아이디 구하기(임시)-->
 		<select id="findUser" resultType="int" parameterType="ChallengeChatDto">
 			select USER_ID from challengeUser where challenge_nick=#{challengeNick}
 		</select>
 	
-	<select id="findAllChatByRoomType"
-	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
-		select * from challengechat cc JOIN challengeuser cu ON cc.user_Id=cu.user_Id
-			WHERE CHATROOM_ID = #{chatroomId}
-	</select>
+	
 	
 	
 	

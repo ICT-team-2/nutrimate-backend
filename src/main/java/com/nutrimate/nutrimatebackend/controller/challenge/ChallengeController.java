@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +34,7 @@ public class ChallengeController {
     
     
     //채팅 참여여부 확인
-    @PostMapping("/chatMember")
+    @PostMapping("/chat/member")
     public ResponseEntity<Map<String, Object>> findAccountChallenge(ChallengeChatDto dto) {
         Map<String, Object> challengeChatMemeber = new HashMap<>(); 
         //채팅에 참여해 본적이 있는지 확인
@@ -114,4 +115,28 @@ public class ChallengeController {
     }
 	
 	
+    //챌린지 성공 기록하기
+    @GetMapping("/success/record")
+    public Map challengeSuccessRecord(@ModelAttribute ChallengeChatDto dto){
+        Map map = new HashMap();
+        int count = challengeService.countChallengeSuccess(dto);
+        if(count==0) {
+          int affect=challengeService.saveChallengeSuccess(dto);
+          if(affect == 1) {
+            map.put("SUCCESS", 1);
+          }else {
+            map.put("SUCCESSNOT", 1);
+          }
+        }if(count==1) {
+           map.put("SUCCESS", 0);//이미 챌린지에 참여했습니다.
+        }
+        return map;
+   }
+  
+  //챌린지 등수
+     @GetMapping("/success")
+      public List<ChallengeChatDto> challengeSuccessList(ChallengeChatDto dto) {
+          return challengeService.getChallengeSuccessList(dto);
+      }
+  
 }
