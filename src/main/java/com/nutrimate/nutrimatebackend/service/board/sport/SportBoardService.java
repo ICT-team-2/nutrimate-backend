@@ -45,7 +45,20 @@ public class SportBoardService {
 	
 	//게시글 조회(상세)
 	public SportBoardDto getBoard(int boardId) {
-		return sportBoardMapper.selectBoard(boardId); //게시판 정보 조회
+		SportBoardDto board = sportBoardMapper.selectBoard(boardId);
+		return board; //게시판 정보 조회
+	}
+
+	//해당 글의 해시태그 가져오기
+	public List<SportBoardDto> findHashtagsByBoardId(String boardId) {
+	    SportBoardDto board = new SportBoardDto();
+	    try {
+	        int intBoardId = Integer.parseInt(boardId);
+	        board.setBoardId(intBoardId);
+	    } catch (NumberFormatException e) {
+	        e.printStackTrace();
+	    }
+	    return sportBoardMapper.findHashtagsByBoardId(board);
 	}
 	
 	//게시글 조회(전체)
@@ -90,11 +103,21 @@ public class SportBoardService {
 		sportBoardMapper.deleteBoard(boardId);
 	}
 	
+	// 유저가 좋아요 누른지 확인
+	public int checkUserLike(LikeDto likeDto) {
+		return sportBoardMapper.checkUserLike(likeDto);
+	}
+		
 	//좋아요 수 조회
 	public int countLikes(String boardId) {
 		return sportBoardMapper.countLikes(boardId);
 	}
 	
+	//좋아요 여부 확인
+	public boolean isLiked(LikeDto likeDto) {
+	    return sportBoardMapper.countLike(likeDto) > 0;
+	}
+		
 	//좋아요 생성
 	public boolean insertLike(LikeDto likeDto) {
 		return sportBoardMapper.insertLike(likeDto) == 1;
@@ -114,7 +137,7 @@ public class SportBoardService {
 	public SportBoardDto getPrevBoard(int boardId) {
 		SportBoardDto board = sportBoardMapper.selectPrevBoard(boardId);
 		if (board != null) {
-			sportBoardMapper.updateBoardViewcount(board.getBoardId());
+			//sportBoardMapper.updateBoardViewcount(board.getBoardId());
 		}
 		return board;
 	}
@@ -123,7 +146,7 @@ public class SportBoardService {
 	public SportBoardDto getNextBoard(int boardId) {
 		SportBoardDto board = sportBoardMapper.selectNextBoard(boardId);
 		if (board != null) {
-			sportBoardMapper.updateBoardViewcount(board.getBoardId());
+			//sportBoardMapper.updateBoardViewcount(board.getBoardId());
 		}
 		return board;
 	}
@@ -142,10 +165,9 @@ public class SportBoardService {
 	public int deleteBookmark(BookmarkDto bookmarkDto) {
 		return sportBoardMapper.deleteBookmark(bookmarkDto);
 	}
-	
-	//해당 글의 해시태그 가져오기
-	public List<SportBoardDto> findHashtagsByBoardId(SportBoardDto board) {
-		return sportBoardMapper.findHashtagsByBoardId(board);
-	}
 
+	public List<SportBoardDto> findBoardsByTagName(SportBoardDto board) {
+		return sportBoardMapper.findBoardsByTagName(board);
+	}
+	
 }

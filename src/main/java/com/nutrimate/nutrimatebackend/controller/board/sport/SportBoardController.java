@@ -1,6 +1,5 @@
 package com.nutrimate.nutrimatebackend.controller.board.sport;
 
-import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.sport.BookmarkDto;
 import com.nutrimate.nutrimatebackend.model.board.sport.LikeDto;
 import com.nutrimate.nutrimatebackend.model.board.sport.SportBoardDto;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,33 +24,16 @@ public class SportBoardController {
 	
 	//글 생성
 	@PostMapping()
-	public Map<String, String> createBoard(SportBoardDto board, HttpServletRequest req, @RequestParam(required = false) List<MultipartFile> files) {
-	    String phisicalPath = "C:\\Temp\\upload";
-	    StringBuffer fileNames = new StringBuffer();
+	public Map<String, String> createBoard(@RequestBody SportBoardDto board, HttpServletRequest req) {
 	    Map<String, String> map = new HashMap<>();
-	    if (files == null || files.isEmpty()) {
-	        map.put("message", "사진을 올려주세요");
-	        return map;
-	    }
-
-	    try {
-	        fileNames = FileUtils.upload(files, phisicalPath);
-	        board.setMapImg(fileNames.toString());
-	    } catch (Exception e) { //파일용량 초과시
-	        System.out.println("문제생김");
-	        map.put("message", "파일 업로드에 문제가 발생했습니다");
-	        return map;
-	    }
-
 	    SportBoardDto createdBoard = sportBoardService.createBoard(board);
-
 	    if (createdBoard == null) {
 	        map.put("message", "글 작성에 실패했습니다");
-	        return map;
 	    } else {
 	        map.put("message", "글 작성에 성공했습니다");
-	        return map;
+	        map.put("boardId", String.valueOf(createdBoard.getBoardId())); // boardId 추가
 	    }
+	    return map;
 	}
 	
 	//글 조회(상세)
@@ -93,26 +74,10 @@ public class SportBoardController {
 	
 	//글 수정
 	@PutMapping("/{id}")
-	public Map<String, String> updateBoard(@PathVariable("id") int id, SportBoardDto board, HttpServletRequest req, @RequestParam("files") List<MultipartFile> files) {
+	public Map<String, String> updateBoard(@PathVariable("id") int id, @RequestBody SportBoardDto board, HttpServletRequest req) {
 	    board.setBoardId(id);
-	    String phisicalPath = "C:\\Temp\\upload";
-	    StringBuffer fileNames = new StringBuffer();
+	    
 	    Map<String, String> map = new HashMap<>();
-
-	    if (files != null) {
-	        try {
-	            SportBoardDto titledto = sportBoardService.getBoard(id);
-	            System.out.println(titledto);
-	            StringBuffer titledto_ = new StringBuffer(titledto.getMapImg());
-	            fileNames = FileUtils.upload(files, phisicalPath);
-	            FileUtils.deletes(titledto_, phisicalPath, ",");
-	            board.setMapImg(fileNames.toString());
-	        } catch (Exception e) {//파일용량 초과시
-	            map.put("message", "파일 업로드에 문제가 발생했습니다");
-	            return map;
-	        }
-	    }
-
 	    SportBoardDto updatedBoard = sportBoardService.updateBoard(board);
 	    
 	    if (updatedBoard == null) {
@@ -145,18 +110,35 @@ public class SportBoardController {
 		return sportBoardService.countLikes(boardId);
 	}
 	
+	// 유저가 좋아요 누른지 확인 (완료)
+	// 입력 데이터 : userId, boardId
+	// 출력 데이터 : message, boardId, userId
+	@PostMapping("/like/check")
+	public ResponseEntity<Map<String, Object>> checkUserLike(@RequestBody LikeDto likeDto) {
+		int checkUserLike = sportBoardService.checkUserLike(likeDto);
+		Map<String, Object> jsonResponse = new HashMap<>();
+		if (checkUserLike == 0) {
+			jsonResponse.put("message", "좋아요를 안눌렀어요");
+		} else {
+			jsonResponse.put("message", "좋아요를 이미 눌렀어요");
+		}
+		jsonResponse.put("boardId", likeDto.getBoardId());
+		jsonResponse.put("userId", likeDto.getUserId());
+		return ResponseEntity.ok(jsonResponse);
+	}
+
 	//좋아요 생성
 	@PostMapping("/{boardId}/likes")
 	public ResponseEntity<Map<String, String>> insertLike(@PathVariable String boardId, @RequestBody LikeDto likeDto) {
 	    Map<String, String> response = new HashMap<>();
 	    likeDto.setBoardId(boardId);
-	    int countLikes = sportBoardService.countLikes(boardId);
-	    
-	    if (countLikes > 0) {
-	        response.put("message", "이미 좋아요를 눌렀습니다");
-	        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-	    }
+	    boolean isLiked = sportBoardService.isLiked(likeDto);
 
+	    if (isLiked) {
+	        response.put("message", "이미 좋아요를 눌렀습니다");
+	        return new ResponseEntity<>(response, HttpStatus.OK); // 상태 코드를 OK로 변경
+	    }
+	    
 	    boolean isCreated = sportBoardService.insertLike(likeDto);
 	    
 	    if (isCreated) {
@@ -189,8 +171,32 @@ public class SportBoardController {
 	        response.put("message", "좋아요 삭제 실패");
 	        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
+	}	
+	/*
+	@DeleteMapping("/{boardId}/likes")
+	public ResponseEntity<Map<String, String>> deleteLike(@PathVariable String boardId, @RequestBody LikeDto likeDto) {
+	    Map<String, String> response = new HashMap<>();
+	    likeDto.setBoardId(boardId);
+
+	    boolean isLikedByUser = sportBoardService.isLiked(likeDto);
+	    
+	    if (!isLikedByUser) {
+	        response.put("message", "좋아요를 누르지 않았습니다");
+	        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	    }
+
+	    int affectedRows = sportBoardService.deleteLike(likeDto);
+	    
+	    if (affectedRows > 0) {
+	        response.put("message", "좋아요 삭제 성공");
+	        return new ResponseEntity<>(response, HttpStatus.OK);
+	    } else {
+	        response.put("message", "좋아요 삭제 실패");
+	        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
-   
+  	*/
+	
     /*
     //이전글 조회
     @GetMapping("/{id}/prev")
@@ -263,22 +269,45 @@ public class SportBoardController {
 
 	//해당 글의 해시태그 가져오기
 	//입력 데이터:boardId / 출력 데이터:tagName or message(해시태그가 비어있거나 없는 게시글번호)
-	@GetMapping("/hashtag")
-	public ResponseEntity<List<Map<String, Object>>> findHashtagsByBoardId(@RequestBody SportBoardDto board) {
-		List<SportBoardDto> tagNames = sportBoardService.findHashtagsByBoardId(board);
-		List<Map<String, Object>> tagNameList = new ArrayList<>();
-		for (SportBoardDto tagName : tagNames) {
-			Map<String, Object> tagNameBoard = new HashMap<>();
-			tagNameBoard.put("tagName", tagName.getTagName());
-			tagNameList.add(tagNameBoard);
+	@GetMapping("/{boardId}/hashtag")
+	public ResponseEntity<List<Map<String, Object>>> findHashtagsByBoardId(@PathVariable String boardId) {
+	    List<SportBoardDto> tagNames = sportBoardService.findHashtagsByBoardId(boardId);
+	    List<Map<String, Object>> tagNameList = new ArrayList<>();
+	    for (SportBoardDto tagName : tagNames) {
+	        Map<String, Object> tagNameBoard = new HashMap<>();
+	        tagNameBoard.put("tagName", tagName.getTagName());
+	        tagNameList.add(tagNameBoard);
+	    }
+	    if (tagNameList.isEmpty()) {
+	        Map<String, Object> tagNameBoard = new HashMap<>();
+	        tagNameBoard.put("message", "해시태그가 없습니다");
+	        tagNameList.add(tagNameBoard);
+	        return new ResponseEntity<>(tagNameList, HttpStatus.OK);
+	    }
+	    return new ResponseEntity<>(tagNameList, HttpStatus.OK);
+	}
+
+	// 해시태그로 글 검색 (완료)
+	// 입력 데이터 : tagName
+	// 출력 데이터 : BoardList or message(해당 해시태그로 검색된 글이 없음)
+	@GetMapping("/hashtag/search")
+	public ResponseEntity<List<Map<String, Object>>> findBoardsByTagName(
+			@RequestBody SportBoardDto board) {
+		List<SportBoardDto> findBoardsByTagNames = sportBoardService.findBoardsByTagName(board);
+		int boardId = board.getBoardId();
+		List<Map<String, Object>> BoardsByTagNameList = new ArrayList<>();
+		for (SportBoardDto findBoardsByTagName : findBoardsByTagNames) {
+			Map<String, Object> BoardList = new HashMap<>();
+			BoardList.put("BoardList", findBoardsByTagName.getBoardId());
+			BoardsByTagNameList.add(BoardList);
 		}
-		if (tagNameList.isEmpty()) {
+		if (BoardsByTagNameList.isEmpty()) {
 			Map<String, Object> tagNameBoard = new HashMap<>();
-			tagNameBoard.put("message", "해시태그가 없습니다");
-			tagNameList.add(tagNameBoard);
-			return new ResponseEntity<>(tagNameList, HttpStatus.OK);
+			tagNameBoard.put("message", "해당 해시태그로 검색된 글이 없어요");
+			BoardsByTagNameList.add(tagNameBoard);
+			return new ResponseEntity<>(BoardsByTagNameList, HttpStatus.OK);
 		}
-		return new ResponseEntity<>(tagNameList, HttpStatus.OK);
+		return new ResponseEntity<>(BoardsByTagNameList, HttpStatus.OK);
 	}
 	
 }
