@@ -11,7 +11,7 @@
 				FROM dual
 		</selectKey>
 		INSERT INTO board VALUES(#{boardId}, #{userId}, #{boardCategory}, #{boardTitle},
-		#{boardContent}, #{boardThumbnail}, #{boardViewcount}, DEFAULT, DEFAULT, DEFAULT)
+		#{boardContent}, DEFAULT, #{boardViewcount}, DEFAULT, DEFAULT, DEFAULT)
 	</insert>
 	<!-- 해시태그 추가 -->
 	<select id="checkTagId" resultType="int">
@@ -35,32 +35,38 @@
 	
 	<!-- Read -->
 	<select id="selectBoard" parameterType="int" resultType="SportBoardDto">
-		SELECT b.*, s.map_img, coalesce(count(*), 0) AS like_count, m.user_nick, h.tag_id,
-		       h.tag_name
+		SELECT b.*, coalesce(count(bl.board_id), 0) AS like_count, m.user_nick, 
+		       s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level
 			FROM board b
 				     LEFT JOIN sportboard s ON b.board_id = s.board_id
 				     LEFT JOIN boardlike bl ON b.board_id = bl.board_id
-				     LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
-				     LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
 				     LEFT JOIN member m ON b.user_id = m.user_id
 			WHERE b.board_id = #{boardId} AND b.deleted = 'N' AND m.deleted = 'N'
-			GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+			GROUP BY s.board_id, b.board_id, b.user_id,
 			         b.board_category, b.board_title, b.board_content,
 			         b.board_thumbnail, b.board_viewcount, b.created_date,
-			         b.deleted, b.blocked, m.user_nick, h.tag_id, h.tag_name
+			         b.deleted, b.blocked, m.user_nick,
+			         s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level
+	</select>
+	<!-- 해당 글의 해시태그 가져오기 -->
+	<select id="findHashtagsByBoardId" resultType="SportBoardDto">
+		SELECT h.tag_name
+			FROM hashtag h
+				     INNER JOIN board_hashtag b
+				                ON h.tag_id = b.tag_id
+			WHERE b.board_id = #{boardId}
 	</select>
 	
 	<select id="selectAllBoards" resultType="SportBoardDto">
 		SELECT * FROM (
-		SELECT b.*, rank() OVER (ORDER BY b.board_id) id_rank, s.map_img,
-		COALESCE(count(*), 0) as like_count, m.user_nick, h.tag_id, h.tag_name,
+		SELECT b.*, rank() OVER (ORDER BY b.board_id) id_rank, 
+		coalesce(count(bl.board_id), 0) AS like_count, m.user_nick,
+		s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level,
 		ROW_NUMBER() OVER (ORDER BY
 		b.board_id DESC) rn
 		FROM board b
 		LEFT JOIN sportboard s ON b.board_id = s.board_id
 		LEFT JOIN boardlike bl ON b.board_id = bl.board_id
-		LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
-		LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
 		LEFT JOIN member m on b.user_id = m.user_id
 		WHERE b.deleted = 'N' AND m.deleted = 'N' AND b.board_category = 'exercise'
 		<if test="searchUser !=null">
@@ -69,15 +75,28 @@
 		<if test="searchTitle !=null">
 			AND b.board_title LIKE '%' || #{searchTitle} || '%'
 		</if>
-		<if test="searchTag !=null">
-			AND h.tag_name LIKE '%' || #{searchTag} || '%'
+		<if test="searchContent !=null">
+			AND b.board_content LIKE '%' || #{searchContent} || '%'
 		</if>
-		GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+		GROUP BY s.board_id, b.board_id, b.user_id,
 		b.board_category, b.board_title, b.board_content,
 		b.board_thumbnail, b.board_viewcount, b.created_date,
-		b.deleted, b.blocked, m.user_nick, h.tag_id, h.tag_name
+		b.deleted, b.blocked, m.user_nick,
+		s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level
 		ORDER BY b.board_id DESC
 		) WHERE rn BETWEEN (#{pageNum} - 1) * #{pageSize} + 1 AND #{pageNum} * #{pageSize}
+	</select>
+	
+	<!-- 해시태그로 글 검색 -->
+	<select id="findBoardsByTagName" resultType="SportBoardDto">
+		SELECT board_id
+			FROM board
+			WHERE deleted = 'N' AND blocked = 'N'
+			  AND board_id IN (SELECT board_id
+				                   FROM hashtag h
+					                        RIGHT JOIN board_hashtag b
+					                                   ON h.tag_id = b.tag_id
+				                   WHERE tag_name = #{tagName})
 	</select>
 	
 	<!-- Increase board viewcount -->
@@ -91,8 +110,7 @@
 	<update id="updateBoard" parameterType="SportBoardDto">
 		UPDATE board
 		SET board_title = #{boardTitle},
-		    board_content = #{boardContent},
-		    board_thumbnail = #{boardThumbnail}
+		    board_content = #{boardContent}
 			WHERE board_id = #{boardId}
 	</update>
 	<!-- 해당글의 해시태그 전부 삭제 -->
@@ -113,14 +131,15 @@
 	<!-- Insert into sportboard -->
 	<insert id="insertSportBoard">
 		INSERT INTO sportboard
-			VALUES (#{boardId}, #{mapImg})
+			VALUES (#{boardId}, #{mapPaths}, #{mapDistances}, #{mapCenterLat}, #{mapCenterLng}, #{mapZoomlevel})
 	</insert>
 	
 	<!-- Update sportboard -->
 	<update id="updateSportBoard">
 		UPDATE sportboard
-		SET map_img = #{mapImg}
-			WHERE board_id = #{boardId}
+		SET map_paths = #{mapPaths}, map_distances = #{mapDistances}, 
+			map_center_lat = #{mapCenterLat}, map_center_lng = #{mapCenterLng}, map_zoom_level = #{mapZoomlevel}
+		WHERE board_id = #{boardId}
 	</update>
 	
 	<!-- Count likes -->
@@ -128,6 +147,22 @@
 		SELECT count(*)
 			FROM boardlike
 			WHERE board_id = #{boardId}
+	</select>
+	
+	<!-- 좋아요 여부 확인 -->
+	<select id="countLike" parameterType="LikeDto" resultType="int">
+	    SELECT COUNT(*)
+	    FROM boardlike
+	    WHERE board_id = #{boardId} AND user_id = #{userId}
+	</select>	
+	
+	<!-- 유저가 좋아요 누른지 확인(0일시 안누름) -->
+	<select id="checkUserLike" resultType="int">
+		SELECT count(like_id)
+			FROM boardlike b
+				     RIGHT JOIN board d
+				                ON b.board_id = d.board_id
+			WHERE b.user_id = #{userId} AND d.board_id = #{boardId}
 	</select>
 	
 	<!-- Insert like -->
@@ -144,40 +179,46 @@
 	<delete id="deleteLike" parameterType="LikeDto">
 		DELETE
 			FROM boardlike
-			WHERE like_id = #{likeId} AND user_id = #{userId}
+			WHERE like_id = (SELECT like_id
+				                 FROM boardlike
+				                 WHERE user_id = #{userId} AND board_id = #{boardId})
 	</delete>
 	
 	<!-- Previous board -->
 	<select id="selectPrevBoard" parameterType="int" resultType="SportBoardDto">
 		SELECT *
-			FROM (SELECT b.*, s.map_img, coalesce(count(bl.board_id), 0) AS like_count, m.user_nick,
+			FROM (SELECT b.*, coalesce(count(bl.board_id), 0) AS like_count, m.user_nick,
+						s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level,
 			             row_number() OVER (ORDER BY b.board_id DESC) AS rn
 				      FROM board b
 					           LEFT JOIN sportboard s ON b.board_id = s.board_id
 					           LEFT JOIN boardlike bl ON b.board_id = bl.board_id
 					           LEFT JOIN member m ON b.user_id = m.user_id
 				      WHERE b.board_id &lt; #{boardId} AND b.deleted = 'N' AND m.deleted = 'N'
-				      GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+				      GROUP BY s.board_id, b.board_id, b.user_id,
 				               b.board_category, b.board_title, b.board_content,
 				               b.board_thumbnail, b.board_viewcount, b.created_date,
-				               b.deleted, b.blocked, m.user_nick)
+				               b.deleted, b.blocked, m.user_nick,
+				               s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level)
 			WHERE rn = 1
 	</select>
 	
 	<!-- Next board -->
 	<select id="selectNextBoard" parameterType="int" resultType="SportBoardDto">
 		SELECT *
-			FROM (SELECT b.*, s.map_img, coalesce(count(bl.board_id), 0) AS like_count, m.user_nick,
+			FROM (SELECT b.*, coalesce(count(bl.board_id), 0) AS like_count, m.user_nick,
+			s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level,
 			             row_number() OVER (ORDER BY b.board_id ASC) AS rn
 				      FROM board b
 					           LEFT JOIN sportboard s ON b.board_id = s.board_id
 					           LEFT JOIN boardlike bl ON b.board_id = bl.board_id
 					           LEFT JOIN member m ON b.user_id = m.user_id
 				      WHERE b.board_id &gt; #{boardId} AND b.deleted = 'N' AND m.deleted = 'N'
-				      GROUP BY s.board_id, s.map_img, b.board_id, b.user_id,
+				      GROUP BY s.board_id, b.board_id, b.user_id,
 				               b.board_category, b.board_title, b.board_content,
 				               b.board_thumbnail, b.board_viewcount, b.created_date,
-				               b.deleted, b.blocked, m.user_nick)
+				               b.deleted, b.blocked, m.user_nick,
+				               s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng, s.map_zoom_level)
 			WHERE rn = 1
 	</select>
 	
@@ -187,6 +228,13 @@
 			FROM board b
 				     LEFT JOIN member m ON b.user_id = m.user_id AND b.board_category = 'exercise'
 			WHERE b.deleted = 'N' AND m.deleted = 'N'
+	</select>
+	
+	<!-- 북마크 저장여부 확인 -->
+	<select id="countBookmarks" parameterType="com.nutrimate.nutrimatebackend.model.board.sport.BookmarkDto" resultType="int">
+	    SELECT COUNT(*)
+	    FROM BOOKMARK
+	    WHERE board_id = #{boardId} AND user_id = #{userId}
 	</select>
 	
 	<!-- Insert bookmark -->
@@ -206,27 +254,4 @@
 			WHERE board_id = #{boardId} AND user_id = #{userId}
 	</delete>
 	
-	<!-- 해시태그 -->
-	<!-- 해당 글의 해시태그 가져오기 -->
-	<select id="findHashtagsByBoardId" resultType="SportBoardDto">
-		SELECT h.tag_name
-			FROM hashtag h
-				     INNER JOIN board_hashtag b
-				                ON h.tag_id = b.tag_id
-			WHERE b.board_id = #{boardId}
-	</select>
-	
-	<!-- 해시태그로 글 검색
-	<select id="findBoardsByTagName" resultType="BoardDto">
-		SELECT BOARD_ID
-		FROM board
-		WHERE DELETED = 'N' AND BLOCKED = 'N'
-		AND board_id IN (
-			SELECT board_id
-			FROM hashtag H RIGHT JOIN board_hashtag B
-			ON H.tag_id = B.tag_id
-			WHERE tag_name = #{tagName}
-		)
-	</select>
-	-->
 </mapper>
