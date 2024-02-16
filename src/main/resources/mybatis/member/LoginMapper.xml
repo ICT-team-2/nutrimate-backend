@@ -12,11 +12,11 @@
 		INSERT INTO
 		member(user_id, user_nick, user_height, user_weight,
 		user_email, user_gender, user_sport_hard,
-		user_cal,user_name,user_uid,user_pwd,user_phone)
+		user_cal,user_name,user_uid,user_pwd,user_phone, user_diet)
 		VALUES (#{userId}, #{userNick}, #{userHeight},
 		#{userWeight}, #{userEmail}, #{userGender},
 		#{userSportHard}, #{userCal}, #{userName},
-		#{userUid}, #{userPwd}, #{userPhone})
+		#{userUid}, #{userPwd}, #{userPhone}, #{userDiet})
 	</insert>
 	<insert id="insertMemberWithOAuth" parameterType="MemberDto">
 		<selectKey keyProperty="userId"
@@ -49,7 +49,6 @@
 				     JOIN oauth o ON m.user_id = o.user_id
 			WHERE o.provider_id = #{providerId}
 			  AND m.deleted = 'N'
-	
 	</select>
 	
 	<select id="findMemberInfoById" parameterType="Long" resultType="MemberDto">
@@ -64,7 +63,8 @@
 		       user_name,
 		       user_uid,
 		       user_phone,
-		       user_role
+		       user_role,
+		       user_diet
 			FROM member
 			WHERE user_id = #{userId}
 			  AND deleted = 'N'
@@ -81,7 +81,8 @@
 		    user_name=#{userName},
 		    user_uid=#{userUid},
 		    user_pwd=#{userPwd},
-		    user_phone=#{userPhone}
+		    user_phone=#{userPhone},
+		    user_diet=#{userDiet}
 			WHERE user_id = #{userId}
 	</update>
 </mapper>
