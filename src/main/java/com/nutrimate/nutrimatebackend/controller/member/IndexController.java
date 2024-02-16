@@ -60,6 +60,7 @@ public class IndexController {
 		return "index";
 	}
 	
+	
 	// OAuth 로그인을 해도 Principal
 	@GetMapping("/api/v1/user")
 	public Map user(Authentication authentication) {
@@ -78,6 +79,7 @@ public class IndexController {
 	public String manager() {
 		return "manager";
 	}
+	
 	
 	// @GetMapping("/loginForm")
 	// public String loginForm() {
@@ -100,7 +102,6 @@ public class IndexController {
 		System.out.println(memberDto);
 		return json;
 	}
-	
 	
 	@GetMapping("/member/mypage")
 	public Map<String, Object> myPage(@RequestParam(value = "userId", required = false) Long userId) {

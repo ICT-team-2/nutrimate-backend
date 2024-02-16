@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginRequestDto {
-	String userUid;
-	String userPwd;
+  Long userId;
+  String userUid;
+  String userPwd;
 }
