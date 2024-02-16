@@ -1,6 +1,5 @@
 package com.nutrimate.nutrimatebackend.mapper.test;
 
-//import com.nutrimate.nutrimatebackend.model.MemberDto;
 import com.nutrimate.nutrimatebackend.model.member.MemberDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
