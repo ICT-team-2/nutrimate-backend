@@ -49,6 +49,11 @@ public class MemberService {
     return memberDto;
   }
 
+  public MemberDto updateMemberDiet(MemberDto memberDto) {
+    memberMapper.updateMemberDiet(memberDto);
+    return memberDto;
+  }
+
 
 
 }

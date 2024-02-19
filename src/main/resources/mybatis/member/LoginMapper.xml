@@ -64,25 +64,30 @@
 		       user_uid,
 		       user_phone,
 		       user_role,
-		       user_diet
+		       user_diet,
+		       user_intro
 			FROM member
 			WHERE user_id = #{userId}
 			  AND deleted = 'N'
 	</select>
 	<update id="updateMemberInfo" parameterType="MemberDto">
 		UPDATE member
-		SET user_nick=#{userNick},
-		    user_height=#{userHeight},
+		SET user_height=#{userHeight},
 		    user_weight=#{userWeight},
 		    user_email=#{userEmail},
 		    user_gender=#{userGender},
 		    user_sport_hard=#{userSportHard},
 		    user_cal=#{userCal},
-		    user_name=#{userName},
-		    user_uid=#{userUid},
-		    user_pwd=#{userPwd},
-		    user_phone=#{userPhone},
-		    user_diet=#{userDiet}
+		    user_diet=#{userDiet},
+		    user_intro=#{userIntro}
+			WHERE user_id = #{userId}
+	</update>
+	
+	<update id="updateMemberDiet" parameterType="MemberDto">
+		UPDATE nutriratio 
+		SET protein=#{protein},
+			carbo=#{carbo},
+			province=#{province}
 			WHERE user_id = #{userId}
 	</update>
 </mapper>
