@@ -101,9 +101,9 @@ public class SecurityConfig {
 				.sessionManagement((sessionManagement) -> sessionManagement
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilter(corsFilter) // @CrossOrigin(인증 x), 시큐리티 필터에 등록인증(o)
-				.addFilter(new JwtAuthenticationFilter(authenticationManager)) // AuthenticationManager
-				.addFilter(new JwtAuthorizationFilter(authenticationManager, memberMapper, passwordEncoder,
-						objectMapper)) // AuthenticationManager
+				.addFilter(new JwtAuthenticationFilter(authenticationManager, objectMapper)) // AuthenticationManager
+				.addFilter(new JwtAuthorizationFilter(authenticationManager, memberMapper,
+						passwordEncoder, objectMapper)) // AuthenticationManager
 				.authorizeHttpRequests(t -> t.requestMatchers("/api/v1/user/**").authenticated()
 						.requestMatchers("/api/v1/user/**").hasAnyRole("USER", "MANAGER", "ADMIN")
 						.requestMatchers("/api/v1/manager/**").hasAnyRole("MANAGER", "ADMIN")
