@@ -30,29 +30,27 @@ public class FeedController {
 	// 입력 데이터 : nowPage(디폴트1), receivePage(디폴트10)
 	// 출력 데이터 : boardId, thumbnail, nowPage, receivePage, totalPages, totalRecordCount
 	@GetMapping("/list")
-	public ResponseEntity<List<Map<String, Object>>> findFeedList(
+	public ResponseEntity<Map<String, Object>> findFeedList(
 			@RequestParam(name = "nowPage", defaultValue = "1") int nowPage,
-			@RequestParam(name = "receivePage", defaultValue = "10") int receivePage) {
+			@RequestParam(name = "receivePage", defaultValue = "10") int receivePage,
+			@RequestParam(name = "userId") int userId) {
 		int totalRecordCount = feedService.findFeedtotalRecordCount();
 		// 페이징 계산
 		int totalPages = (int) Math.ceil((double) totalRecordCount / receivePage);
 		int startRow = (nowPage - 1) * receivePage + 1;
 		int endRow = nowPage * receivePage;
+		
 		// 피드 목록 가져오기
-		List<FeedDto> FeedList = feedService.findFeedList(startRow, endRow);
-		// 각 피드에 페이징 정보 추가
-		List<Map<String, Object>> simplifiedFeedList = new ArrayList<>();
-		for (FeedDto feed : FeedList) {
-			Map<String, Object> simplifiedFeed = new HashMap<>();
-			simplifiedFeed.put("boardId", feed.getBoardId());
-			simplifiedFeed.put("thumbnail", feed.getBoardThumbnail());
-			simplifiedFeed.put("nowPage", nowPage);
-			simplifiedFeed.put("receivePage", receivePage);
-			simplifiedFeed.put("totalPages", totalPages);
-			simplifiedFeed.put("totalRecordCount", totalRecordCount);
-			simplifiedFeedList.add(simplifiedFeed);
-		}
-		return new ResponseEntity<>(simplifiedFeedList, HttpStatus.OK);
+		List<FeedDto> feedList = feedService.findFeedList(startRow, endRow, userId);
+		
+		Map<String, Object> simplifiedFeed = new HashMap<>();
+		simplifiedFeed.put("feedList", feedList);
+		simplifiedFeed.put("nowPage", nowPage);
+		simplifiedFeed.put("receivePage", receivePage);
+		simplifiedFeed.put("totalPages", totalPages);
+		simplifiedFeed.put("totalRecordCount", totalRecordCount);
+		
+		return new ResponseEntity<>(simplifiedFeed, HttpStatus.OK);
 	}
 	
 	// 피드 상세보기 정보 가져오기 (완료)
@@ -63,7 +61,7 @@ public class FeedController {
 	// 출력 데이터 : boardId, userNick, userProfile, createdDate, boardThumbnail, boardViewCount,
 	// LIKE_COUNT
 	@GetMapping("/view")
-	public ResponseEntity<List<Map<String, Object>>> findFeedDetail(@RequestBody FeedDto feedDto) {
+	public ResponseEntity<List<Map<String, Object>>> findFeedDetail(FeedDto feedDto) {
 		List<FeedDto> FeedList = feedService.findFeedDetail(feedDto);
 		List<Map<String, Object>> detailfiedFeedList = new ArrayList<>();
 		for (FeedDto feed : FeedList) {
@@ -72,9 +70,9 @@ public class FeedController {
 			detailfiedFeed.put("userNick", feed.getUserNick());
 			detailfiedFeed.put("userProfile", feed.getUserProfile());
 			detailfiedFeed.put("createdDate", feed.getCreatedDate());
-			detailfiedFeed.put("Thumbnail", feed.getBoardThumbnail());
-			detailfiedFeed.put("ViewCount", feed.getBoardViewCount()); // 조회수
-			detailfiedFeed.put("LIKE_COUNT", feed.getLikeCount()); // 좋아요 수
+			detailfiedFeed.put("thumbnail", feed.getBoardThumbnail());
+			detailfiedFeed.put("viewCount", feed.getBoardViewCount()); // 조회수
+			detailfiedFeed.put("likeCount", feed.getLikeCount()); // 좋아요 수
 			detailfiedFeedList.add(detailfiedFeed);
 		}
 		return new ResponseEntity<>(detailfiedFeedList, HttpStatus.OK);

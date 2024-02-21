@@ -5,13 +5,24 @@
 	
 	<!-- 피드 글목록 가져오기 -->
 	<select id="findFeedList" resultType="FeedDto" parameterType="map">
-		SELECT *
-			FROM (SELECT board_id, board_thumbnail,
-			             row_number() OVER (ORDER BY board_id DESC) AS rnum
-				      FROM board
-				      WHERE deleted = 'N' AND blocked = 'N'
-					    AND board_category = 'FEED')
-			WHERE rnum BETWEEN #{startRow} AND #{endRow}
+		SELECT b.*
+			FROM (SELECT b.board_id, b.board_thumbnail, b.board_content,
+			             m.user_nick, m.user_profile,
+			             row_number() OVER (ORDER BY b.board_id DESC) AS rnum,
+			             count(like_id) AS like_count,
+			             (SELECT(count(bl3.like_id))
+				              FROM boardlike bl3
+				              WHERE bl3.user_id = #{userId}
+					            AND bl3.board_id = b.board_id) AS checked_like
+				      FROM board b
+					           JOIN member m ON b.user_id = m.user_id
+					           LEFT JOIN boardlike bl ON b.board_id = bl.board_id
+				      WHERE b.deleted = 'N' AND blocked = 'N'
+					    AND board_category = 'FEED'
+				      GROUP BY b.board_id, b.board_thumbnail,
+				               b.board_content, m.user_nick, m.user_profile) b
+				     LEFT JOIN boardlike bl2 ON b.board_id = bl2.board_id
+			WHERE rnum BETWEEN 1 AND 10
 	</select>
 	
 	<!-- 피드 총 페이지 수 가져오기(페이징 시 필요) -->

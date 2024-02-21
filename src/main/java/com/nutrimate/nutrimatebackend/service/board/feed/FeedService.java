@@ -16,8 +16,8 @@ public class FeedService {
 	private FeedMapper feedMapper;
 	
 	/** 피드 기능 **/
-	public List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow) {
-		return feedMapper.findFeedList(startRow, endRow);
+	public List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow, int userId) {
+		return feedMapper.findFeedList(startRow, endRow, userId);
 	}
 	
 	public int findFeedtotalRecordCount() {

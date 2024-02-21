@@ -10,7 +10,7 @@ import java.util.List;
 public interface FeedMapper {
 	
 	// 피드 글목록 가져오기
-	List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow);
+	List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow, int userId);
 	
 	int findFeedtotalRecordCount();
 	
