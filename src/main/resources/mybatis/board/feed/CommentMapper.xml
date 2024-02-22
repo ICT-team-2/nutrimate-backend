@@ -25,6 +25,7 @@
 				     JOIN member m
 				          ON c.user_id = m.user_id
 			WHERE board_id = #{boardId}
+			  AND c.deleted = 'N'
 			START WITH cmt_depth = 0
 			CONNECT BY PRIOR cmt_id = cmt_ref
 			ORDER SIBLINGS BY c.created_date
