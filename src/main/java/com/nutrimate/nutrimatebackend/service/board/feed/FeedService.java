@@ -25,7 +25,7 @@ public class FeedService {
 	}
 	
 	// 피드의 상세보기 정보를 가져오기
-	public List<FeedDto> findFeedDetail(FeedDto feedDto) {
+	public FeedDto findFeedDetail(FeedDto feedDto) {
 		return feedMapper.findFeedDetail(feedDto);
 	}
 	

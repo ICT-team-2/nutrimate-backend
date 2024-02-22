@@ -62,21 +62,8 @@ public class FeedController {
 	// 출력 데이터 : boardId, userNick, userProfile, createdDate, boardThumbnail, boardViewCount,
 	// LIKE_COUNT
 	@GetMapping("/view")
-	public ResponseEntity<List<Map<String, Object>>> findFeedDetail(FeedDto feedDto) {
-		List<FeedDto> FeedList = feedService.findFeedDetail(feedDto);
-		List<Map<String, Object>> detailfiedFeedList = new ArrayList<>();
-		for (FeedDto feed : FeedList) {
-			Map<String, Object> detailfiedFeed = new HashMap<>();
-			detailfiedFeed.put("boardId", feed.getBoardId());
-			detailfiedFeed.put("userNick", feed.getUserNick());
-			detailfiedFeed.put("userProfile", feed.getUserProfile());
-			detailfiedFeed.put("createdDate", feed.getCreatedDate());
-			detailfiedFeed.put("thumbnail", feed.getBoardThumbnail());
-			detailfiedFeed.put("viewCount", feed.getBoardViewCount()); // 조회수
-			detailfiedFeed.put("likeCount", feed.getLikeCount()); // 좋아요 수
-			detailfiedFeedList.add(detailfiedFeed);
-		}
-		return new ResponseEntity<>(detailfiedFeedList, HttpStatus.OK);
+	public FeedDto findFeedDetail(FeedDto feedDto) {
+		return feedService.findFeedDetail(feedDto);
 	}
 	
 	// 피드의 조회수를 +1하기 (완료)

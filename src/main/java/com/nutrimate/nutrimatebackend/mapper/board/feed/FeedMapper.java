@@ -16,7 +16,7 @@ public interface FeedMapper {
 	int findFeedtotalRecordCount(String searchWord);
 	
 	// 피드의 상세보기 정보를 가져오기
-	List<FeedDto> findFeedDetail(FeedDto feedDto);
+	FeedDto findFeedDetail(FeedDto feedDto);
 	
 	// 피드의 조회수를 +1하기
 	void updateincreaseViewCount(FeedDto feedDto);

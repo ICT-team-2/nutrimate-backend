@@ -3,7 +3,6 @@ package com.nutrimate.nutrimatebackend.controller.board;
 import com.nutrimate.nutrimatebackend.model.board.CommentDto;
 import com.nutrimate.nutrimatebackend.service.board.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -105,18 +104,9 @@ public class CommentController {
 	// 입력 데이터 : cmtId
 	// 출력 데이터 :
 	@DeleteMapping("/delete")
-	public ResponseEntity<Map<String, Object>> deleteComment(
+	public CommentDto deleteComment(
 			@RequestBody CommentDto commentDto) {
-		int affectedRows = commentService.deleteComment(commentDto);
-		Map<String, Object> jsonResponse = new HashMap<>();
-		if (affectedRows > 0) {
-			jsonResponse.put("message", "comments deleted successfully");
-			jsonResponse.put("cmtId", commentDto.getCmtId());
-			return ResponseEntity.ok(jsonResponse);
-		} else {
-			jsonResponse.put("message", "comments delete failed");
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(jsonResponse);
-		}
+		return commentService.deleteComment(commentDto);
 	}
 	
 }

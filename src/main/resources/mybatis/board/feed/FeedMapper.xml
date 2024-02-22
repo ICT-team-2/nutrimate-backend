@@ -25,7 +25,9 @@
         WITH b3 AS (
         SELECT b.board_id, b.board_thumbnail, b.board_content,
         m.user_nick, m.user_profile, m.user_id,
-        count(like_id) AS like_count,
+        (SELECT (count(bl3.like_id))
+        FROM boardlike bl3
+        WHERE bl3.board_id = b.board_id) AS like_count,
         (SELECT (count(bl3.like_id))
         FROM boardlike bl3
         WHERE bl3.user_id = #{userId}
@@ -93,19 +95,44 @@
     
     <!-- 피드 상세보기 정보 가져오기 -->
     <select id="findFeedDetail" resultType="FeedDto">
-        SELECT b.board_id, m.user_nick, m.user_profile, b.created_date, b.board_thumbnail,
-               b.board_viewcount,
-               (SELECT count(like_id) FROM boardlike WHERE board_id = b.board_id) AS like_count
-            FROM board b
-                     RIGHT JOIN member m ON m.user_id = b.user_id
-            WHERE b.board_id = #{boardId}
-            GROUP BY b.board_id, m.user_nick, m.user_profile, b.created_date, b.board_thumbnail,
-                     b.board_viewcount
+        WITH b3 AS (SELECT b.board_id, b.board_thumbnail, b.board_content,
+                           m.user_nick, m.user_profile, m.user_id,
+                           (SELECT count(bl3.like_id)
+                                FROM boardlike bl3
+                                WHERE bl3.board_id = b.board_id) AS like_count,
+                           (SELECT (count(bl3.like_id))
+                                FROM boardlike bl3
+                                WHERE bl3.user_id = #{userId}
+                                  AND bl3.board_id = b.board_id) AS checked_like
+                        FROM board b
+                                 JOIN member m
+                                      ON b.user_id = m.user_id
+                                 LEFT JOIN boardlike bl ON b.board_id = bl.board_id
+                                 LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
+                                 RIGHT JOIN hashtag h ON bh.tag_id = h.tag_id
+                        WHERE b.board_id = #{boardId}
+                        GROUP BY b.board_id, b.board_thumbnail,
+                                 b.board_content, m.user_nick, m.user_profile, m.user_id),
+             b4 AS (SELECT b3.*,
+                           (SELECT count(bm.user_id)
+                                FROM bookmark bm
+                                WHERE bm.board_id = b3.board_id) AS bookmark_count,
+                           (SELECT count(bm.user_id)
+                                FROM bookmark bm
+                                WHERE bm.board_id = b3.board_id
+                                  AND bm.user_id = #{userId}) AS checked_bookmark
+                        FROM b3
+                                 LEFT JOIN bookmark bm ON b3.board_id = bm.board_id
+                        GROUP BY b3.board_id, b3.board_thumbnail, b3.board_content, b3.user_nick,
+                                 b3.user_profile, b3.like_count, b3.checked_like, bm.user_id,
+                                 b3.user_id)
+        SELECT b4.*
+            FROM b4
     </select>
     
     <!-- 피드의 조회수를 +1하기 -->
     <update id="updateincreaseViewCount">
-        UPDATE BOARD SET BOARD_VIEWCOUNT = BOARD_VIEWCOUNT + 1 WHERE BOARD_ID = #{boardId}
+        UPDATE board SET board_viewcount = board_viewcount + 1 WHERE board_id = #{boardId}
         <selectKey keyProperty="boardViewCount" order="AFTER" resultType="int">
             SELECT board_viewcount
                 FROM board

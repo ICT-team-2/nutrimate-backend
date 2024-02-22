@@ -24,6 +24,7 @@ public class CommentDto {
 	private Date createdDate; // 댓글 작성 날짜
 	private int cmtDepth = 0; // 댓글 깊이
 	private String deleted; // 삭제 여부(Y,N(디폴트))
+	private String allDeleted; // 댓글+대댓글 모두 삭제 여부(Y,N(디폴트))
 	private Integer cmtRef; // 대댓글을 달은 댓글의 번호
 	private String userName;
 	private String userNick;
