@@ -30,18 +30,19 @@ public class FeedController {
 	// 입력 데이터 : nowPage(디폴트1), receivePage(디폴트10)
 	// 출력 데이터 : boardId, thumbnail, nowPage, receivePage, totalPages, totalRecordCount
 	@GetMapping("/list")
-	public ResponseEntity<Map<String, Object>> findFeedList(
+	public Map<String, Object> findFeedList(
 			@RequestParam(name = "nowPage", defaultValue = "1") int nowPage,
 			@RequestParam(name = "receivePage", defaultValue = "10") int receivePage,
-			@RequestParam(name = "userId") int userId) {
-		int totalRecordCount = feedService.findFeedtotalRecordCount();
+			@RequestParam(name = "userId") int userId,
+			@RequestParam(name = "searchWord", required = false, defaultValue = "") String searchWord) {
+		int totalRecordCount = feedService.findFeedtotalRecordCount(searchWord);
 		// 페이징 계산
 		int totalPages = (int) Math.ceil((double) totalRecordCount / receivePage);
 		int startRow = (nowPage - 1) * receivePage + 1;
 		int endRow = nowPage * receivePage;
 		
 		// 피드 목록 가져오기
-		List<FeedDto> feedList = feedService.findFeedList(startRow, endRow, userId);
+		List<FeedDto> feedList = feedService.findFeedList(startRow, endRow, userId, searchWord);
 		
 		Map<String, Object> simplifiedFeed = new HashMap<>();
 		simplifiedFeed.put("feedList", feedList);
@@ -50,7 +51,7 @@ public class FeedController {
 		simplifiedFeed.put("totalPages", totalPages);
 		simplifiedFeed.put("totalRecordCount", totalRecordCount);
 		
-		return new ResponseEntity<>(simplifiedFeed, HttpStatus.OK);
+		return simplifiedFeed;
 	}
 	
 	// 피드 상세보기 정보 가져오기 (완료)
@@ -289,11 +290,11 @@ public class FeedController {
 	@GetMapping("/hashtag")
 	public ResponseEntity<List<Map<String, Object>>> findHashtagsByBoardId(
 			@RequestBody FeedDto feedDto) {
-		List<FeedDto> tagNames = feedService.findHashtagsByBoardId(feedDto);
+		List<String> tagNames = feedService.findHashtagsByBoardId(feedDto);
 		List<Map<String, Object>> tagNameList = new ArrayList<>();
-		for (FeedDto tagName : tagNames) {
+		for (String tagName : tagNames) {
 			Map<String, Object> tagNameFeed = new HashMap<>();
-			tagNameFeed.put("tagName", tagName.getTagName());
+			tagNameFeed.put("tagName", tagName);
 			tagNameList.add(tagNameFeed);
 		}
 		if (tagNameList.isEmpty()) {

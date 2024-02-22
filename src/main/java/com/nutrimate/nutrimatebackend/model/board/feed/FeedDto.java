@@ -36,6 +36,10 @@ public class FeedDto {
 	private Date boardCreatedDate; // 작성일
 	private String deleted; // 삭제 여부(Y,N(디폴트))
 	private String blocked; // 차단 여부(Y,N(디폴트))
+	
+	private String searchWord; // 검색어
+	
+	
 	/* 페이징 */
 	private int nowPage; // 현재 페이지
 	private int receivePage; // 받아올 페이지
@@ -50,6 +54,8 @@ public class FeedDto {
 	private int checkedLike; // 좋아요 체크
 	
 	/** 북마크 **/
+	private int bookmarkCount;// 북마크 수
+	private int checkedBookmark; // 북마크 체크
 	// private int userId; // 유저아이디(+북마크FK)
 	// private int boardId; // 글번호(+북마크FK)
 	// private Date createdDate; // 북마크 누른 날짜
