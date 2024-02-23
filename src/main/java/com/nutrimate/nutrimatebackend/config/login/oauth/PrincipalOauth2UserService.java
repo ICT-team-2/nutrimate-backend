@@ -5,7 +5,7 @@ import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
 import com.nutrimate.nutrimatebackend.config.login.oauth.provider.*;
 import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
 import com.nutrimate.nutrimatebackend.model.member.MemberDto;
-import com.nutrimate.nutrimatebackend.service.MemberService;
+import com.nutrimate.nutrimatebackend.service.member.MemberService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

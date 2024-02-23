@@ -1,4 +1,4 @@
-package com.nutrimate.nutrimatebackend.service;
+package com.nutrimate.nutrimatebackend.service.member;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,6 +54,8 @@ public class MemberService {
     return memberDto;
   }
 
-
-
+  public boolean checkNick(String nickName) {
+    boolean exists = memberMapper.checkNick(nickName);
+    return exists;
+  }
 }

@@ -22,5 +22,12 @@ public interface MemberMapper {
 
   int updateMemberDiet(MemberDto memberDto);
 
+  boolean checkPhoneNumber(String userPhone);
+
+  boolean checkNick(String nickName);
+
+  boolean checkEmail(String email);
+
+
 
 }

@@ -12,11 +12,11 @@
 		INSERT INTO
 		member(user_id, user_nick, user_height, user_weight,
 		user_email, user_gender, user_sport_hard,
-		user_cal,user_name,user_uid,user_pwd,user_phone, user_diet)
+		user_cal,user_name,user_uid,user_pwd,user_phone, user_diet, user_allergy)
 		VALUES (#{userId}, #{userNick}, #{userHeight},
 		#{userWeight}, #{userEmail}, #{userGender},
 		#{userSportHard}, #{userCal}, #{userName},
-		#{userUid}, #{userPwd}, #{userPhone}, #{userDiet})
+		#{userUid}, #{userPwd}, #{userPhone}, #{userDiet}, #{userAllergy})
 	</insert>
 	<insert id="insertMemberWithOAuth" parameterType="MemberDto">
 		<selectKey keyProperty="userId"
@@ -90,4 +90,16 @@
 			province=#{province}
 			WHERE user_id = #{userId}
 	</update>
+
+	<select id="checkPhoneNumber" parameterType="string" resultType="boolean">
+	  SELECT COUNT(*) FROM member WHERE user_phone = #{userPhone}
+	</select>
+	
+	<select id="checkEmail" parameterType="string" resultType="boolean">
+	  SELECT COUNT(*) FROM member WHERE user_email = #{userEmail}
+	</select>
+	
+	<select id="checkNick" parameterType="string" resultType="boolean">
+	  SELECT COUNT(*) FROM member WHERE user_nick = #{userNick}
+	</select>
 </mapper>
