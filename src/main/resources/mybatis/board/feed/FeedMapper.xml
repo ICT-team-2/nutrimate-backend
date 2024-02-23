@@ -37,7 +37,7 @@
         ON b.user_id = m.user_id
         LEFT JOIN boardlike bl ON b.board_id = bl.board_id
         LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
-        RIGHT JOIN hashtag h ON bh.tag_id = h.tag_id
+        LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
         WHERE b.deleted = 'N' AND blocked = 'N'
         AND board_category = 'FEED'
         <if test="searchWord!=null">
@@ -94,7 +94,7 @@
     </select>
     
     <!-- 피드 상세보기 정보 가져오기 -->
-    <select id="findFeedDetail" resultType="FeedDto">
+    <select id="findFeedDetail" resultMap="FeedDto">
         WITH b3 AS (SELECT b.board_id, b.board_thumbnail, b.board_content,
                            m.user_nick, m.user_profile, m.user_id,
                            (SELECT count(bl3.like_id)
@@ -109,7 +109,7 @@
                                       ON b.user_id = m.user_id
                                  LEFT JOIN boardlike bl ON b.board_id = bl.board_id
                                  LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
-                                 RIGHT JOIN hashtag h ON bh.tag_id = h.tag_id
+                                 LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
                         WHERE b.board_id = #{boardId}
                         GROUP BY b.board_id, b.board_thumbnail,
                                  b.board_content, m.user_nick, m.user_profile, m.user_id),
@@ -146,7 +146,7 @@
             SELECT SEQ_BOARD.NEXTVAL
                 FROM DUAL
         </selectKey>
-        INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', #{boardTitle}, #{boardContent},
+        INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', null, #{boardContent},
         #{boardThumbnail}, 0, SYSDATE, DEFAULT, DEFAULT)
     </insert>
     <!-- 해시태그 추가 -->
@@ -172,9 +172,11 @@
     <!-- 피드 수정 -->
     <update id="updateFeed" parameterType="FeedDto">
         UPDATE board
-        SET board_title = #{boardTitle}, board_content = #{boardContent},
-            board_thumbnail = #{boardThumbnail}
-            WHERE board_id = #{boardId}
+        SET board_content = #{boardContent}
+        <if test="boardThumbnail!=null">
+            , board_thumbnail = #{boardThumbnail}
+        </if>
+        WHERE board_id = #{boardId}
     </update>
     <!-- 해당글의 해시태그 전부 삭제 -->
     <update id="updateHashtag" parameterType="FeedDto">

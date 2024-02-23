@@ -3,6 +3,7 @@ package com.nutrimate.nutrimatebackend.controller.board.feed;
 import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.feed.FeedDto;
 import com.nutrimate.nutrimatebackend.service.board.feed.FeedService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/board/feed")
+@Log4j2
 public class FeedController {
 	
 	@Autowired
@@ -95,7 +97,6 @@ public class FeedController {
 			return map;
 		}
 		try {
-			System.out.println("dto.getFiles()" + dto.getFiles());
 			fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
 			dto.setBoardThumbnail(fileNames.toString());
 		} catch (Exception e) {// 파일용량 초과시
@@ -128,6 +129,7 @@ public class FeedController {
 				fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
 				dto.setBoardThumbnail(fileNames.toString());
 			}
+			log.info("dto : " + dto);
 			feedService.updateFeed(dto);
 			int boardId = dto.getBoardId();
 			map.put("message", "Feed Update successfully");
