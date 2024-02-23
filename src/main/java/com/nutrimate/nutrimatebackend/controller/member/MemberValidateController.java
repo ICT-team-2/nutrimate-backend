@@ -97,8 +97,8 @@ public class MemberValidateController {
     return code;
   }
 
-  // 이메일 인증
-  // @PostMapping("/email/send")
+  // //이메일 인증
+  // @GetMapping("/email/send")
   // @ResponseBody
   // public ResponseEntity<String> mailCheck(@RequestParam("email") String email) {
   // try {
