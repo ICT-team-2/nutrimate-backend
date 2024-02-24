@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.member.MemberProfileMapper">
+    
+    <!--    기본 유저정보 가져오기-->
+    <select id="findMemberProfileByUserId" resultType="MemberProfileDto">
+        SELECT *
+            FROM member
+            WHERE user_id = #{userId}
+    </select>
+    <!--    자신이 작성한 정보 공유 게시글의 개수 가져오기-->
+    <select id="findWriteBoardCountByUserId" resultType="int">
+        SELECT count(*)
+            FROM board b
+            WHERE user_id = #{userId}
+              AND deleted = 'N' AND blocked = 'N'
+    </select>
+    
+    <select id="findInfoBoardListByUserId" resultType="InfoBoardDto">
+        WITH b2 AS (SELECT b.*,
+        (SELECT count(*)
+        FROM ict.bookmark bm
+        WHERE b.board_id = bm.board_id
+        AND bm.user_id = #{userId}) AS bookmark_count,
+        rank() OVER (ORDER BY b.created_date DESC) AS rank,
+        user_nick
+        FROM board b
+        LEFT JOIN ict.bookmark bm ON b.board_id = bm.board_id
+        join member m on b.user_id = m.user_id
+        WHERE b.deleted = 'N' AND b.blocked = 'N'
+        AND (upper(board_category) = 'FOOD'
+        OR upper(board_category) = 'EXERCISE')
+        <if test="mypage!=null and mypage">
+            AND b.user_id = #{userId}
+        </if>
+        <if test="bookmark!=null and bookmark">
+            AND bm.user_id = #{userId}
+        </if>
+        ORDER BY b.created_date DESC)
+        SELECT *
+        FROM b2
+        WHERE rank
+        BETWEEN ((#{nowPage} - 1) * #{receivePage})
+        AND ((#{nowPage} * #{receivePage}) - 1)
+    </select>
+    <select id="findBookmarkInfoBoardCountByUserId" resultType="java.lang.Integer">
+        SELECT count(*)
+            FROM ict.bookmark bm
+                     JOIN board b ON bm.board_id = b.board_id
+            WHERE bm.user_id = #{userId}
+              AND b.deleted = 'N' AND b.blocked = 'N'
+              AND (upper(b.board_category) = 'FOOD'
+                OR upper(b.board_category) = 'EXERCISE')
+    </select>
+    <select id="findWriteInfoBoardCountByUserId" resultType="java.lang.Integer">
+        SELECT count(*)
+            FROM board b
+            WHERE user_id = #{userId}
+              AND deleted = 'N' AND blocked = 'N'
+              AND (upper(board_category) = 'FOOD'
+                OR upper(board_category) = 'EXERCISE')
+    </select>
+    
+    <update id="updateMemberProfileByUserId">
+        UPDATE member
+        SET user_profile = #{userProfile}
+            WHERE user_id = #{userId}
+    </update>
+
+</mapper>

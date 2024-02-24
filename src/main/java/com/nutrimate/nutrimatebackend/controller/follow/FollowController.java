@@ -60,7 +60,7 @@ public class FollowController {
 	// 입력 데이터 : userId
 	// 출력 데이터 : message, followingCount
 	@GetMapping("/following/count")
-	public ResponseEntity<Map<String, Object>> findFollowingCount(@RequestBody FollowDto followDto) {
+	public ResponseEntity<Map<String, Object>> findFollowingCount(FollowDto followDto) {
 		int followingCount = followservice.findFollowingCount(followDto);
 		Map<String, Object> jsonResponse = new HashMap<>();
 		jsonResponse.put("message", "FollowingCount successfully");
@@ -72,7 +72,7 @@ public class FollowController {
 	// 입력 데이터 : userId
 	// 출력 데이터 : message, followingCount
 	@GetMapping("/follower/count")
-	public ResponseEntity<Map<String, Object>> findFollowerCount(@RequestBody FollowDto followDto) {
+	public ResponseEntity<Map<String, Object>> findFollowerCount(FollowDto followDto) {
 		int followerCount = followservice.findFollowerCount(followDto);
 		Map<String, Object> jsonResponse = new HashMap<>();
 		jsonResponse.put("message", "followerCount successfully");
@@ -84,7 +84,7 @@ public class FollowController {
 	// 입력 데이터 : userId
 	// 출력 데이터 : user_id,user_profile,user_nickname,user_intro... Dto정보 반환
 	@GetMapping("/following/list")
-	public List<FollowDto> findFollowingList(@RequestBody FollowDto followDto) {
+	public List<FollowDto> findFollowingList(FollowDto followDto) {
 		return followservice.findFollowingList(followDto);
 	}
 	
@@ -92,7 +92,7 @@ public class FollowController {
 	// 입력 데이터 : userId
 	// 출력 데이터 : user_id,user_profile,user_nickname,user_intro... Dto정보 반환
 	@GetMapping("/follower/list")
-	public List<FollowDto> findFollowerList(@RequestBody FollowDto followDto) {
+	public List<FollowDto> findFollowerList(FollowDto followDto) {
 		return followservice.findFollowerList(followDto);
 	}
 	
@@ -100,7 +100,7 @@ public class FollowController {
 	// 입력 데이터 : userId,followeeId
 	// 출력 데이터 : message, followStatus
 	@GetMapping("/check")
-	public ResponseEntity<Map<String, Object>> checkFollowStatus(@RequestBody FollowDto followDto) {
+	public ResponseEntity<Map<String, Object>> checkFollowStatus(FollowDto followDto) {
 		Integer followStatus = followservice.checkFollowStatus(followDto);
 		Map<String, Object> jsonResponse = new HashMap<>();
 		jsonResponse.put("message", (followStatus >= 1) ? "팔로우 중인 유저에요" : "팔로우가 아니에요");

@@ -56,25 +56,48 @@
         FROM bookmark bm
         WHERE bm.board_id = b3.board_id
         AND bm.user_id = #{userId}) AS checked_bookmark
+        <if test="bookmark!=null and bookmark==true">
+            , (SELECT count(bm.user_id)
+            FROM bookmark bm
+            WHERE bm.board_id = b3.board_id
+            AND bm.user_id = #{profileUserId}) AS checked_profile_user_bookmark
+        </if>
         FROM b3
         LEFT JOIN bookmark bm ON b3.board_id = bm.board_id
         GROUP BY b3.board_id, b3.board_thumbnail, b3.board_content, b3.user_nick,
         b3.user_profile, b3.like_count, b3.checked_like, bm.user_id,
-        b3.user_id),
+        b3.user_id
+        ),
         b5 AS (SELECT b4.*, row_number() OVER (ORDER BY b4.board_id DESC) AS rnum
         FROM b4
         GROUP BY b4.board_id, b4.board_thumbnail, b4.board_content, b4.user_nick,
         b4.user_profile, b4.like_count, b4.checked_like, b4.bookmark_count,
-        b4.checked_bookmark, b4.user_id)
+        b4.checked_bookmark, b4.user_id
+        <if test="bookmark!=null and bookmark==true">
+            , checked_profile_user_bookmark
+        </if>
+        )
         SELECT b5.*
         FROM b5
         WHERE rnum BETWEEN #{startRow} AND #{endRow}
+        <if test="profile!=null and profile==true">
+            AND user_id = #{profileUserId}
+        </if>
+        <if test="bookmark!=null and bookmark==true">
+            AND checked_profile_user_bookmark = 1
+        </if>
     </select>
     
     <!-- 피드 총 페이지 수 가져오기(페이징 시 필요) -->
     <select id="findFeedtotalRecordCount" resultType="int">
         with b4 as (
-        SELECT b.board_id
+        SELECT b.board_id, b.user_id
+        <if test="bookmark!=null and bookmark==true">
+            , (SELECT count(bm.user_id)
+            FROM bookmark bm
+            WHERE bm.board_id = b.board_id
+            AND bm.user_id = #{profileUserId}) AS checked_profile_user_bookmark
+        </if>
         FROM board b
         JOIN member m
         ON b.user_id = m.user_id
@@ -88,9 +111,17 @@
             OR board_content LIKE '%' || #{searchWord} || '%'
             OR user_nick LIKE '%' || #{searchWord} || '%')
         </if>
-        GROUP BY b.board_id
+        GROUP BY b.board_id, b.user_id
         )
         SELECT count(*) FROM b4
+        <where>
+            <if test="profile!=null and profile==true">
+                AND user_id = #{profileUserId}
+            </if>
+            <if test="bookmark!=null and bookmark==true">
+                AND checked_profile_user_bookmark = 1
+            </if>
+        </where>
     </select>
     
     <!-- 피드 상세보기 정보 가져오기 -->
@@ -146,8 +177,8 @@
             SELECT SEQ_BOARD.NEXTVAL
                 FROM DUAL
         </selectKey>
-        INSERT INTO BOARD VALUES (#{boardId}, #{userId}, 'FEED', null, #{boardContent},
-        #{boardThumbnail}, 0, SYSDATE, DEFAULT, DEFAULT)
+        INSERT INTO board VALUES (#{boardId}, #{userId}, 'FEED', NULL, #{boardContent},
+        #{boardThumbnail}, 0, sysdate, DEFAULT, DEFAULT)
     </insert>
     <!-- 해시태그 추가 -->
     <select id="checkTagId" resultType="int">

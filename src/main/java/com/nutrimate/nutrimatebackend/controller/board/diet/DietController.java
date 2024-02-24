@@ -1,30 +1,30 @@
 package com.nutrimate.nutrimatebackend.controller.board.diet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
 import com.nutrimate.nutrimatebackend.service.board.diet.DietService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Log4j2
 public class DietController {
-	String phisicalPath = "C://Temp/upload";
+	
+	@Value("${upload-path}")
+	String phisicalPath;
+	
 	@Autowired
 	private DietService dietService;
 	//게시글 전체 리스트
@@ -190,21 +190,21 @@ public class DietController {
 		int count = dietService.countLike(dto);//
 		if (count == 0) {
 			int affected = dietService.saveLikeBoard(dto);
-		     if (affected == 1) {
-	            map.put("LIKEOK", "좋아요 입력에 성공했습니다.");
-	        } else {
-	            map.put("LIKEOK", "종아요 입력에 실패했습니다!");
-	            
-	        }
+			if (affected == 1) {
+				map.put("LIKEOK", "좋아요 입력에 성공했습니다.");
+			} else {
+				map.put("LIKEOK", "종아요 입력에 실패했습니다!");
+				
+			}
 			
 		} else {
 			int affected = dietService.deleteLikeBoard(dto);
-	          if (affected == 1) {
-                map.put("LIKEOK", "좋아요 입력 쥐소에 성공했습니다.");
-            } else {
-                map.put("LIKEOK", "종아요 입력 취소에 실패했습니다!");
-                
-            }
+			if (affected == 1) {
+				map.put("LIKEOK", "좋아요 입력 쥐소에 성공했습니다.");
+			} else {
+				map.put("LIKEOK", "종아요 입력 취소에 실패했습니다!");
+				
+			}
 		}
 		return map;
 	}
@@ -216,21 +216,21 @@ public class DietController {
 		int count = dietService.countBookMark(dto);//
 		if (count == 0) {
 			int affected = dietService.saveBookMarkBoard(dto);
-	          if (affected == 1) {
-                map.put("BOOKMARKOK", "북마크 입력에 성공했습니다.");
-            } else {
-                map.put("BOOKMARKOK", "북마크 입력에 실패했습니다!");
-                
-            }
+			if (affected == 1) {
+				map.put("BOOKMARKOK", "북마크 입력에 성공했습니다.");
+			} else {
+				map.put("BOOKMARKOK", "북마크 입력에 실패했습니다!");
+				
+			}
 			
 		} else {
 			int affected = dietService.deleteBookMarkBoard(dto);
-	           if (affected == 1) {
-	                map.put("BOOKMARKOK", "북마크 취소에 성공했습니다.");
-	            } else {
-	                map.put("BOOKMARKOK", "북마크 취소에 실패했습니다!");
-	                
-	            }
+			if (affected == 1) {
+				map.put("BOOKMARKOK", "북마크 취소에 성공했습니다.");
+			} else {
+				map.put("BOOKMARKOK", "북마크 취소에 실패했습니다!");
+				
+			}
 		}
 		return map;
 	}
