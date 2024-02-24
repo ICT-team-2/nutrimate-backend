@@ -10,12 +10,13 @@ import java.util.List;
 public interface FeedMapper {
 	
 	// 피드 글목록 가져오기
-	List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow, int userId);
+	List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow")
+	int endRow, int userId, String searchWord);
 	
-	int findFeedtotalRecordCount();
+	int findFeedtotalRecordCount(String searchWord);
 	
 	// 피드의 상세보기 정보를 가져오기
-	List<FeedDto> findFeedDetail(FeedDto feedDto);
+	FeedDto findFeedDetail(FeedDto feedDto);
 	
 	// 피드의 조회수를 +1하기
 	void updateincreaseViewCount(FeedDto feedDto);
@@ -70,7 +71,7 @@ public interface FeedMapper {
 	
 	/** 해시태그 **/
 	// 해당 글의 해시태그 가져오기
-	List<FeedDto> findHashtagsByBoardId(FeedDto feedDto);
+	List<String> findHashtagsByBoardId(FeedDto feedDto);
 	
 	// 해시태그로 글 검색
 	List<FeedDto> findBoardsByTagName(FeedDto feedDto);
