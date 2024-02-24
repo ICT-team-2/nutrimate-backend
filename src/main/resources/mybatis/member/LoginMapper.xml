@@ -12,11 +12,11 @@
 		INSERT INTO
 		member(user_id, user_nick, user_height, user_weight,
 		user_email, user_gender, user_sport_hard,
-		user_cal,user_name,user_uid,user_pwd,user_phone, user_diet, user_allergy)
+		user_cal,user_name,user_uid,user_pwd,user_phone, user_diet)
 		VALUES (#{userId}, #{userNick}, #{userHeight},
 		#{userWeight}, #{userEmail}, #{userGender},
 		#{userSportHard}, #{userCal}, #{userName},
-		#{userUid}, #{userPwd}, #{userPhone}, #{userDiet}, #{userAllergy})
+		#{userUid}, #{userPwd}, #{userPhone}, #{userDiet})
 	</insert>
 	<insert id="insertMemberWithOAuth" parameterType="MemberDto">
 		<selectKey keyProperty="userId"

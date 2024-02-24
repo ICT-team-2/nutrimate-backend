@@ -58,20 +58,6 @@ public class MemberValidateController {
     }
   }
 
-  @PostMapping("/verifyEmail")
-  public ResponseEntity<String> verifyECode(@RequestBody Map<String, String> params) {
-    String email = params.get("userEmail");
-    String inputEcode = params.get("code");
-
-    String verificationResult = emailService.verifyECode(email, inputEcode);
-
-    if (verificationResult.equals("인증 성공")) {
-      return ResponseEntity.ok().body("인증 성공");
-    } else {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(verificationResult);
-    }
-  }
-
 
   // @PostMapping("/resendVerificationCode")
   // public ResponseEntity<String> resendVerificationCode(@RequestBody Map<String, String> params) {
@@ -95,6 +81,21 @@ public class MemberValidateController {
 
     log.info("인증코드 : " + code);
     return code;
+  }
+
+  @PostMapping("/verifyEmail")
+  public ResponseEntity<String> verifyECode(@RequestBody Map<String, String> params) {
+    String email = params.get("userEmail");
+    String inputEcode = params.get("code");
+
+    String verificationResult = emailService.verifyECode(email, inputEcode);
+    log.info(verificationResult);
+    if (verificationResult.equals("인증 성공")) {
+      return ResponseEntity.ok().body("인증 성공");
+    } else {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(verificationResult);
+    }
+
   }
 
   // //이메일 인증

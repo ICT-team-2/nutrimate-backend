@@ -1,7 +1,8 @@
 package com.nutrimate.nutrimatebackend.service.member;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +15,15 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Component
 public class EmailService {
-  private final ConcurrentHashMap<String, String> authCodes = new ConcurrentHashMap<>();
+  // private final ConcurrentHashMap<String, String> authCodes = new ConcurrentHashMap<>();
+  private Map<String, String> authCodes = new HashMap<>();
   @Autowired
   private JavaMailSender mailSender;
   private int authNumber;
   @Autowired
   private MemberMapper memberMapper;
   // private Object authCodes;
+
 
 
   public void makeRandomNumber() {
@@ -43,8 +46,10 @@ public class EmailService {
         .append("<p>인증 번호는 <strong>").append(authNumber).append("</strong>입니다.</p>").append("<br>")
         .append("<p>해당 인증번호를 인증번호 확인란에 기입하여 주세요.</p>");
 
+    // 이메일을 키로, 인증번호를 값으로 맵에 저장
+    authCodes.put(email, Integer.toString(authNumber));
+
     mailSend(setFrom, toMail, title, content.toString());
-    // mailSend(setFrom, toMail, title, sb.toString());
     return Integer.toString(authNumber);
   }
 
@@ -60,10 +65,10 @@ public class EmailService {
       // true 전달 > html 형식으로 전송 , 작성하지 않으면 단순 텍스트로 전달.
       helper.setText(content, true);
       mailSender.send(message);
-      log.info("이메일 전송 성공: 수신자 - {}, 제목 - {}", toMail, title);
+      // log.info("이메일 전송 성공: 수신자 - {}, 제목 - {}", toMail, title);
     } catch (MessagingException e) {
       e.printStackTrace();
-      log.error("이메일 전송 실패: 수신자 - {}, 제목 - {}", toMail, title);
+      // log.error("이메일 전송 실패: 수신자 - {}, 제목 - {}", toMail, title);
     }
 
   }
@@ -72,6 +77,7 @@ public class EmailService {
     boolean exists = memberMapper.checkEmail(email);
     return exists;
   }
+
 
   public String verifyECode(String email, String inputEcode) {
     String storedECode = authCodes.get(email);
@@ -82,7 +88,7 @@ public class EmailService {
       return "인증번호가 일치하지 않습니다.";
     }
     // 인증 성공했으므로 해당 이메일의 인증 코드 정보를 삭제
-    authCodes.remove(email);
+
     return "인증 성공";
   }
 }

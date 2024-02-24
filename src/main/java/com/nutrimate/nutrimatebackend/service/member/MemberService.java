@@ -44,8 +44,8 @@ public class MemberService {
 
 
   public MemberDto updateMemberInfo(MemberDto memberDto) {
-    memberMapper.updateMemberInfo(memberDto);
     log.info("updateMemberInfo: " + memberDto);
+    memberMapper.updateMemberInfo(memberDto);
     return memberDto;
   }
 
