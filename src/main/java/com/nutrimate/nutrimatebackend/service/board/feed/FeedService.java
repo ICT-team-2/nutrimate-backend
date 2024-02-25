@@ -16,12 +16,12 @@ public class FeedService {
 	private FeedMapper feedMapper;
 	
 	/** 피드 기능 **/
-	public List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow, int userId, String searchWord) {
-		return feedMapper.findFeedList(startRow, endRow, userId, searchWord);
+	public List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow, int userId, String searchWord, int profileUserId, Boolean profile, Boolean bookmark) {
+		return feedMapper.findFeedList(startRow, endRow, userId, searchWord, profileUserId, profile, bookmark);
 	}
 	
-	public int findFeedtotalRecordCount(String searchWord) {
-		return feedMapper.findFeedtotalRecordCount(searchWord);
+	public int findFeedtotalRecordCount(String searchWord, int profileUserId, Boolean profile, Boolean bookmark) {
+		return feedMapper.findFeedtotalRecordCount(searchWord, profileUserId, profile, bookmark);
 	}
 	
 	// 피드의 상세보기 정보를 가져오기

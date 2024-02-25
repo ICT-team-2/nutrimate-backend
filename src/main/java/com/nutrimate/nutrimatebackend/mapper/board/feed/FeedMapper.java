@@ -11,9 +11,9 @@ public interface FeedMapper {
 	
 	// 피드 글목록 가져오기
 	List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow")
-	int endRow, int userId, String searchWord);
+	int endRow, int userId, String searchWord, int profileUserId, Boolean profile, Boolean bookmark);
 	
-	int findFeedtotalRecordCount(String searchWord);
+	int findFeedtotalRecordCount(String searchWord, int profileUserId, Boolean profile, Boolean bookmark);
 	
 	// 피드의 상세보기 정보를 가져오기
 	FeedDto findFeedDetail(FeedDto feedDto);

@@ -1,181 +1,180 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.board.diet.DietMapper">
-	<select id="findAllDietBoard" resultType="dietDto" parameterType="dietDto">
-		SELECT * FROM (
-		SELECT DISTINCT user_nick,b.*,COUNT(bl.like_id) OVER (PARTITION BY b.board_id) likecount,
-		CEIL(((select count(*) from foodboard fb join board b on fb.board_id=b.board_id where
-		deleted ='N' AND BLOCKED ='N')/10)) totalPage,
-		RANK() OVER (ORDER BY b.board_id desc) AS label
-		FROM board b
-		LEFT JOIN boardlike bl ON b.board_id=bl.board_id
-		JOIN member m ON m.user_id= b.user_id
-		LEFT JOIN board_hashtag bh ON bh.board_id= b.board_id
-		LEFT JOIN hashTag h ON bh.tag_id= h.tag_id
-		WHERE b.blocked='N' AND b.deleted='N' AND b.board_category = 'FOOD'
-		<if test="searchTitle !=null">
-			AND b.board_title LIKE '%' || #{searchTitle} || '%'
-		</if>
-		<if test="searchUser !=null">
-			AND m.user_nick LIKE '%' || #{searchUser} || '%'
-		</if>
-		<if test="searchContent !=null">
-			AND b.board_content LIKE '%' || #{searchContent} || '%'
-		</if>
-		<if test="searchHashTag !=null">
-			AND h.tag_name LIKE '%' || #{searchHashTag} || '%'
-		</if>
-		
-		ORDER BY b.board_id DESC
-		
-		) WHERE label BETWEEN (#{nowPage}-1)*10+1 AND #{nowPage}*10
-	
-	</select>
-	
-	
-	<update id="updateViewCountByBoardId" parameterType="dietDto">
-		UPDATE board
-		SET board_viewcount=(SELECT board_viewcount FROM board WHERE board_id = #{boardId}) + 1
-			WHERE board_id = #{boardId}
-	</update>
-	
-	<select id="findDietBoardOne" resultType="dietDto" parameterType="dietDto">
-		SELECT DISTINCT m.user_nick, b.*, fb.*, f.food_cal, f.intake_unit, f.food_intake,
-		                count(bl.like_id) OVER (PARTITION BY b.board_id) likecount, (SELECT count(*)
-			                                                                             FROM bookmark
-			                                                                             WHERE board_id = #{boardId} AND user_id = #{userId}) bookmarkcount
-			FROM board b
-				     JOIN foodboard fb ON b.board_id = fb.board_id
-				     JOIN food f ON fb.food_id = f.food_id
-				     LEFT JOIN boardlike bl ON fb.board_id = bl.board_id
-				     JOIN member m ON m.user_id = b.user_id
-				     LEFT JOIN bookmark bm ON b.board_id = bm.board_id
-			WHERE b.blocked = 'N' AND b.deleted = 'N' AND b.board_id = #{boardId}
-	</select>
-	
-	<insert id="insertBoard" parameterType="dietDto">
-		<selectKey keyProperty="boardId" resultType="int" order="BEFORE">
-			SELECT SEQ_BOARD.NEXTVAL
-				FROM DUAL
-		</selectKey>
-		INSERT INTO board
-		VALUES(SEQ_BOARD.CURRVAL,#{userId},'FOOD',#{boardTitle},#{boardContent},DEFAULT, 0, sysdate,
-		DEFAULT, DEFAULT)
-	</insert>
-	<insert id="insertFoodBoard" parameterType="dietDto">
-		INSERT INTO foodboard
-			VALUES (#{boardId}, #{foodId}, #{fbImg})
-	</insert>
-	<update id="updateBoardByboardId" parameterType="dietDto">
-		UPDATE board
-		SET board_title=#{boardTitle}, board_content=#{boardContent}
-			WHERE board_id = #{boardId}
-	</update>
-	<update id="updateFoodBoardByboardId" parameterType="dietDto">
-		<if test="fbImg !=null">
-			UPDATE foodboard SET food_id=#{foodId},fb_img=#{fbImg} WHERE board_id=#{boardId}
-		</if>
-		<if test="fbImg ==null">
-			UPDATE foodboard SET food_id=#{foodId} WHERE board_id=#{boardId}
-		</if>
-	</update>
-	
-	<update id="updateBoardDeleteByBoardId" parameterType="dietDto">
-		UPDATE board
-		SET deleted='Y'
-			WHERE board_id = #{boardId}
-	</update>
-	
-	<select id="findLikeBoardContByBoardIdAndUserId" resultType="int" parameterType="dietDto">
-		SELECT count(*)
-			FROM boardlike
-			WHERE board_id = #{boardId} AND user_id = #{userId}
-	</select>
-	<insert id="insertLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
-		INSERT INTO boardlike
-			VALUES (seq_like.nextval, #{boardId}, #{userId}, sysdate)
-	</insert>
-	<delete id="deleteLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
-		DELETE boardlike
-			WHERE board_id = #{boardId} AND user_id = #{userId}
-	</delete>
-	
-	
-	<select id="findPrevByBoardId" resultType="dietDto" parameterType="dietDto">
+    <select id="findAllDietBoard" resultType="dietDto" parameterType="dietDto">
+        SELECT * FROM (
+        SELECT DISTINCT user_nick,b.*,COUNT(bl.like_id) OVER (PARTITION BY b.board_id) likecount,
+        CEIL(((select count(*) from foodboard fb join board b on fb.board_id=b.board_id where
+        deleted ='N' AND BLOCKED ='N')/10)) totalPage,
+        RANK() OVER (ORDER BY b.board_id desc) AS label
+        FROM board b
+        LEFT JOIN boardlike bl ON b.board_id=bl.board_id
+        JOIN member m ON m.user_id= b.user_id
+        LEFT JOIN board_hashtag bh ON bh.board_id= b.board_id
+        LEFT JOIN hashTag h ON bh.tag_id= h.tag_id
+        WHERE b.blocked='N' AND b.deleted='N' AND b.board_category = 'FOOD'
+        <if test="searchTitle !=null">
+            AND b.board_title LIKE '%' || #{searchTitle} || '%'
+        </if>
+        <if test="searchUser !=null">
+            AND m.user_nick LIKE '%' || #{searchUser} || '%'
+        </if>
+        <if test="searchContent !=null">
+            AND b.board_content LIKE '%' || #{searchContent} || '%'
+        </if>
+        <if test="searchHashTag !=null">
+            AND h.tag_name LIKE '%' || #{searchHashTag} || '%'
+        </if>
+        ORDER BY b.board_id DESC
+        ) WHERE label BETWEEN (#{nowPage}-1)*10+1 AND #{nowPage}*10
+    
+    </select>
+    
+    
+    <update id="updateViewCountByBoardId" parameterType="dietDto">
+        UPDATE board
+        SET board_viewcount=(SELECT board_viewcount FROM board WHERE board_id = #{boardId}) + 1
+            WHERE board_id = #{boardId}
+    </update>
+    
+    <select id="findDietBoardOne" resultType="dietDto" parameterType="dietDto">
+        SELECT DISTINCT m.user_nick, b.*, fb.*, f.food_cal, f.intake_unit, f.food_intake,
+                        count(bl.like_id) OVER (PARTITION BY b.board_id) likecount,
+                        (SELECT count(*)
+                             FROM bookmark
+                             WHERE board_id = #{boardId} AND user_id = #{userId}) bookmarkcount
+            FROM board b
+                     JOIN foodboard fb ON b.board_id = fb.board_id
+                     JOIN food f ON fb.food_id = f.food_id
+                     LEFT JOIN boardlike bl ON fb.board_id = bl.board_id
+                     JOIN member m ON m.user_id = b.user_id
+                     LEFT JOIN bookmark bm ON b.board_id = bm.board_id
+            WHERE b.blocked = 'N' AND b.deleted = 'N' AND b.board_id = #{boardId}
+    </select>
+    
+    <insert id="insertBoard" parameterType="dietDto">
+        <selectKey keyProperty="boardId" resultType="int" order="BEFORE">
+            SELECT SEQ_BOARD.NEXTVAL
+                FROM DUAL
+        </selectKey>
+        INSERT INTO board
+        VALUES(seq_board.currval,#{userId},'FOOD',#{boardTitle},#{boardContent},DEFAULT, 0, sysdate,
+        DEFAULT, DEFAULT)
+    </insert>
+    <insert id="insertFoodBoard" parameterType="dietDto">
+        INSERT INTO foodboard
+            VALUES (#{boardId}, #{foodId}, #{fbImg})
+    </insert>
+    <update id="updateBoardByboardId" parameterType="dietDto">
+        UPDATE board
+        SET board_title=#{boardTitle}, board_content=#{boardContent}
+            WHERE board_id = #{boardId}
+    </update>
+    <update id="updateFoodBoardByboardId" parameterType="dietDto">
+        <if test="fbImg !=null">
+            UPDATE foodboard SET food_id=#{foodId},fb_img=#{fbImg} WHERE board_id=#{boardId}
+        </if>
+        <if test="fbImg ==null">
+            UPDATE foodboard SET food_id=#{foodId} WHERE board_id=#{boardId}
+        </if>
+    </update>
+    
+    <update id="updateBoardDeleteByBoardId" parameterType="dietDto">
+        UPDATE board
+        SET deleted='Y'
+            WHERE board_id = #{boardId}
+    </update>
+    
+    <select id="findLikeBoardContByBoardIdAndUserId" resultType="int" parameterType="dietDto">
+        SELECT count(*)
+            FROM boardlike
+            WHERE board_id = #{boardId} AND user_id = #{userId}
+    </select>
+    <insert id="insertLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
+        INSERT INTO boardlike
+            VALUES (seq_like.nextval, #{boardId}, #{userId}, sysdate)
+    </insert>
+    <delete id="deleteLikeBoardContByBoardIdAndUserId" parameterType="dietDto">
+        DELETE boardlike
+            WHERE board_id = #{boardId} AND user_id = #{userId}
+    </delete>
+    
+    
+    <select id="findPrevByBoardId" resultType="dietDto" parameterType="dietDto">
 		<![CDATA[
-		SELECT board_id, board_title
-			FROM board
-			WHERE board_id = (SELECT min(board_id)
-				                  FROM board
-				                  WHERE board_id > #{boardId} AND blocked = 'N' AND deleted = 'N')
-			  AND board_category = 'FOOD'
-		]]>
+        SELECT board_id, board_title
+            FROM board
+            WHERE board_id = (SELECT min(board_id)
+                                  FROM board
+                                  WHERE board_id > #{boardId} AND blocked = 'N' AND deleted = 'N')
+              AND board_category = 'FOOD'
+        ]]>
 		</select>
-	
-	<select id="findNextByBoardId" resultType="dietDto" parameterType="dietDto">
+    
+    <select id="findNextByBoardId" resultType="dietDto" parameterType="dietDto">
 		<![CDATA[
-		SELECT board_id, board_title
-			FROM board
-			WHERE blocked = 'N' AND deleted = 'N' AND
-				board_id = (SELECT max(board_id) FROM board WHERE board_id < #{boardId})
-			  AND board_category = 'FOOD'
-		]]>
+        SELECT board_id, board_title
+            FROM board
+            WHERE blocked = 'N' AND deleted = 'N' AND
+                board_id = (SELECT max(board_id) FROM board WHERE board_id < #{boardId})
+              AND board_category = 'FOOD'
+        ]]>
 		</select>
-	
-	<select id="findBookMarkByBoardIdANDuserId" resultType="int" parameterType="dietDto">
-		SELECT count(*)
-			FROM bookmark
-			WHERE board_id = #{boardId} AND user_id = #{userId}
-	</select>
-	<insert id="insertBookMarkByBoardIdAndUserId" parameterType="dietDto">
-		INSERT INTO bookmark
-			VALUES (#{userId}, #{boardId}, sysdate)
-	</insert>
-	<delete id="deleteBookMarkByBoardIdANDuserId" parameterType="dietDto">
-		DELETE bookmark
-			WHERE board_id = #{boardId} AND user_id = #{userId}
-	</delete>
-	
-	
-	<select id="findHashTagCountByHashTagName" resultType="int" parameterType="dietDto">
-		SELECT count(*)
-			FROM hashtag
-			WHERE tag_name = #{tagName}
-	</select>
-	<select id="findHashTagIdByHashTagName" resultType="int" parameterType="dietDto">
-		SELECT tag_id
-			FROM hashtag
-			WHERE tag_name = #{tagName}
-	</select>
-	
-	
-	<insert id="insertHashTag" parameterType="dietDto">
-		<selectKey keyProperty="tagId" resultType="int" order="BEFORE">
-			SELECT SEQ_HASHTAG.NEXTVAL
-				FROM DUAL
-		</selectKey>
-		INSERT INTO hashtag VALUES(SEQ_HASHTAG.CURRVAL,#{tagName})
-	</insert>
-	
-	<insert id="insertBoardHashTagByBoardId" parameterType="dietDto">
-		INSERT INTO board_hashtag
-			VALUES (#{boardId}, #{tagId})
-	</insert>
-	<select id="findHashTagByBoardId" resultType="dietDto" parameterType="dietDto">
-		SELECT h.tag_name, h.tag_id
-			FROM board_hashtag bh
-				     JOIN hashtag h ON h.tag_id = bh.tag_id
-			WHERE bh.board_id = #{boardId}
-	</select>
-	<delete id="deleteBoardHashTagByBoardIdAndTagId" parameterType="dietDto">
-		DELETE board_hashtag
-			WHERE board_id = #{boardId}
-	</delete>
-	<insert id="updateBoardHashTagByBoardId" parameterType="dietDto">
-		INSERT INTO board_hashtag
-			VALUES (#{boardId}, #{tagId})
-	</insert>
+    
+    <select id="findBookMarkByBoardIdANDuserId" resultType="int" parameterType="dietDto">
+        SELECT count(*)
+            FROM bookmark
+            WHERE board_id = #{boardId} AND user_id = #{userId}
+    </select>
+    <insert id="insertBookMarkByBoardIdAndUserId" parameterType="dietDto">
+        INSERT INTO bookmark
+            VALUES (#{userId}, #{boardId}, sysdate)
+    </insert>
+    <delete id="deleteBookMarkByBoardIdANDuserId" parameterType="dietDto">
+        DELETE bookmark
+            WHERE board_id = #{boardId} AND user_id = #{userId}
+    </delete>
+    
+    
+    <select id="findHashTagCountByHashTagName" resultType="int" parameterType="dietDto">
+        SELECT count(*)
+            FROM hashtag
+            WHERE tag_name = #{tagName}
+    </select>
+    <select id="findHashTagIdByHashTagName" resultType="int" parameterType="dietDto">
+        SELECT tag_id
+            FROM hashtag
+            WHERE tag_name = #{tagName}
+    </select>
+    
+    
+    <insert id="insertHashTag" parameterType="dietDto">
+        <selectKey keyProperty="tagId" resultType="int" order="BEFORE">
+            SELECT SEQ_HASHTAG.NEXTVAL
+                FROM DUAL
+        </selectKey>
+        INSERT INTO hashtag VALUES(seq_hashtag.currval,#{tagName})
+    </insert>
+    
+    <insert id="insertBoardHashTagByBoardId" parameterType="dietDto">
+        INSERT INTO board_hashtag
+            VALUES (#{boardId}, #{tagId})
+    </insert>
+    <select id="findHashTagByBoardId" resultType="dietDto" parameterType="dietDto">
+        SELECT h.tag_name, h.tag_id
+            FROM board_hashtag bh
+                     JOIN hashtag h ON h.tag_id = bh.tag_id
+            WHERE bh.board_id = #{boardId}
+    </select>
+    <delete id="deleteBoardHashTagByBoardIdAndTagId" parameterType="dietDto">
+        DELETE board_hashtag
+            WHERE board_id = #{boardId}
+    </delete>
+    <insert id="updateBoardHashTagByBoardId" parameterType="dietDto">
+        INSERT INTO board_hashtag
+            VALUES (#{boardId}, #{tagId})
+    </insert>
 
 
 </mapper>

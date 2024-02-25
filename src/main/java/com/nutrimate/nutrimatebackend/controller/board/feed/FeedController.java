@@ -24,8 +24,8 @@ public class FeedController {
 	@Autowired
 	private FeedService feedService;
 	
-	@Value("C://Temp/upload")
-	private String saveDirectory;
+	@Value("${upload-path}")
+	private String uploadPath;
 	
 	/** 피드 **/
 	// 피드 글목록 가져오기 (완료)
@@ -36,15 +36,21 @@ public class FeedController {
 			@RequestParam(name = "nowPage", defaultValue = "1") int nowPage,
 			@RequestParam(name = "receivePage", defaultValue = "10") int receivePage,
 			@RequestParam(name = "userId") int userId,
-			@RequestParam(name = "searchWord", required = false, defaultValue = "") String searchWord) {
-		int totalRecordCount = feedService.findFeedtotalRecordCount(searchWord);
+			@RequestParam(name = "searchWord", required = false, defaultValue = "") String searchWord,
+			@RequestParam(name = "profileUserId", required = false, defaultValue = "-1") int profileUserId,
+			@RequestParam(name = "profile", required = false, defaultValue = "false") Boolean profile,
+			@RequestParam(name = "bookmark", required = false, defaultValue = "false") Boolean bookmark) {
+		
+		int totalRecordCount = feedService.findFeedtotalRecordCount(searchWord, profileUserId,
+				profile, bookmark);
 		// 페이징 계산
 		int totalPages = (int) Math.ceil((double) totalRecordCount / receivePage);
 		int startRow = (nowPage - 1) * receivePage + 1;
 		int endRow = nowPage * receivePage;
 		
 		// 피드 목록 가져오기
-		List<FeedDto> feedList = feedService.findFeedList(startRow, endRow, userId, searchWord);
+		List<FeedDto> feedList = feedService.findFeedList(startRow, endRow,
+				userId, searchWord, profileUserId, profile, bookmark);
 		
 		Map<String, Object> simplifiedFeed = new HashMap<>();
 		simplifiedFeed.put("feedList", feedList);
@@ -89,7 +95,7 @@ public class FeedController {
 	// 출력 데이터 : message, boardId
 	@PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Map insertFeed(FeedDto dto) {
-		String phisicalPath = "C://Temp/upload";
+		String phisicalPath = uploadPath;
 		StringBuffer fileNames = new StringBuffer();
 		Map map = new HashMap();
 		if (dto.getFiles() == null) {
@@ -123,7 +129,7 @@ public class FeedController {
 		Map<String, Object> map = new HashMap<>();
 		try {
 			if (dto.getFiles() != null) {
-				String phisicalPath = "C://Temp/upload";
+				String phisicalPath = uploadPath;
 				StringBuffer fileNames = new StringBuffer();
 				
 				fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
