@@ -9,7 +9,7 @@ import java.util.List;
 public interface FollowMapper {
 	
 	// 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기)
-	List<FollowDto> findRecommendedFollowersList();
+	List<FollowDto> findRecommendedFollowersList(int userId);
 	
 	// 내가 상대를 팔로우 하는 쿼리문 (내가 팔로워가 된다)
 	void insertFollowUser(FollowDto followDto);

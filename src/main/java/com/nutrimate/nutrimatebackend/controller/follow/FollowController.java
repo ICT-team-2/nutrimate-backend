@@ -35,8 +35,9 @@ public class FollowController {
 	// 입력 데이터 : 없음
 	// 출력 데이터 : user_id,user_profile,user_nickname,user_intro... Dto정보 반환
 	@GetMapping("/recommend")
-	public List<FollowDto> findRecommendedFollowersList() {
-		return followservice.findRecommendedFollowersList();
+	public List<FollowDto> findRecommendedFollowersList(int userId) {
+		log.info(followservice.findRecommendedFollowersList(userId));
+		return followservice.findRecommendedFollowersList(userId);
 	}
 	
 	// 내가 상대를 팔로우 하는 쿼리문 (내가 팔로워가 된다) (완료)
