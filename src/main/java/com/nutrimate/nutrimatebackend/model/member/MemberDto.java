@@ -33,6 +33,7 @@ public class MemberDto {
 	private String userDiet;
 	private String deleted;
 	private String userIntro;
+	private String userAllergy;
 	
 	
 	// 일반 로그인(CommonUser)
@@ -50,6 +51,13 @@ public class MemberDto {
 		return new ArrayList<>();
 	}
 	
+	public List<String> getAllergyList() {
+        if (this.userAllergy != null) {
+            return Arrays.asList(this.userAllergy.split(","));
+        } else {
+            return new ArrayList<>();  
+        }
+    }
 	
 }
 
