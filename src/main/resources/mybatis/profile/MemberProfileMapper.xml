@@ -41,8 +41,9 @@
         SELECT *
         FROM b2
         WHERE rank
-        BETWEEN ((#{nowPage} - 1) * #{receivePage})
-        AND ((#{nowPage} * #{receivePage}) - 1)
+        BETWEEN (((#{nowPage}-1) * #{receivePage})+1)
+        AND (#{nowPage}* #{receivePage})
+        order by rank
     </select>
     <select id="findBookmarkInfoBoardCountByUserId" resultType="java.lang.Integer">
         SELECT count(*)

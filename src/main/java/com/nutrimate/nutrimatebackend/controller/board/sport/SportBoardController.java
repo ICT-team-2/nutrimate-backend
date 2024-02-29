@@ -1,8 +1,10 @@
 package com.nutrimate.nutrimatebackend.controller.board.sport;
 
+import com.nutrimate.nutrimatebackend.model.board.InfoBoardDto;
 import com.nutrimate.nutrimatebackend.model.board.sport.BookmarkDto;
 import com.nutrimate.nutrimatebackend.model.board.sport.LikeDto;
 import com.nutrimate.nutrimatebackend.model.board.sport.SportBoardDto;
+import com.nutrimate.nutrimatebackend.service.board.InfoBoardService;
 import com.nutrimate.nutrimatebackend.service.board.sport.SportBoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -21,8 +23,14 @@ import java.util.Map;
 @Log4j2
 public class SportBoardController {
 	
-	@Autowired
 	private SportBoardService sportBoardService;
+	private InfoBoardService infoBoardService;
+	
+	@Autowired
+	public SportBoardController(SportBoardService sportBoardService, InfoBoardService infoBoardService) {
+		this.sportBoardService = sportBoardService;
+		this.infoBoardService = infoBoardService;
+	}
 	
 	//글 생성
 	@PostMapping()
@@ -39,26 +47,23 @@ public class SportBoardController {
 	}
 	
 	//글 조회(상세)
-	@GetMapping("/{id}")
-	public ResponseEntity<Map<String, Object>> getBoardWithPrevAndNext(@PathVariable("id") int id) {
-		Map<String, Object> response = new HashMap<>();
-		SportBoardDto board = sportBoardService.getBoard(id);
-		if (board != null) {
-			sportBoardService.updateBoardViewcount(id); //조회수 증가
-			response.put("current", board);
+	@GetMapping("/{boardId}")
+	public ResponseEntity<SportBoardDto> getBoardWithPrevAndNext(
+			@PathVariable("boardId") int boardId,
+			int userId) {
+		SportBoardDto board = sportBoardService.getBoard(boardId, userId);
+		
+		InfoBoardDto dto = new InfoBoardDto();
+		dto.setBoardId(boardId);
+		dto.setBoardCategory("EXERCISE");
+		Map<String, Integer> prevAndNext = infoBoardService.findPrevAndNextByBoardId(
+				dto.getBoardId(), dto.getBoardCategory());
+		if (prevAndNext != null) {
+			board.setPrevBoardId(prevAndNext.get("prevBoardId"));
+			board.setNextBoardId(prevAndNext.get("nextBoardId"));
 		}
 		
-		SportBoardDto prevBoard = sportBoardService.getPrevBoard(id);
-		if (prevBoard != null) {
-			response.put("prev", prevBoard);
-		}
-		
-		SportBoardDto nextBoard = sportBoardService.getNextBoard(id);
-		if (nextBoard != null) {
-			response.put("next", nextBoard);
-		}
-		
-		return response.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<>(board, HttpStatus.OK);
 	}
 	
 	//글 목록 조회(전체)

@@ -16,11 +16,11 @@ public interface SportBoardMapper {
 	boolean insertBoard(SportBoardDto board);
 	
 	//게시글 조회(상세)
-	SportBoardDto selectBoard(int boardId);
+	SportBoardDto selectBoard(int boardId, int userId);
 	
 	//해당 글의 해시태그 가져오기
 	List<SportBoardDto> findHashtagsByBoardId(SportBoardDto board);
-		
+	
 	//모든 게시글 조회(전체)
 	List<SportBoardDto> selectAllBoards(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("searchUser") String searchUser, @Param("searchTitle") String searchTitle, @Param("searchContent") String searchContent, @Param("searchTag") String searchTag);
 	
@@ -44,7 +44,7 @@ public interface SportBoardMapper {
 	
 	//좋아요 여부 확인
 	int countLike(LikeDto likeDto);
-		
+	
 	//좋아요 생성
 	int insertLike(LikeDto likeDto);
 	
@@ -72,15 +72,17 @@ public interface SportBoardMapper {
 	int deleteBookmark(BookmarkDto bookmarkDto);
 	
 	//해시태그 입력시
-	int checkTagId(String tag);	
-	void insertTag(String tag);	
+	int checkTagId(String tag);
+	
+	void insertTag(String tag);
+	
 	void insertHashtag(SportBoardDto board);
 	
 	//해시태그 수정시
 	void updateHashtag(SportBoardDto board);
-
+	
 	//해시태그 검색
 	List<SportBoardDto> findBoardsByTagName(SportBoardDto board);
-
+	
 	
 }

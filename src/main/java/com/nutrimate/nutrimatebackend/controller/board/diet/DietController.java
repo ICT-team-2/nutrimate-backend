@@ -2,6 +2,7 @@ package com.nutrimate.nutrimatebackend.controller.board.diet;
 
 import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
+import com.nutrimate.nutrimatebackend.service.board.InfoBoardService;
 import com.nutrimate.nutrimatebackend.service.board.diet.DietService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -20,45 +21,59 @@ import java.util.Map;
 
 @RestController
 @Log4j2
+@RequestMapping("/board/info/diet")
+
 public class DietController {
 	
 	@Value("${upload-path}")
 	String phisicalPath;
 	
-	@Autowired
 	private DietService dietService;
+	private InfoBoardService infoBoardService;
+	
+	@Autowired
+	public DietController(DietService dietService, InfoBoardService infoBoardService) {
+		this.dietService = dietService;
+		this.infoBoardService = infoBoardService;
+	}
+	
+	@ExceptionHandler({Exception.class})
+	public ResponseEntity<Map<String, String>> handle(Exception ex) {
+		// ...
+		Map<String, String> map = new HashMap<>();
+		map.put("error", ex.getMessage());
+		return new ResponseEntity<>(map, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	//게시글 전체 리스트
-	@GetMapping("/infoboard/dietboards")
+	@GetMapping("/list")
 	public List<DietDto> dietBoardList(@ModelAttribute DietDto dto) {
 		List<DietDto> dietList = dietService.selectListDietBoard(dto);
 		return dietList;
-		
 	}
 	
 	
-	//게시글 상세 보기,이전글다음글
-	@GetMapping("/infoboard/dietboards/{boardId}")
-	public List<DietDto> dietBoardOne(@ModelAttribute DietDto dto) {
-		if (dto.getBOARD() != null && dto.getBOARD().equals("LIST")) {
+	//게시글 상세 보기,이전글 다음글
+	@GetMapping("/view")
+	public DietDto dietBoardOne(DietDto dto) throws Exception {
+		if (dto.getUpdateViewCount() != null
+				&& dto.getUpdateViewCount().equalsIgnoreCase("true")) {
 			dietService.saveViewCount(dto);
 		}
+		DietDto dietOne = dietService.selectDietBoardOne(dto);//[0]이전글 [1]다음글 [2]상세보기
+		if (dietOne == null) {
+			throw new Exception("게시물이 존재하지 않습니다.");
+		}
 		log.info(dto);
-		DietDto prev = dietService.selectPrev(dto);
-		DietDto next = dietService.selectNext(dto);
-		DietDto dietOne = dietService.selectDietBoardOne(dto);//[0]이 이전글 [1]이 다음글 [2]상세보기
-		System.out.println(dietOne.getFbImg());
-		System.out.println(prev);
-		List<DietDto> dietList = new ArrayList<>();
-		dietList.add(prev);
-		dietList.add(next);
-		dietList.add(dietOne);
-		
-		return dietList;
-		
+		Map<String, Integer> prevAndNext = infoBoardService.findPrevAndNextByBoardId(dto.getBoardId(), "FOOD");
+		if (prevAndNext != null) {
+			dietOne.setPrevBoardId(prevAndNext.get("prevBoardId"));
+			dietOne.setNextBoardId(prevAndNext.get("nextBoardId"));
+		}
+		return dietOne;
 	}
 	
 	//해당하는 보드의 해시태그네임 얻어오기
-	@GetMapping("/infoboard/hashtags/{boardId}")
+	@GetMapping("/hashtag")
 	public ResponseEntity<List<Map<String, Object>>> hashTagFind(@ModelAttribute DietDto dto) {
 		List<DietDto> hashtagList_ = dietService.selectHashTag(dto);
 		List<Map<String, Object>> hashtagList = new ArrayList<>();
@@ -68,16 +83,14 @@ public class DietController {
 			hashtag_.put("tagId", hashtag.getTagId());
 			hashtagList.add(hashtag_);
 		}
-		
 		return new ResponseEntity<>(hashtagList, HttpStatus.OK);
-		
 	}
 	
 	
 	//게시글 입력
-	@PostMapping(value = "/infoboard/dietboards", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //@RequestBody
-	public Map writeBlock(DietDto dto, @RequestParam String userId, HttpServletRequest req, List<MultipartFile> files) {
+	public Map writeBlock(DietDto dto, HttpServletRequest req, List<MultipartFile> files) {
 		StringBuffer fileNames = new StringBuffer();
 		Map map = new HashMap();
 		if (dto.getFoodId() == null) {
@@ -91,9 +104,7 @@ public class DietController {
 		} catch (Exception e) {//파일용량 초과시
 			map.put("WriteOK", "게시물 입력을 실패했습니다!!");
 			return map;
-			
 		}
-		dto.setUserId(userId);
 		if (dto.getTagNameList() != null) {
 			int affected = dietService.saveBoardANDHashBoardANDHashTag(dto);
 			if (affected == 1) {
@@ -112,35 +123,30 @@ public class DietController {
 				FileUtils.deletes(fileNames, phisicalPath, ",");
 				map.put("WriteOK", "게시물 입력을 실패했습니다!");
 				return map;
-				
 			}
 		}
 		return map;
-		
 	}
 	
 	//게시글 수정
-	@PutMapping(value = "/infoboard/dietboards/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public Map editBoard(DietDto dto, @RequestParam String userId, @RequestParam int boardId, HttpServletRequest req, List<MultipartFile> files) {
+	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public Map editBoard(
+			DietDto dto,
+			HttpServletRequest req,
+			List<MultipartFile> files) {
 		Map map = new HashMap();
 		StringBuffer fileNames = new StringBuffer();
-		dto.setUserId(userId);
-		dto.setBoardId(boardId);
 		if (files != null) {
 			try {
-				
 				DietDto titledto = dietService.selectDietBoardOne(dto);
-				System.out.println(titledto);
+				log.info(titledto);
 				StringBuffer titledto_ = new StringBuffer(titledto.getFbImg());
 				fileNames = FileUtils.upload(files, phisicalPath);
 				FileUtils.deletes(titledto_, phisicalPath, ",");
 				dto.setFbImg(fileNames.toString());
-				
-				
 			} catch (Exception e) {//파일용량 초과시
 				map.put("EDITOK", "게시물 수정을 실패했습니다!");
 				return map;
-				
 			}
 		}
 		if (dto.getTagNameList() != null) {
@@ -152,7 +158,6 @@ public class DietController {
 				map.put("EDITOK", "게시물 수정을 실패했습니다!");
 				return map;
 			}
-			
 		} else {
 			int affected = dietService.editBoard(dto);
 			if (affected == 1) {
@@ -160,80 +165,76 @@ public class DietController {
 			} else {
 				FileUtils.deletes(fileNames, phisicalPath, ",");
 				map.put("EDITOK", "게시물 수정에 실패했습니다!!");
-				
 			}
 		}
 		return map;
-		
 	}
 	
 	
 	//게시글 삭제
-	@PutMapping("/infoboard/dietboards-deleted/{boardId}")
+	@DeleteMapping("")
 	public Map deleteBoard(@ModelAttribute DietDto dto) {
 		Map map = new HashMap();
-		
 		int affected = dietService.deleteBoard(dto);
 		if (affected == 1) {
 			map.put("DELETEOK", "게시물 삭제에 성공했습니다.");
 		} else {
 			map.put("DELETEOK", "게시물 삭제를 실패했습니다!");
-			
 		}
 		return map;
 		
 	}
 	//좋아요 입력 삭제
-	@PostMapping("/infoboard/likeboard/{boardId}")
-	public Map writeLike(@ModelAttribute DietDto dto) {
-		Map map = new HashMap();
-		int count = dietService.countLike(dto);//
-		if (count == 0) {
-			int affected = dietService.saveLikeBoard(dto);
-			if (affected == 1) {
-				map.put("LIKEOK", "좋아요 입력에 성공했습니다.");
-			} else {
-				map.put("LIKEOK", "종아요 입력에 실패했습니다!");
-				
-			}
-			
-		} else {
-			int affected = dietService.deleteLikeBoard(dto);
-			if (affected == 1) {
-				map.put("LIKEOK", "좋아요 입력 쥐소에 성공했습니다.");
-			} else {
-				map.put("LIKEOK", "종아요 입력 취소에 실패했습니다!");
-				
-			}
-		}
-		return map;
-	}
-	
-	//북마크 입력 삭제
-	@PostMapping("/infoboard/bookmark/{boardId}")
-	public Map writeBookmark(@ModelAttribute DietDto dto) {
-		Map map = new HashMap();
-		int count = dietService.countBookMark(dto);//
-		if (count == 0) {
-			int affected = dietService.saveBookMarkBoard(dto);
-			if (affected == 1) {
-				map.put("BOOKMARKOK", "북마크 입력에 성공했습니다.");
-			} else {
-				map.put("BOOKMARKOK", "북마크 입력에 실패했습니다!");
-				
-			}
-			
-		} else {
-			int affected = dietService.deleteBookMarkBoard(dto);
-			if (affected == 1) {
-				map.put("BOOKMARKOK", "북마크 취소에 성공했습니다.");
-			} else {
-				map.put("BOOKMARKOK", "북마크 취소에 실패했습니다!");
-				
-			}
-		}
-		return map;
-	}
+//	@PostMapping("/infoboard/likeboard/{boardId}")
+//	public Map writeLike(@ModelAttribute DietDto dto) {
+//		Map map = new HashMap();
+//		int count = dietService.countLike(dto);//
+//		if (count == 0) {
+//			int affected = dietService.saveLikeBoard(dto);
+//			if (affected == 1) {
+//				map.put("LIKEOK", "좋아요 입력에 성공했습니다.");
+//			} else {
+//				map.put("LIKEOK", "종아요 입력에 실패했습니다!");
+//
+//			}
+//
+//		} else {
+//			int affected = dietService.deleteLikeBoard(dto);
+//			if (affected == 1) {
+//				map.put("LIKEOK", "좋아요 입력 쥐소에 성공했습니다.");
+//			} else {
+//				map.put("LIKEOK", "종아요 입력 취소에 실패했습니다!");
+//
+//			}
+//		}
+//		return map;
+//	}
+//
+//	//북마크 입력 삭제
+//	@PostMapping("/infoboard/bookmark/{boardId}")
+//	public Map writeBookmark(@ModelAttribute DietDto dto) {
+//		Map map = new HashMap();
+//		int count = dietService.countBookMark(dto);//
+//		if (count == 0) {
+//			int affected = dietService.saveBookMarkBoard(dto);
+//			if (affected == 1) {
+//				map.put("BOOKMARKOK", "북마크 입력에 성공했습니다.");
+//			} else {
+//				map.put("BOOKMARKOK", "북마크 입력에 실패했습니다!");
+//
+//			}
+//
+//		} else {
+//			int affected = dietService.deleteBookMarkBoard(dto);
+//			if (affected == 1) {
+//				map.put("BOOKMARKOK", "북마크 취소에 성공했습니다.");
+//			} else {
+//				map.put("BOOKMARKOK", "북마크 취소에 실패했습니다!");
+//
+//			}
+//		}
+//		return map;
+//	}
 	
 	
 }
