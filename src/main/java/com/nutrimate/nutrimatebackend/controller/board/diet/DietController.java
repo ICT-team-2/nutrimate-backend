@@ -109,6 +109,7 @@ public class DietController {
 			int affected = dietService.saveBoardANDHashBoardANDHashTag(dto);
 			if (affected == 1) {
 				map.put("WriteOK", "게시물 입력을 성공했습니다.");
+				map.put("boardId", dto.getBoardId());
 			} else {
 				FileUtils.deletes(fileNames, phisicalPath, ",");
 				map.put("WriteOK", "게시물 입력을 실패했습니다!");
@@ -119,6 +120,7 @@ public class DietController {
 			int affected = dietService.saveBoard(dto);
 			if (affected == 1) {
 				map.put("WriteOK", "게시물 입력을 성공했습니다.");
+				map.put("boardId", dto.getBoardId());
 			} else {
 				FileUtils.deletes(fileNames, phisicalPath, ",");
 				map.put("WriteOK", "게시물 입력을 실패했습니다!");

@@ -16,6 +16,7 @@
         <result column="cmt_ref" property="cmtRef"/>
         <result column="user_name" property="userName"/>
         <result column="user_nick" property="userNick"/>
+        <result column="user_profile" property="userProfile"/>
     </resultMap>
     <update id="deleteAllRepliesAndComment">
         UPDATE comments
@@ -29,7 +30,7 @@
     
     <!-- 글번호에 따른 댓글+대댓글 목록 조회 -->
     <select id="findCommentsByBoardId" resultMap="CommentDto">
-        SELECT c.*, m.user_name, m.user_nick
+        SELECT c.*, m.user_name, m.user_nick, m.user_profile
             FROM comments c
                      JOIN member m
                           ON c.user_id = m.user_id

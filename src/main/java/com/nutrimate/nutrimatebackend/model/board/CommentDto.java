@@ -28,6 +28,7 @@ public class CommentDto {
 	private Integer cmtRef; // 대댓글을 달은 댓글의 번호
 	private String userName;
 	private String userNick;
+	private String userProfile;
 	
 	private List<CommentDto> replies = new ArrayList<>(); // 대댓글 리스트 가져오기 위한 변수
 	private int mycmtId; // 대댓글 입력시 cmtId 받기위한 변수

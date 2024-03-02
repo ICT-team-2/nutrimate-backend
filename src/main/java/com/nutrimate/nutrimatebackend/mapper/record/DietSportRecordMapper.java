@@ -1,15 +1,19 @@
 package com.nutrimate.nutrimatebackend.mapper.record;
 
+import com.nutrimate.nutrimatebackend.model.FoodDto;
 import com.nutrimate.nutrimatebackend.model.record.DietSportRecordDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface DietSportRecordMapper {
 	
+	List<FoodDto> findFoodListByFoodId(@Param("list") List<Integer> foodId);
+	
 	// 음식 목록 가져오기
-	List<DietSportRecordDto> findFoodList(String searchWord);
+	List<DietSportRecordDto> findFoodListBySearchWord(String searchWord);
 	
 	// 자신이 먹은 음식 기록하기 (식단DB 데이터 사용)
 	void insertRecord(DietSportRecordDto dietSportRecordDto);
