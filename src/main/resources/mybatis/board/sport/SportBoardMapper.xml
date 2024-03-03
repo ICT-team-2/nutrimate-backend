@@ -25,11 +25,11 @@
         <result property="bookmarkCount" column="bookmark_count"/>
         <result property="checkedBookmark" column="checked_bookmark"/>
         <collection
-                property="hashtag"
+                property="tagNameList"
                 column="board_id"
                 ofType="string"
                 javaType="list"
-                select="com.nutrimate.nutrimatebackend.mapper.board.feed.FeedMapperfindHashtagsByBoardId"/>
+                select="com.nutrimate.nutrimatebackend.mapper.board.feed.FeedMapper.findHashtagsByBoardId"/>
     </resultMap>
     <!-- Create -->
     <insert id="insertBoard" parameterType="SportBoardDto">
@@ -61,7 +61,7 @@
     </insert>
     
     <!-- Read -->
-    <select id="selectBoard" parameterType="int" resultType="SportBoardDto">
+    <select id="selectBoard" parameterType="int" resultMap="SportBoardDto">
         SELECT b.*, m.user_nick,
                s.map_paths, s.map_distances, s.map_center_lat, s.map_center_lng,
                s.map_zoom_level,

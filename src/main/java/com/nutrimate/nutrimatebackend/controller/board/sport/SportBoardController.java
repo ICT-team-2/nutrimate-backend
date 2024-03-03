@@ -59,8 +59,10 @@ public class SportBoardController {
 		Map<String, Integer> prevAndNext = infoBoardService.findPrevAndNextByBoardId(
 				dto.getBoardId(), dto.getBoardCategory());
 		if (prevAndNext != null) {
-			board.setPrevBoardId(prevAndNext.get("prevBoardId"));
-			board.setNextBoardId(prevAndNext.get("nextBoardId"));
+			board.setPrevBoardId(prevAndNext.get("PREV_BOARD_ID") == null ? null :
+					Integer.parseInt(String.valueOf(prevAndNext.get("PREV_BOARD_ID"))));
+			board.setNextBoardId(prevAndNext.get("NEXT_BOARD_ID") == null ? null :
+					Integer.parseInt(String.valueOf(prevAndNext.get("NEXT_BOARD_ID"))));
 		}
 		
 		return new ResponseEntity<>(board, HttpStatus.OK);

@@ -25,7 +25,7 @@ public class InfoBoardDto { //정보 게시판 (리스트용)
 	
 	String userNick; //작성자 닉네임
 	Date createdDate; //작성일
-	int viewCount; //조회수
+	int boardViewCount; //조회수
 	
 	List<String> hashtag = new ArrayList<>(); //해시태그
 }

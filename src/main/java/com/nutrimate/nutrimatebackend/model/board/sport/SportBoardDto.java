@@ -49,6 +49,7 @@ public class SportBoardDto {
 	private String tagName; //태그 이름
 	private List<String> hashtag; //해시태그
 	private int checkTagId; //해시태그 중복체크
+	private List<String> tagNameList; //태그 목록
 	
 	//지도 관련
 	private String mapPaths;

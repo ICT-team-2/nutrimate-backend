@@ -64,10 +64,14 @@ public class DietController {
 			throw new Exception("게시물이 존재하지 않습니다.");
 		}
 		log.info(dto);
-		Map<String, Integer> prevAndNext = infoBoardService.findPrevAndNextByBoardId(dto.getBoardId(), "FOOD");
+		Map<String, Integer> prevAndNext = infoBoardService.findPrevAndNextByBoardId(
+				dto.getBoardId(), "FOOD");
+		log.info("prevAndNext: " + prevAndNext);
 		if (prevAndNext != null) {
-			dietOne.setPrevBoardId(prevAndNext.get("prevBoardId"));
-			dietOne.setNextBoardId(prevAndNext.get("nextBoardId"));
+			dietOne.setPrevBoardId(prevAndNext.get("PREV_BOARD_ID") == null ? null :
+					Integer.parseInt(String.valueOf(prevAndNext.get("PREV_BOARD_ID"))));
+			dietOne.setNextBoardId(prevAndNext.get("NEXT_BOARD_ID") == null ? null :
+					Integer.parseInt(String.valueOf(prevAndNext.get("NEXT_BOARD_ID"))));
 		}
 		return dietOne;
 	}
