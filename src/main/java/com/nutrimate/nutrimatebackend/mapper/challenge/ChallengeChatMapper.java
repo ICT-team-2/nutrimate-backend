@@ -1,8 +1,11 @@
 package com.nutrimate.nutrimatebackend.mapper.challenge;
 
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import com.nutrimate.nutrimatebackend.model.challenge.ChallengeChatDto;
+import com.nutrimate.nutrimatebackend.model.challenge.ChallengeCommentDto;
 
 @Mapper
 public interface ChallengeChatMapper {
@@ -46,7 +49,24 @@ public interface ChallengeChatMapper {
     int findChallengeSuccessCount(ChallengeChatDto dto);
     //챌린지 성공 기록하기
     int insertChallengeSuccessCount(ChallengeChatDto dto);
+	
+    ///댓글 기록
+    int insertComment(ChallengeCommentDto dto);
+    //챌린지 댓글 기록
+	int insertChallengeComment(ChallengeCommentDto dto);
+	
+	//챌린지 댓글 가지고 오기
+	List<ChallengeCommentDto> findCommentList(ChallengeCommentDto dto);
+	
+	//챌린지 댓글 수정
+	int updateComment(ChallengeCommentDto dto);
+	
 
+	//챌린지 댓글 삭제
+	int deleteComment(ChallengeCommentDto dto);
+	
+	//챌린지 유저 nick찾기 
+	Map selectUserNick(ChallengeCommentDto dto);
 
    
 

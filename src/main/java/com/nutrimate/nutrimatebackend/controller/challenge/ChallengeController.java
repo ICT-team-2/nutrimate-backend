@@ -1,6 +1,7 @@
 package com.nutrimate.nutrimatebackend.controller.challenge;
 
 import com.nutrimate.nutrimatebackend.model.challenge.ChallengeChatDto;
+import com.nutrimate.nutrimatebackend.model.challenge.ChallengeCommentDto;
 import com.nutrimate.nutrimatebackend.service.challenge.ChallengeChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Console;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,5 +140,65 @@ public class ChallengeController {
 	public List<ChallengeChatDto> challengeSuccessList(ChallengeChatDto dto) {
 		return challengeService.getChallengeSuccessList(dto);
 	}
+	
+	
+	//챌린지 댓글 등록
+	@PostMapping("/comment/record")
+	public Map challengeCommentRecord(@RequestBody ChallengeCommentDto dto) {
+		Map map = new HashMap();
+	//int count = challengeService.countChallengeSuccess(dto);
+		//if (count == 0) {}
+		    System.out.println(dto);
+			int affect = challengeService.savechallengeComment(dto);
+			if (affect == 1) {
+				map.put("SUCCESS", 1);
+			} else {
+				map.put("SUCCESSNOT", 1);
+			}
+		return map;
+	}
+	
+	
+	
+	//챌린지 댓글 가지고 오기
+	@GetMapping("/comment/list")
+	public List<ChallengeCommentDto> challengeCommentList(ChallengeCommentDto dto) {
+		return challengeService.getChallengeCommentList(dto);
+	}
+	
+	//챌린지 댓글 수정
+	@PutMapping("/comment/list/edit")
+	public Map challengeCommentEdit(@RequestBody ChallengeCommentDto dto) {
+	  
+		Map map = new HashMap();
+		int affect = challengeService.editChallengeComment(dto);
+		if (affect == 1) {
+			map.put("SUCCESS", 1);
+		} else {
+			map.put("SUCCESSNOT", 1);
+		}
+		return map;
+	}
+	
+	//챌린지 댓글 삭제
+	@PutMapping("/comment/list/delete")
+	public Map challengeCommentDelete(@RequestBody ChallengeCommentDto dto) {
+		System.out.println(dto.getCmtId());
+		Map map = new HashMap();
+		int affect = challengeService.deleteChallengeComment(dto);
+		if (affect == 1) {
+			map.put("SUCCESS", 1);
+		} else {
+			map.put("SUCCESSNOT", 1);
+		}
+		return map;
+	}
+	
+	//챌린지 유저 nick찾기
+	@GetMapping("/usernick")
+	public Map findUserNick(ChallengeCommentDto dto) {
+		return challengeService.findUserNickByUserId(dto);
+	}
+	
 	
 }

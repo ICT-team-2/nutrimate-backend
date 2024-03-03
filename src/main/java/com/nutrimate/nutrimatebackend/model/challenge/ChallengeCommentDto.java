@@ -5,6 +5,8 @@ import lombok.extern.log4j.Log4j2;
 
 import java.sql.Date;
 
+import org.apache.ibatis.type.Alias;
+
 @Builder
 @Setter
 @Getter
@@ -12,14 +14,17 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Alias("ChallengeCommentDto")
 public class ChallengeCommentDto {
 	
-	private Long cmtId;
-	private Long userId;
+	private int cmtId;
+	private int userId;
 	private String cmtContent;
 	private String challengeNick;
 	private String userNick;
 	private Date createdDate;
+	private int label;
+	private int nowPage;
 	
 	private String deleted;
 	private String cmtDepth;
