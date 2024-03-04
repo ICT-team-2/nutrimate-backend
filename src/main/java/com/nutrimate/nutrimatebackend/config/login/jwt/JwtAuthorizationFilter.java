@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
 import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
 import com.nutrimate.nutrimatebackend.model.member.MemberDto;
-import com.nutrimate.nutrimatebackend.service.MemberService;
+import com.nutrimate.nutrimatebackend.service.member.MemberService;
 import com.nutrimate.nutrimatebackend.util.JWTOkens;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.pay.PaymentMapper">
+	<select id="findPayList" resultType="PaymentDto" parameterType="String">
+		SELECT ID as id, PAY_DATE as payDate, PAY_TYPE as payType, PAY_NAME as payName, PAY_PRICE as payPrice, PAY_METHOD as payMethod FROM PAYMENT_LIST WHERE ID = #{id}
+	</select>
+	<insert id="before_insertPayment" parameterType="Map">
+		INSERT INTO PAYMENT_LIST(ID, PAY_TYPE, PAY_NAME, PAY_PRICE, Pay_method) VALUES(#{id}, 0, '포인트 충전', #{pay_price}, #{pay_method})
+	</insert>
+	<insert id="insertPayment" parameterType="Map">
+		INSERT INTO PAYMENT_LIST(ID, PAY_TYPE, PAY_NAME, PAY_PRICE, Pay_method) VALUES(#{id}, #{pay_type}, #{pay_name}, #{pay_price}, '포인트로 결제')
+	</insert>
+</mapper>
