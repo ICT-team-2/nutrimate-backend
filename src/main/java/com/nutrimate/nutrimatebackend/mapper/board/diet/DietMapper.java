@@ -1,8 +1,10 @@
 package com.nutrimate.nutrimatebackend.mapper.board.diet;
 
-import java.util.List;
-import org.apache.ibatis.annotations.Mapper;
+import com.nutrimate.nutrimatebackend.model.FoodDto;
 import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface DietMapper {
@@ -76,4 +78,9 @@ public interface DietMapper {
 	int updateBoardHashTagByBoardId(DietDto dto);
 	
 	
+	int insertFoodData(int boardId, int foodId);
+	
+	int deleteFoodDataByBoardId(DietDto dto);
+	
+	List<FoodDto> findFoodDataByBoardId(int boardId);
 }

@@ -81,7 +81,7 @@ public interface FeedMapper {
 	
 	/** 해시태그 **/
 	// 해당 글의 해시태그 가져오기
-	List<String> findHashtagsByBoardId(FeedDto feedDto);
+	List<String> findHashtagsByBoardId(int userId);
 	
 	// 해시태그로 글 검색
 	List<FeedDto> findBoardsByTagName(FeedDto feedDto);

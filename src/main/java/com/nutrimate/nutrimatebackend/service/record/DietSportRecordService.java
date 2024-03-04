@@ -1,6 +1,7 @@
 package com.nutrimate.nutrimatebackend.service.record;
 
 import com.nutrimate.nutrimatebackend.mapper.record.DietSportRecordMapper;
+import com.nutrimate.nutrimatebackend.model.FoodDto;
 import com.nutrimate.nutrimatebackend.model.record.DietSportRecordDto;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,11 @@ public class DietSportRecordService {
 	
 	// 음식 목록 가져오기
 	public List<DietSportRecordDto> findFoodList(String searchWord) {
-		return dietSportRecordMapper.findFoodList(searchWord);
+		return dietSportRecordMapper.findFoodListBySearchWord(searchWord);
+	}
+	
+	public List<FoodDto> findFoodListByFoodId(List<Integer> foodId) {
+		return dietSportRecordMapper.findFoodListByFoodId(foodId);
 	}
 	
 	// 자신이 먹은 음식 기록하기 (식단DB 데이터 사용)

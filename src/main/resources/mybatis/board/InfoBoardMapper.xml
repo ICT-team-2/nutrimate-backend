@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.board.InfoBoardMapper">
+    <resultMap id="InfoBoardDto" type="InfoBoardDto">
+        <id property="boardId" column="board_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="boardTitle" column="board_title"/>
+        <result property="boardContent" column="board_content"/>
+        <result property="boardCategory" column="board_category"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="rank" column="rank"/>
+        <result property="userNick" column="user_nick"/>
+        <collection
+                property="hashtag"
+                column="board_id"
+                ofType="string"
+                javaType="list"
+                select="com.nutrimate.nutrimatebackend.mapper.board.feed.FeedMapperfindHashtagsByBoardId"/>
+    </resultMap>
+    
+    <update id="updateViewCount">
+        UPDATE board
+        SET board_viewcount = board_viewcount + 1
+            WHERE board_id = #{boardId}
+    </update>
+    
+    <select id="findAll" resultType="InfoBoardDto">
+        WITH b2 AS (SELECT distinct b.*,
+        (SELECT count(*)
+        FROM bookmark bm
+        WHERE b.board_id = bm.board_id
+        AND bm.user_id = #{userId}) AS bookmark_count,
+        user_nick
+        FROM board b
+        LEFT JOIN ict.bookmark bm ON b.board_id = bm.board_id
+        JOIN member m ON b.user_id = m.user_id
+        LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
+        LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
+        WHERE b.deleted = 'N' AND b.blocked = 'N'
+        <if test="boardCategory != 'FOOD' and boardCategory != 'EXERCISE'">
+            AND (upper(board_category) = 'FOOD'
+            OR upper(board_category) = 'EXERCISE')
+        </if>
+        <if test="boardCategory == 'FOOD'">
+            AND upper(board_category) = 'FOOD'
+        </if>
+        <if test="boardCategory == 'EXERCISE'">
+            AND upper(board_category) = 'EXERCISE'
+        </if>
+        <if test="searchColumn != null and searchColumn != ''  and searchKeyword != null and searchKeyword != ''">
+            <![CDATA[
+			AND lower(${searchColumn}) LIKE '%' || lower(#{searchKeyword}) || '%'
+		]]></if>
+        ORDER BY b.created_date DESC),
+        b3 as (SELECT b2.*,
+        rank() OVER (ORDER BY b2.created_date DESC) AS rank
+        FROM b2)
+        SELECT * FROM b3
+        WHERE rank
+        BETWEEN (((#{nowPage}-1) * #{receivePage})+1)
+        AND (#{nowPage}* #{receivePage})
+        order by rank
+    </select>
+    
+    <select id="findCountAll" resultType="java.lang.Integer">
+        WITH b2 AS (SELECT distinct b.*
+        FROM board b
+        LEFT JOIN ict.bookmark bm ON b.board_id = bm.board_id
+        JOIN member m ON b.user_id = m.user_id
+        LEFT JOIN board_hashtag bh ON b.board_id = bh.board_id
+        LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
+        WHERE b.deleted = 'N' AND b.blocked = 'N'
+        <if test="boardCategory != 'FOOD' and boardCategory != 'EXERCISE'">
+            AND (upper(board_category) = 'FOOD'
+            OR upper(board_category) = 'EXERCISE')
+        </if>
+        <if test="boardCategory == 'FOOD'">
+            AND upper(board_category) = 'FOOD'
+        </if>
+        <if test="boardCategory == 'EXERCISE'">
+            AND upper(board_category) = 'EXERCISE'
+        </if>
+        <if test="searchColumn != null and searchColumn != ''  and searchKeyword != null and searchKeyword != ''">
+            <![CDATA[
+			AND lower(${searchColumn}) LIKE '%' || lower(#{searchKeyword}) || '%'
+		]]></if>
+        )
+        SELECT count(*) FROM b2
+    </select>
+    <select id="findRankByBoardId" resultType="java.lang.Integer">
+        WITH b1 AS (SELECT rank() OVER (ORDER BY board_id DESC) rank, board_id
+                        FROM board
+                        WHERE upper(board_category) = upper(#{category})
+                          AND blocked = 'N'
+                          AND deleted = 'N')
+        SELECT *
+            FROM b1
+            WHERE board_id = #{boardId}
+    </select>
+    <select id="findPrevAndNextByBoardId" resultType="java.util.Map">
+        WITH b1 AS (SELECT board_id, board_category
+                        FROM board
+                        WHERE deleted = 'N' AND blocked = 'N'),
+             b2 AS (SELECT b1.*, rank() OVER (ORDER BY b1.board_id DESC) rank
+                        FROM b1
+                        WHERE upper(board_category) = upper(#{category}))
+        SELECT (SELECT board_id FROM b2 WHERE rank = #{rank} + 1) prev_board_id,
+               (SELECT board_id FROM b2 WHERE rank = #{rank} - 1) next_board_id
+            FROM dual
+    </select>
+
+
+</mapper>

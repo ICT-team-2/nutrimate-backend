@@ -43,7 +43,7 @@ public class MybatisConfig {
 			factoryBean.setConfiguration(configuration);
 			factory = factoryBean.getObject();
 		} catch (Exception e) {
-			log.warn(e.getMessage());
+			log.error(e.getMessage(), e);
 		}
 		return factory;
 		
