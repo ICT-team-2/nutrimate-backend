@@ -11,5 +11,5 @@ public interface PaymentMapper {
 
   public int insertPayment(Map map);
 
-  public int updatePayment(Map map);
+  // public int updatePayment(Map map);
 }

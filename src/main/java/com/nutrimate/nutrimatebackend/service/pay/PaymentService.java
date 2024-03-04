@@ -5,7 +5,9 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import com.nutrimate.nutrimatebackend.mapper.pay.PaymentMapper;
 import com.nutrimate.nutrimatebackend.model.pay.PaymentDto;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 public class PaymentService {
   private PaymentMapper paymentMapper;
@@ -15,6 +17,8 @@ public class PaymentService {
   }
 
   public List<PaymentDto> getPaymentList(Long userId) {
+    log.info("paymentMapper: " + paymentMapper);
+
     return paymentMapper.findByPaymentUserId(userId);
   }
 
@@ -22,7 +26,4 @@ public class PaymentService {
     return paymentMapper.insertPayment(map);
   }
 
-  public int updatePayment(Map map) {
-    return paymentMapper.updatePayment(map);
-  }
 }

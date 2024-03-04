@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.pay.PaymentMapper">
+	<select id="findByPaymentUserId" parameterType="Long" resultType="PaymentDto">
+		SELECT user_id, pay_date, pay_type, pay_name, pay_price, pay_method FROM payment WHERE user_id = #{userId}
+	</select>
+	<insert id="insertPayment" parameterType="Map">
+	<selectKey keyProperty="payId" resultType="int" order="AFTER">
+			SELECT SEQ_RECORD.CURRVAL
+				FROM DUAL
+		</selectKey>
+		INSERT INTO payment VALUES(seq_payment.nextval,#{userId}, 0, '구독 완료', #{payPrice}, #{payMethod})
+	</insert>
+</mapper>

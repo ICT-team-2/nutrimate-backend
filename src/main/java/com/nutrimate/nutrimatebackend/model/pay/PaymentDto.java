@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class PaymentDto {
-  private Long userId;
+  private long userId;
   private Timestamp payDate;
   private int priceType;
   private int price;

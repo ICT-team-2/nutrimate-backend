@@ -49,22 +49,17 @@
 		VALUES (seq_food.nextval , #{foodName}, #{foodCal})
 	</insert>
 	<insert id="insertRecordCustomFood" parameterType="DietSportRecordDto">
-		INSERT INTO customfood
-			VALUES ((SELECT max(food_id) FROM food WHERE food_name = #{foodName}),
-			        #{userId, jdbcType=INTEGER},
-			        sysdate)
+    INSERT INTO customfood
+        VALUES (seq_food.nextval, #{userId, jdbcType=INTEGER}, sysdate)
 	</insert>
+
 	<insert id="insertDietFoodRecord" parameterType="DietSportRecordDto">
-		<selectKey keyProperty="dietrecordId" resultType="int" order="AFTER">
-			SELECT SEQ_DIETRECORD.CURRVAL
-				FROM DUAL
-		</selectKey>
 		INSERT INTO dietrecord VALUES (SEQ_DIETRECORD.NEXTVAL, #{recordId}, #{foodId})
 	</insert>
 	
 	<!-- 먹은 칼로리와 일일 권장 칼로리 열람하기 -->
 	<!-- (운동 정도에 따라 권장 칼로리를 바꿀 수 있도록) -->
-	<select id="findFoodCaloriesByUserId" resultType="int">
+	<select id="findFoodCaloriesByUserId" parameterType="DietSportRecordDto" resultType="int">
 		<!-- 오늘 먹은 칼로리 -->
 		SELECT sum(f.food_cal) AS food_cal
 		FROM food f
@@ -83,7 +78,7 @@
 		)
 		 -->
 	</select>
-	<select id="findFoodRecommendedCaloriesByUserId" resultType="int">
+	<select id="findFoodRecommendedCaloriesByUserId" parameterType="DietSportRecordDto" resultType="int">
 		<!-- 일일 권장 칼로리 -->
 		SELECT user_cal FROM member
 		WHERE user_id=#{userId}
@@ -194,5 +189,7 @@
 				                    WHERE user_id = #{userId}
 					                  AND trunc(do_date) BETWEEN to_date(#{startDate}, 'YYYYMMDD') AND to_date(#{endDate}, 'YYYYMMDD'))
 	</select>
+	
+ 
 
 </mapper>

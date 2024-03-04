@@ -89,14 +89,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
       MemberService memberService =
           (MemberService) request.getServletContext().getAttribute("service");
 
-      // accessToken = JWTOkens.getToken(request, "ACCESS");
-      // String accessToken =
-      // JWTOkens.getToken(request, request.getServletContext().getInitParameter("ACCESS"));
-      // String refreshToken =
-      // JWTOkens.getToken(request, request.getServletContext().getInitParameter("REFRESH"));
-
-      // System.out.println("accessToken1111111111 :" + accessToken);
-      // System.out.println("refreshToken2222222222 :" + refreshToken);
       if (!accessToken.isEmpty()) {
         int accessVerifyStatus = JWTOkens.verifyToken(accessToken, JWTOkens.ACCESS);
 
@@ -139,40 +131,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 
     }
-    // MemberService memberService =
-    // (MemberService) request.getServletContext().getAttribute("service");
-    // accessToken =
-    // JWTOkens.getToken(request, request.getServletContext().getInitParameter("ACCESS"));
-    //
-    //
-    // String refreshToken =
-    // JWTOkens.getToken(request, request.getServletContext().getInitParameter("REFRESH"));
 
-
-    // if (!accessToken.isEmpty()) {
-    // int accessVerifyStatus = JWTOkens.verifyToken(accessToken, JWTOkens.ACCESS);
-    // switch (accessVerifyStatus) {
-    // case JWTOkens.SIGNED:
-    // case JWTOkens.EXPIRED:
-    // int refreshVerifyStatus = JWTOkens.verifyToken(refreshToken, JWTOkens.REFRESH);
-    // switch (refreshVerifyStatus) {
-    // case JWTOkens.EXPIRED:
-    // JWTOkens.getToken(request, refreshToken);
-    // System.out.println("DDDD");
-    // case JWTOkens.SIGNED:
-    // setUserInfo(refreshToken, request, response, memberService, userId);
-    // break;
-    // case JWTOkens.UNSIGNED:
-    // JWTOkens.removeToken(request, response);
-    // loginFail(response);
-    // }
-    // break;
-    // case JWTOkens.UNSIGNED: {
-    // JWTOkens.removeToken(request, response);
-    // loginFail(response);
-    // }
-    // }
-    // }
     chain.doFilter(request, response);
   }
 
@@ -183,12 +142,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     response.getWriter().print(json);
   }
 
-  // public void setUserInfo(String refreshToken, HttpServletRequest request,
-  // HttpServletResponse response, MemberService memberService, Long userId) {
-  // Map<String, Object> payload = JWTOkens.getTokenPayloads(refreshToken, JWTOkens.REFRESH);
-  // request.setAttribute("userId", payload.get("user_id"));
-  // MemberDto memberDto = memberService.findMemberInfoById(userId);
-  // request.setAttribute("member", memberDto);
-  // }
+
 
 }
