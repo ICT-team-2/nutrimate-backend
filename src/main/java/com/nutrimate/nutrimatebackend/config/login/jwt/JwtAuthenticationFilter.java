@@ -101,8 +101,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			log.info(refreshCookie);
 			response.addCookie(refreshCookie);
 		}
-		Map<String, String> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<>();
 		result.put("message", "success");
+		result.put("userId", principalDetails.getMemberDto().getUserId());
 		String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
 		response.getWriter().print(json);
 	}
