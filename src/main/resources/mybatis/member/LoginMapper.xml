@@ -24,8 +24,8 @@
 			SELECT seq_member.nextval userid
 				FROM dual
 		</selectKey>
-		INSERT INTO member(user_id, user_uid,user_pwd)
-		VALUES (#{userId},#{userUid},#{userPwd})
+		INSERT INTO member(user_id, user_uid,user_pwd,user_nick)
+		VALUES (#{userId},#{userUid},#{userPwd},#{userNick})
 	</insert>
 	<insert id="insertOAuth" parameterType="MemberDto">
 		INSERT INTO oauth(user_id, provider, provider_id)
@@ -84,22 +84,28 @@
 	</update>
 	
 	<update id="updateMemberDiet" parameterType="MemberDto">
-		UPDATE nutriratio 
+		UPDATE nutriratio
 		SET protein=#{protein},
-			carbo=#{carbo},
-			province=#{province}
+		    carbo=#{carbo},
+		    province=#{province}
 			WHERE user_id = #{userId}
 	</update>
-
+	
 	<select id="checkPhoneNumber" parameterType="string" resultType="boolean">
-	  SELECT COUNT(*) FROM member WHERE user_phone = #{userPhone}
+		SELECT count(*)
+			FROM member
+			WHERE user_phone = #{userPhone}
 	</select>
 	
 	<select id="checkEmail" parameterType="string" resultType="boolean">
-	  SELECT COUNT(*) FROM member WHERE user_email = #{userEmail}
+		SELECT count(*)
+			FROM member
+			WHERE user_email = #{userEmail}
 	</select>
 	
 	<select id="checkNick" parameterType="string" resultType="boolean">
-	  SELECT COUNT(*) FROM member WHERE user_nick = #{userNick}
+		SELECT count(*)
+			FROM member
+			WHERE user_nick = #{userNick}
 	</select>
 </mapper>

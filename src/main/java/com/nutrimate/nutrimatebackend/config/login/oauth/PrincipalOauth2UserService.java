@@ -81,6 +81,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 		if (userEntity == null) {
 			log.info("OAuth 로그인이 최초");
 			userEntity = MemberDto.builder().userUid(userUid).userPwd(password)
+					.userNick(provider + "_" + providerId)
 					// .userName(name).userEmail(email)
 					.userRole(role).provider(provider).providerId(providerId).build();
 			log.info("userEntity : " + userEntity);
