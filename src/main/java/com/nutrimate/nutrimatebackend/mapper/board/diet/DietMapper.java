@@ -3,6 +3,7 @@ package com.nutrimate.nutrimatebackend.mapper.board.diet;
 import com.nutrimate.nutrimatebackend.model.FoodDto;
 import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface DietMapper {
 	int deleteBookMarkByBoardIdANDuserId(DietDto dto);
 	
 	//해당 해시태그 갯수
-	int findHashTagCountByHashTagName(String tageName);
+	int findHashTagCountByHashTagName(@Param("tageName") String tageName);
 	
 	//해시태그 저장
 	int insertHashTag(DietDto dto);
@@ -66,7 +67,7 @@ public interface DietMapper {
 	int insertBoardHashTagByBoardId(DietDto dto);
 	
 	//해시태그아이디 얻어오기
-	int findHashTagIdByHashTagName(String tagName);
+	int findHashTagIdByHashTagName(@Param("tagName") String tagName);
 	
 	//해당하는 보드의 해시태그네임 얻어오기
 	List<DietDto> findHashTagByBoardId(DietDto dto);
@@ -78,9 +79,9 @@ public interface DietMapper {
 	int updateBoardHashTagByBoardId(DietDto dto);
 	
 	
-	int insertFoodData(int boardId, int foodId);
+	int insertFoodData(@Param("boardId") int boardId, @Param("foodId") int foodId);
 	
 	int deleteFoodDataByBoardId(DietDto dto);
 	
-	List<FoodDto> findFoodDataByBoardId(int boardId);
+	List<FoodDto> findFoodDataByBoardId(@Param("boardId") int boardId);
 }

@@ -3,6 +3,7 @@ package com.nutrimate.nutrimatebackend.mapper.board;
 import com.nutrimate.nutrimatebackend.model.board.InfoBoardDto;
 import com.nutrimate.nutrimatebackend.model.board.PagingDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -15,9 +16,12 @@ public interface InfoBoardMapper {
 	
 	int findCountAll(PagingDto dto);
 	
-	int updateViewCount(int boardId);
+	int updateViewCount(@Param("boardId") int boardId);
 	
-	int findRankByBoardId(int boardId, String category);
+	int findRankByBoardId(
+			@Param("boardId") int boardId,
+			@Param("category") String category);
 	
-	Map<String, Integer> findPrevAndNextByBoardId(int rank, String category);
+	Map<String, Integer> findPrevAndNextByBoardId(
+			@Param("rank") int rank, @Param("category") String category);
 }
