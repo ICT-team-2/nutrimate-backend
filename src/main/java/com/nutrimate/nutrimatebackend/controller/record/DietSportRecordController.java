@@ -1,5 +1,6 @@
 package com.nutrimate.nutrimatebackend.controller.record;
 
+import com.nutrimate.nutrimatebackend.model.FoodDto;
 import com.nutrimate.nutrimatebackend.model.record.DietSportRecordDto;
 import com.nutrimate.nutrimatebackend.service.record.DietSportRecordService;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +22,13 @@ public class DietSportRecordController {
 	@Autowired
 	private DietSportRecordService dietSportRecordService;
 	
+	@GetMapping("/food/list/id")
+	public ResponseEntity<List<FoodDto>> findFoodListByFoodId(
+			@RequestParam(required = true) List<Integer> foodId) {
+		List<FoodDto> foodList = dietSportRecordService.findFoodListByFoodId(foodId);
+		return new ResponseEntity<>(foodList, HttpStatus.OK);
+	}
+	
 	// 음식 목록 가져오기 (완료)
 	// 입력 데이터 : 없음, [searchWord]
 	// 출력 데이터 : foodId, foodName, foodCal
@@ -34,6 +42,9 @@ public class DietSportRecordController {
 			simplifiedFood.put("foodId", food.getFoodId());
 			simplifiedFood.put("foodName", food.getFoodName());
 			simplifiedFood.put("foodCal", food.getFoodCal());
+			simplifiedFood.put("foodProvi", food.getFoodProvi());
+			simplifiedFood.put("foodCarbo", food.getFoodCarbo());
+			simplifiedFood.put("foodProtein", food.getFoodProtein());
 			simplifiedFoodList.add(simplifiedFood);
 		}
 		return new ResponseEntity<>(simplifiedFoodList, HttpStatus.OK);

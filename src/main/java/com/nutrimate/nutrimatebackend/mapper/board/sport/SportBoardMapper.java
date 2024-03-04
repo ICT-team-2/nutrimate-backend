@@ -16,19 +16,25 @@ public interface SportBoardMapper {
 	boolean insertBoard(SportBoardDto board);
 	
 	//게시글 조회(상세)
-	SportBoardDto selectBoard(int boardId);
+	SportBoardDto selectBoard(@Param("boardId") int boardId, @Param("userId") int userId);
 	
 	//해당 글의 해시태그 가져오기
 	List<SportBoardDto> findHashtagsByBoardId(SportBoardDto board);
-		
+	
 	//모든 게시글 조회(전체)
-	List<SportBoardDto> selectAllBoards(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("searchUser") String searchUser, @Param("searchTitle") String searchTitle, @Param("searchContent") String searchContent, @Param("searchTag") String searchTag);
+	List<SportBoardDto> selectAllBoards(
+			@Param("pageNum") int pageNum,
+			@Param("pageSize") int pageSize,
+			@Param("searchUser") String searchUser,
+			@Param("searchTitle") String searchTitle,
+			@Param("searchContent") String searchContent,
+			@Param("searchTag") String searchTag);
 	
 	//게시글 수정
 	int updateBoard(SportBoardDto board);
 	
 	//게시글 삭제
-	int deleteBoard(int boardId);
+	int deleteBoard(@Param("boardId") int boardId);
 	
 	//스포츠 게시판 게시글 생성
 	int insertSportBoard(SportBoardDto board);
@@ -40,11 +46,11 @@ public interface SportBoardMapper {
 	int checkUserLike(LikeDto likeDto);
 	
 	//좋아요 수 조회
-	int countLikes(String boardId);
+	int countLikes(@Param("boardId") String boardId);
 	
 	//좋아요 여부 확인
 	int countLike(LikeDto likeDto);
-		
+	
 	//좋아요 생성
 	int insertLike(LikeDto likeDto);
 	
@@ -52,12 +58,12 @@ public interface SportBoardMapper {
 	int deleteLike(LikeDto likeDto);
 	
 	//조회수 증가
-	int updateBoardViewcount(int boardId);
+	int updateBoardViewcount(@Param("boardId") int boardId);
 	
 	//이전글/다음글
-	SportBoardDto selectPrevBoard(int boardId); //이전글 조회
+	SportBoardDto selectPrevBoard(@Param("boardId") int boardId); //이전글 조회
 	
-	SportBoardDto selectNextBoard(int boardId); //다음글 조회
+	SportBoardDto selectNextBoard(@Param("boardId") int boardId); //다음글 조회
 	
 	//총 페이지 수
 	int countBoards();
@@ -72,15 +78,17 @@ public interface SportBoardMapper {
 	int deleteBookmark(BookmarkDto bookmarkDto);
 	
 	//해시태그 입력시
-	int checkTagId(String tag);	
-	void insertTag(String tag);	
+	int checkTagId(String tag);
+	
+	void insertTag(String tag);
+	
 	void insertHashtag(SportBoardDto board);
 	
 	//해시태그 수정시
 	void updateHashtag(SportBoardDto board);
-
+	
 	//해시태그 검색
 	List<SportBoardDto> findBoardsByTagName(SportBoardDto board);
-
+	
 	
 }

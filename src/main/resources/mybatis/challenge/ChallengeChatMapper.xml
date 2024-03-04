@@ -2,91 +2,110 @@
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.challenge.ChallengeChatMapper">
-
-
-
-	    <!--채팅에 참여해 본적이 있는지 확인-->
-		<select id="findChatMemberbyUseridAndUserRoom" resultType="int" parameterType="ChallengeChatDto">
-			SELECT count(*) from challengeuserChatRoom where user_id=#{userId} AND chatroom_id=#{chatroomId}
-		</select>
-		
-		<!-- 채팅에 참여 정보 가지고 오기-->
-		<select id="findChatMemberInfoByUserIdAndUserRoom" resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
-			SELECT * from challengeuserChatRoom ccr JOIN challengeuser cu ON ccr.user_id=cu.user_id LEFT JOIN chatroom cr ON ccr.chatroom_id=cr.chatroom_id  WHERE ccr.user_id=#{userId} AND cr.chatroom_id=#{chatroomId}
-		</select>
-	    
-	   <!-- 챌린지 참여 여부 확인-->
-		<select id="findChallengeMemberByUserId" resultType="int" parameterType="ChallengeChatDto">
-			SELECT count(*) from challengeuser where user_id=#{userId}
-		</select>
-		
-		<!-- 챌린지 계정의 중복 여부 확인-->
-		<select id="findChallengeAccount" resultType="int" parameterType="ChallengeChatDto">
-			SELECT count(*) FROM challengeuser WHERE challenge_nick=#{challengeNick}
-		</select>
-		
-
-		
-		<!--챌린지 계정 생성-->
-		<insert id="insertAccountChallengeMemeber" parameterType="ChallengeChatDto">
-			INSERT INTO challengeuser VALUES (#{userId},#{challengeNick})
-		</insert>
-		
-		
-	    <!--채팅 참여 계정 생성-->
-		<insert id="insertAccountChatroom" parameterType="ChallengeChatDto">
-			INSERT INTO challengeuserchatroom VALUES (#{userId},#{chatroomId})
-		</insert>
 	
-		 <!--채팅 메세지 저장-->
-		<insert id="insertChatMessage" parameterType="ChallengeChatDto">
-			INSERT INTO challengechat (chat_id, user_id, message_type, chat_message, chatroom_Id)
-				VALUES (seq_challenge_chat.nextval,
-					       #{userId}, #{messageType},
-					       #{chatMessage}, #{chatroomId})
-		</insert>
-		
-		
-		 <!--챌린지 등수 출력-->
-		 <select id="findChallengeSuccessList" resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
+	
+	<!--채팅에 참여해 본적이 있는지 확인-->
+	<select id="findChatMemberbyUseridAndUserRoom" resultType="int"
+	        parameterType="ChallengeChatDto">
+		SELECT count(*)
+			FROM challengeuserchatroom
+			WHERE user_id = #{userId} AND chatroom_id = #{chatroomId}
+	</select>
+	
+	<!-- 채팅에 참여 정보 가지고 오기-->
+	<select id="findChatMemberInfoByUserIdAndUserRoom" resultType="ChallengeChatDto"
+	        parameterType="ChallengeChatDto">
+		SELECT *
+			FROM challengeuserchatroom ccr
+				     JOIN challengeuser cu ON ccr.user_id = cu.user_id
+				     LEFT JOIN chatroom cr ON ccr.chatroom_id = cr.chatroom_id
+			WHERE ccr.user_id = #{userId} AND cr.chatroom_id = #{chatroomId}
+	</select>
+	
+	<!-- 챌린지 참여 여부 확인-->
+	<select id="findChallengeMemberByUserId" resultType="int" parameterType="ChallengeChatDto">
+		SELECT count(*)
+			FROM challengeuser
+			WHERE user_id = #{userId}
+	</select>
+	
+	<!-- 챌린지 계정의 중복 여부 확인-->
+	<select id="findChallengeAccount" resultType="int" parameterType="ChallengeChatDto">
+		SELECT count(*)
+			FROM challengeuser
+			WHERE challenge_nick = #{challengeNick}
+	</select>
+	
+	
+	<!--챌린지 계정 생성-->
+	<insert id="insertAccountChallengeMemeber" parameterType="ChallengeChatDto">
+		INSERT INTO challengeuser
+			VALUES (#{userId}, #{challengeNick})
+	</insert>
+	
+	
+	<!--채팅 참여 계정 생성-->
+	<insert id="insertAccountChatroom" parameterType="ChallengeChatDto">
+		INSERT INTO challengeuserchatroom
+			VALUES (#{userId}, #{chatroomId})
+	</insert>
+	
+	<!--채팅 메세지 저장-->
+	<insert id="insertChatMessage" parameterType="ChallengeChatDto">
+		INSERT INTO challengechat (chat_id, user_id, message_type, chat_message, chatroom_id)
+			VALUES (seq_challenge_chat.nextval,
+			        #{userId}, #{messageType},
+			        #{chatMessage}, #{chatroomId})
+	</insert>
+	
+	
+	<!--챌린지 등수 출력-->
+	<select id="findChallengeSuccessList" resultType="ChallengeChatDto"
+	        parameterType="ChallengeChatDto">
 		  <![CDATA[
-					SELECT * 
-				        FROM (
-				                SELECT DISTINCT cu.challenge_nick, COUNT(*) OVER (PARTITION BY cs.user_id) AS COUNT FROM ChallengeSuccess cs
-				                JOIN Challengeuser cu ON cu.user_id = cs.user_id where trunc(cs.success_date)<=trunc(sysdate) and trunc(cs.success_date)>=trunc(sysdate-6)  and CHATROOM_ID=#{chatroomId}
-				                ORDER BY COUNT DESC
-										)
-				   WHERE ROWNUM BETWEEN 1 AND 5 
-				   ]]>
+		SELECT *
+			FROM (SELECT DISTINCT cu.challenge_nick,
+			                      count(*) OVER (PARTITION BY cs.user_id) AS count
+				      FROM challengesuccess cs
+					           JOIN challengeuser cu ON cu.user_id = cs.user_id
+				      WHERE trunc(cs.success_date) <= trunc(sysdate)
+					    AND trunc(cs.success_date) >= trunc(sysdate - 6)
+					    AND chatroom_id = #{chatroomId}
+				      ORDER BY count DESC)
+			WHERE rownum BETWEEN 1 AND 5
+		]]>
 		 </select>
-		 <!--챌린지 등수 출력-->
-		<select id="findChallengeSuccessCount" resultType="int" parameterType="ChallengeChatDto">
-		     SELECT COUNT(*) from ChallengeSuccess WHERE USER_ID = #{userId} AND trunc(success_date) = trunc(sysdate) AND chatroom_id=#{chatroomId}
-		 </select>
-		 
-		 <!--챌린지 성공 기록하기-->
-		<insert id="insertChallengeSuccessCount" parameterType="ChallengeChatDto">
-		    INSERT INTO ChallengeSuccess VALUES(#{userId},#{chatroomId},sysdate,SEQ_BOARD.NEXTVAL)
-		 </insert>
-		<select id="findAllChatByRoomType"
-		        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
+	<!--챌린지 등수 출력-->
+	<select id="findChallengeSuccessCount" resultType="int" parameterType="ChallengeChatDto">
+		SELECT count(*)
+			FROM challengesuccess
+			WHERE user_id = #{userId} AND trunc(success_date) = trunc(sysdate)
+			  AND chatroom_id = #{chatroomId}
+	</select>
+	
+	<!--챌린지 성공 기록하기-->
+	<insert id="insertChallengeSuccessCount" parameterType="ChallengeChatDto">
+		INSERT INTO challengesuccess
+			VALUES (#{userId}, #{chatroomId}, sysdate, seq_board.nextval)
+	</insert>
+	<select id="findAllChatByRoomType"
+	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
 		 <![CDATA[
-			select cc.*, cu.*,m.user_profile from challengechat cc JOIN challengeuser cu ON cc.user_Id=cu.user_Id
-          		JOIN member m ON cc.user_Id=m.user_Id
-				WHERE CHATROOM_ID = #{chatroomId} AND TRUNC(cc.created_date)>=TRUNC(sysdate)-1
-				
-				]]>
+		SELECT cc.*, cu.*, m.user_profile
+			FROM challengechat cc
+				     JOIN challengeuser cu ON cc.user_id = cu.user_id
+				     JOIN member m ON cc.user_id = m.user_id
+			WHERE chatroom_id = #{chatroomId} AND trunc(cc.created_date) >= trunc(sysdate) - 1
+		]]>
 		</select>
-		
+	
 	
 	<!-- 채팅 닉네임 아이디 구하기(임시)-->
-		<select id="findUser" resultType="int" parameterType="ChallengeChatDto">
-			select USER_ID from challengeUser where challenge_nick=#{challengeNick}
-		</select>
-	
-	
-	
-	
-	
-	
+	<select id="findUser" resultType="int" parameterType="ChallengeChatDto">
+		SELECT user_id
+			FROM challengeuser
+			WHERE challenge_nick = #{challengeNick}
+	</select>
+
+
 </mapper>

@@ -3,7 +3,6 @@ package com.nutrimate.nutrimatebackend.controller.board;
 import com.nutrimate.nutrimatebackend.model.board.CommentDto;
 import com.nutrimate.nutrimatebackend.service.board.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,25 +25,7 @@ public class CommentController {
 	public ResponseEntity<List<CommentDto>> findCommentsByBoardId(
 			@PathVariable(name = "boardId") int boardId) {
 		List<CommentDto> comments = commentService.findCommentsByBoardId(boardId);
-		List<CommentDto> jsonResponse = new ArrayList<>();
-		Map<String, Object> replies = new HashMap<>();
-		for (CommentDto comment : comments) {
-			// 삭제된 댓글에 대한 처리
-			if ("Y".equals(comment.getDeleted())) {
-				// 대댓글이 있는 경우에 대한 처리
-				if (1 < commentService.countReplies(comment.getCmtId())) {
-					// 삭제된 댓글에 대댓글이 있는 경우는 "삭제된 댓글입니다"를 출력하고 대댓글을 포함시킴
-					comment.setCmtContent("삭제된 댓글입니다");
-					comment.setReplies(getReplies(comment.getCmtId()));
-				} else {
-					// 삭제된 댓글에 대댓글이 없는 경우는 출력하지 않음
-					continue;
-				}
-			}
-			comment.setReplies(getReplies(comment.getCmtId()));
-			jsonResponse.add(comment);
-		}
-		return ResponseEntity.ok(jsonResponse);
+		return ResponseEntity.ok(comments);
 	}
 	
 	// 주어진 댓글 ID에 대한 대댓글을 가져오는 도우미 메소드
@@ -123,18 +104,9 @@ public class CommentController {
 	// 입력 데이터 : cmtId
 	// 출력 데이터 :
 	@DeleteMapping("/delete")
-	public ResponseEntity<Map<String, Object>> deleteComment(
+	public CommentDto deleteComment(
 			@RequestBody CommentDto commentDto) {
-		int affectedRows = commentService.deleteComment(commentDto);
-		Map<String, Object> jsonResponse = new HashMap<>();
-		if (affectedRows > 0) {
-			jsonResponse.put("message", "comments deleted successfully");
-			jsonResponse.put("cmtId", commentDto.getCmtId());
-			return ResponseEntity.ok(jsonResponse);
-		} else {
-			jsonResponse.put("message", "comments delete failed");
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(jsonResponse);
-		}
+		return commentService.deleteComment(commentDto);
 	}
 	
 }

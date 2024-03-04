@@ -16,16 +16,16 @@ public class FeedService {
 	private FeedMapper feedMapper;
 	
 	/** 피드 기능 **/
-	public List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow) {
-		return feedMapper.findFeedList(startRow, endRow);
+	public List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow, int userId, String searchWord, int profileUserId, Boolean profile, Boolean bookmark) {
+		return feedMapper.findFeedList(startRow, endRow, userId, searchWord, profileUserId, profile, bookmark);
 	}
 	
-	public int findFeedtotalRecordCount() {
-		return feedMapper.findFeedtotalRecordCount();
+	public int findFeedtotalRecordCount(String searchWord, int profileUserId, Boolean profile, Boolean bookmark) {
+		return feedMapper.findFeedtotalRecordCount(searchWord, profileUserId, profile, bookmark);
 	}
 	
 	// 피드의 상세보기 정보를 가져오기
-	public List<FeedDto> findFeedDetail(FeedDto feedDto) {
+	public FeedDto findFeedDetail(FeedDto feedDto) {
 		return feedMapper.findFeedDetail(feedDto);
 	}
 	
@@ -129,8 +129,8 @@ public class FeedService {
 	
 	/** 해시태그 **/
 	// 해당 글의 해시태그 가져오기
-	public List<FeedDto> findHashtagsByBoardId(FeedDto feedDto) {
-		return feedMapper.findHashtagsByBoardId(feedDto);
+	public List<String> findHashtagsByBoardId(FeedDto feedDto) {
+		return feedMapper.findHashtagsByBoardId(feedDto.getBoardId());
 	}
 	
 	// 해시태그로 글 검색
