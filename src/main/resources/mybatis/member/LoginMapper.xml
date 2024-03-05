@@ -65,7 +65,8 @@
 		       user_phone,
 		       user_role,
 		       user_diet,
-		       user_intro
+		       user_intro,
+		       user_allergy
 			FROM member
 			WHERE user_id = #{userId}
 			  AND deleted = 'N'
@@ -79,7 +80,8 @@
 		    user_sport_hard=#{userSportHard},
 		    user_cal=#{userCal},
 		    user_diet=#{userDiet},
-		    user_intro=#{userIntro}
+		    user_intro=#{userIntro},
+		    user_allergy=#{userAllergy}
 			WHERE user_id = #{userId}
 	</update>
 	
