@@ -3,6 +3,7 @@ package com.nutrimate.nutrimatebackend.controller.board.feed;
 import com.nutrimate.nutrimatebackend.model.FileUtils;
 import com.nutrimate.nutrimatebackend.model.board.feed.FeedDto;
 import com.nutrimate.nutrimatebackend.service.board.feed.FeedService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,42 +18,48 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/board/feed")
+@Log4j2
 public class FeedController {
 	
 	@Autowired
 	private FeedService feedService;
 	
-	@Value("C://Temp/upload")
-	private String saveDirectory;
+	@Value("${upload-path}")
+	private String uploadPath;
 	
 	/** 피드 **/
 	// 피드 글목록 가져오기 (완료)
 	// 입력 데이터 : nowPage(디폴트1), receivePage(디폴트10)
 	// 출력 데이터 : boardId, thumbnail, nowPage, receivePage, totalPages, totalRecordCount
 	@GetMapping("/list")
-	public ResponseEntity<List<Map<String, Object>>> findFeedList(
+	public Map<String, Object> findFeedList(
 			@RequestParam(name = "nowPage", defaultValue = "1") int nowPage,
-			@RequestParam(name = "receivePage", defaultValue = "10") int receivePage) {
-		int totalRecordCount = feedService.findFeedtotalRecordCount();
+			@RequestParam(name = "receivePage", defaultValue = "10") int receivePage,
+			@RequestParam(name = "userId") int userId,
+			@RequestParam(name = "searchWord", required = false, defaultValue = "") String searchWord,
+			@RequestParam(name = "profileUserId", required = false, defaultValue = "-1") int profileUserId,
+			@RequestParam(name = "profile", required = false, defaultValue = "false") Boolean profile,
+			@RequestParam(name = "bookmark", required = false, defaultValue = "false") Boolean bookmark) {
+		
+		int totalRecordCount = feedService.findFeedtotalRecordCount(searchWord, profileUserId,
+				profile, bookmark);
 		// 페이징 계산
 		int totalPages = (int) Math.ceil((double) totalRecordCount / receivePage);
 		int startRow = (nowPage - 1) * receivePage + 1;
 		int endRow = nowPage * receivePage;
+		
 		// 피드 목록 가져오기
-		List<FeedDto> FeedList = feedService.findFeedList(startRow, endRow);
-		// 각 피드에 페이징 정보 추가
-		List<Map<String, Object>> simplifiedFeedList = new ArrayList<>();
-		for (FeedDto feed : FeedList) {
-			Map<String, Object> simplifiedFeed = new HashMap<>();
-			simplifiedFeed.put("boardId", feed.getBoardId());
-			simplifiedFeed.put("thumbnail", feed.getBoardThumbnail());
-			simplifiedFeed.put("nowPage", nowPage);
-			simplifiedFeed.put("receivePage", receivePage);
-			simplifiedFeed.put("totalPages", totalPages);
-			simplifiedFeed.put("totalRecordCount", totalRecordCount);
-			simplifiedFeedList.add(simplifiedFeed);
-		}
-		return new ResponseEntity<>(simplifiedFeedList, HttpStatus.OK);
+		List<FeedDto> feedList = feedService.findFeedList(startRow, endRow,
+				userId, searchWord, profileUserId, profile, bookmark);
+		
+		Map<String, Object> simplifiedFeed = new HashMap<>();
+		simplifiedFeed.put("feedList", feedList);
+		simplifiedFeed.put("nowPage", nowPage);
+		simplifiedFeed.put("receivePage", receivePage);
+		simplifiedFeed.put("totalPages", totalPages);
+		simplifiedFeed.put("totalRecordCount", totalRecordCount);
+		
+		return simplifiedFeed;
 	}
 	
 	// 피드 상세보기 정보 가져오기 (완료)
@@ -63,21 +70,8 @@ public class FeedController {
 	// 출력 데이터 : boardId, userNick, userProfile, createdDate, boardThumbnail, boardViewCount,
 	// LIKE_COUNT
 	@GetMapping("/view")
-	public ResponseEntity<List<Map<String, Object>>> findFeedDetail(@RequestBody FeedDto feedDto) {
-		List<FeedDto> FeedList = feedService.findFeedDetail(feedDto);
-		List<Map<String, Object>> detailfiedFeedList = new ArrayList<>();
-		for (FeedDto feed : FeedList) {
-			Map<String, Object> detailfiedFeed = new HashMap<>();
-			detailfiedFeed.put("boardId", feed.getBoardId());
-			detailfiedFeed.put("userNick", feed.getUserNick());
-			detailfiedFeed.put("userProfile", feed.getUserProfile());
-			detailfiedFeed.put("createdDate", feed.getCreatedDate());
-			detailfiedFeed.put("Thumbnail", feed.getBoardThumbnail());
-			detailfiedFeed.put("ViewCount", feed.getBoardViewCount()); // 조회수
-			detailfiedFeed.put("LIKE_COUNT", feed.getLikeCount()); // 좋아요 수
-			detailfiedFeedList.add(detailfiedFeed);
-		}
-		return new ResponseEntity<>(detailfiedFeedList, HttpStatus.OK);
+	public FeedDto findFeedDetail(FeedDto feedDto) {
+		return feedService.findFeedDetail(feedDto);
 	}
 	
 	// 피드의 조회수를 +1하기 (완료)
@@ -101,7 +95,7 @@ public class FeedController {
 	// 출력 데이터 : message, boardId
 	@PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Map insertFeed(FeedDto dto) {
-		String phisicalPath = "C://Temp/upload";
+		String phisicalPath = uploadPath;
 		StringBuffer fileNames = new StringBuffer();
 		Map map = new HashMap();
 		if (dto.getFiles() == null) {
@@ -109,7 +103,6 @@ public class FeedController {
 			return map;
 		}
 		try {
-			System.out.println("dto.getFiles()" + dto.getFiles());
 			fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
 			dto.setBoardThumbnail(fileNames.toString());
 		} catch (Exception e) {// 파일용량 초과시
@@ -136,12 +129,13 @@ public class FeedController {
 		Map<String, Object> map = new HashMap<>();
 		try {
 			if (dto.getFiles() != null) {
-				String phisicalPath = "C://Temp/upload";
+				String phisicalPath = uploadPath;
 				StringBuffer fileNames = new StringBuffer();
 				
 				fileNames = FileUtils.upload(dto.getFiles(), phisicalPath);
 				dto.setBoardThumbnail(fileNames.toString());
 			}
+			log.info("dto : " + dto);
 			feedService.updateFeed(dto);
 			int boardId = dto.getBoardId();
 			map.put("message", "Feed Update successfully");
@@ -291,11 +285,11 @@ public class FeedController {
 	@GetMapping("/hashtag")
 	public ResponseEntity<List<Map<String, Object>>> findHashtagsByBoardId(
 			@RequestBody FeedDto feedDto) {
-		List<FeedDto> tagNames = feedService.findHashtagsByBoardId(feedDto);
+		List<String> tagNames = feedService.findHashtagsByBoardId(feedDto);
 		List<Map<String, Object>> tagNameList = new ArrayList<>();
-		for (FeedDto tagName : tagNames) {
+		for (String tagName : tagNames) {
 			Map<String, Object> tagNameFeed = new HashMap<>();
-			tagNameFeed.put("tagName", tagName.getTagName());
+			tagNameFeed.put("tagName", tagName);
 			tagNameList.add(tagNameFeed);
 		}
 		if (tagNameList.isEmpty()) {

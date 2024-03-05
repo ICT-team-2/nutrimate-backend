@@ -13,6 +13,12 @@ public interface CommentMapper {
 	
 	List<CommentDto> findRepliesByParentId(int parentCommentId);
 	
+	int findCountRepliesByCmtId(CommentDto dto);
+	
+	int findCountDeletedRepliesByCommentId(CommentDto dto);
+	
+	int deleteAllRepliesAndComment(CommentDto dto);
+	
 	// 대댓글 수 확인
 	int countReplies(int commentId);
 	
@@ -29,4 +35,9 @@ public interface CommentMapper {
 	int deleteComment(CommentDto commentDto);
 	
 	
+	int updateToNoCommentIfGetReplies(CommentDto dto);
+	
+	int updateAllDeletedWhenReplyDeleted(CommentDto dto);
+	
+	Integer findCmtRefByCmtId(int cmtId);
 }

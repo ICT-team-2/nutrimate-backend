@@ -10,12 +10,23 @@ import java.util.List;
 public interface FeedMapper {
 	
 	// 피드 글목록 가져오기
-	List<FeedDto> findFeedList(@Param("startRow") int startRow, @Param("endRow") int endRow);
+	List<FeedDto> findFeedList(
+			@Param("startRow") int startRow,
+			@Param("endRow") int endRow,
+			@Param("userId") int userId,
+			@Param("searchWord") String searchWord,
+			@Param("profileUserId") int profileUserId,
+			@Param("profile") Boolean profile,
+			@Param("bookmark") Boolean bookmark);
 	
-	int findFeedtotalRecordCount();
+	int findFeedtotalRecordCount(
+			@Param("searchWord") String searchWord,
+			@Param("profileUserId") int profileUserId,
+			@Param("profile") Boolean profile,
+			@Param("bookmark") Boolean bookmark);
 	
 	// 피드의 상세보기 정보를 가져오기
-	List<FeedDto> findFeedDetail(FeedDto feedDto);
+	FeedDto findFeedDetail(FeedDto feedDto);
 	
 	// 피드의 조회수를 +1하기
 	void updateincreaseViewCount(FeedDto feedDto);
@@ -23,9 +34,9 @@ public interface FeedMapper {
 	// 피드 작성
 	void insertFeed(FeedDto feedDto);
 	
-	int checkTagId(String tag);
+	int checkTagId(@Param("tag") String tag);
 	
-	void insertTag(String tag);
+	void insertTag(@Param("tag") String tag);
 	
 	void insertHashtag(FeedDto feedDto);
 	
@@ -70,7 +81,7 @@ public interface FeedMapper {
 	
 	/** 해시태그 **/
 	// 해당 글의 해시태그 가져오기
-	List<FeedDto> findHashtagsByBoardId(FeedDto feedDto);
+	List<String> findHashtagsByBoardId(@Param("userId") int userId);
 	
 	// 해시태그로 글 검색
 	List<FeedDto> findBoardsByTagName(FeedDto feedDto);
