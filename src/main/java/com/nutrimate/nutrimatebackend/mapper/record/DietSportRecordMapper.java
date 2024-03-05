@@ -1,7 +1,7 @@
 package com.nutrimate.nutrimatebackend.mapper.record;
 
 import com.nutrimate.nutrimatebackend.model.FoodDto;
-import com.nutrimate.nutrimatebackend.model.record.DietSportRecordDto;
+import com.nutrimate.nutrimatebackend.model.record.RecordDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -10,54 +10,54 @@ import java.util.List;
 public interface DietSportRecordMapper {
 	
 	// 음식 목록 가져오기
-	List<DietSportRecordDto> findFoodList(String searchWord);
+	List<RecordDto> findFoodList(String searchWord);
 	
 	// 자신이 먹은 음식 기록하기 (식단DB 데이터 사용)
-	void insertRecord(DietSportRecordDto dietSportRecordDto);
+	void insertRecord(RecordDto recordDto);
 	
-	void insertFoodRecord(DietSportRecordDto dietSportRecordDto);
+	void insertFoodRecord(RecordDto recordDto);
 	
 	// 자신이 먹은 음식 기록하기 (유저가 직접 입력)
-	void insertRecordFo(DietSportRecordDto dietSportRecordDto);
+	void insertRecordFo(RecordDto recordDto);
 	
-	void insertRecordFood(DietSportRecordDto dietSportRecordDto);
+	void insertRecordFood(RecordDto recordDto);
 	
-	void insertRecordCustomFood(DietSportRecordDto dietSportRecordDto);
+	void insertRecordCustomFood(RecordDto recordDto);
 	
-	void insertDietFoodRecord(DietSportRecordDto dietSportRecordDto);
+	void insertDietFoodRecord(RecordDto recordDto);
 	
 	// 먹은 칼로리와 일일 권장 칼로리 열람하기
-	Integer findFoodCaloriesByUserId(DietSportRecordDto dietSportRecordDto);
+	Integer findFoodCaloriesByUserId(RecordDto recordDto);
 	
-	Integer findFoodRecommendedCaloriesByUserId(DietSportRecordDto dietSportRecordDto);
+	Integer findFoodRecommendedCaloriesByUserId(RecordDto recordDto);
 	
 	// 운동 목록 가져오기
-	List<DietSportRecordDto> findSportList(String searchWord);
+	List<RecordDto> findSportList(String searchWord);
 	
 	// 운동으로 소모한 칼로리를 기록하는 쿼리문 (운동DB 데이터 사용)
-	void insertRecordExer(DietSportRecordDto dietSportRecordDto);
+	void insertRecordExer(RecordDto recordDto);
 	
-	void insertExerciseRecord(DietSportRecordDto dietSportRecordDto);
+	void insertExerciseRecord(RecordDto recordDto);
 	
 	// 운동으로 소모한 칼로리를 기록하는 쿼리문 (유저가 직접 입력)
-	void insertRecordSp(DietSportRecordDto dietSportRecordDto);
+	void insertRecordSp(RecordDto recordDto);
 	
-	void insertRecordSport(DietSportRecordDto dietSportRecordDto);
+	void insertRecordSport(RecordDto recordDto);
 	
-	void insertRecordCustomSport(DietSportRecordDto dietSportRecordDto);
+	void insertRecordCustomSport(RecordDto recordDto);
 	
-	void insertCustomSportRecord(DietSportRecordDto dietSportRecordDto);
+	void insertCustomSportRecord(RecordDto recordDto);
 	
 	// 오늘 자신이 소모한 칼로리를 열람하는 쿼리문
-	Integer findExerciseCaloriesByUserId(DietSportRecordDto dietSportRecordDto);
+	Integer findExerciseCaloriesByUserId(RecordDto recordDto);
 	
 	// 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(식단 분석 그래프)
-	Integer findTotalFoodCalories(DietSportRecordDto dietSportRecordDto);
+	Integer findTotalFoodCalories(RecordDto recordDto);
 	
 	// 자신이 기록했던 운동의 소모한 칼로리 정보를 가져오기(운동 분석 그래프)
-	Integer findTotalSportCalories(DietSportRecordDto dietSportRecordDto);
+	Integer findTotalSportCalories(RecordDto recordDto);
 	
-	List<DietSportRecordDto> findFoodListBySearchWord(String searchWord);
+	List<RecordDto> findFoodListBySearchWord(String searchWord);
 	
 	List<FoodDto> findFoodListByFoodId(List<Integer> foodId);
 }
