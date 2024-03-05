@@ -8,6 +8,22 @@
     <insert id="insertAlarm" parameterType="AlarmDto">
         INSERT INTO alarm VALUES (seq_alarm.nextval, #{userId}, #{alarmCategory}, #{alarmTime}, sysdate)
     </insert>
+    <!-- 알람주단위 -->
+    
+    <select id="findWeekAlarm" parameterType="AlarmDto" resultType="AlarmDto">
+			    SELECT * FROM Alarm WHERE 
+			    trunc(ALARM_TIME) BETWEEN #{startWeek} AND  #{endWeek}
+			    order by ALARM_TIME
+    </select>
+    
+        <!-- 알람저장 -->
+    <delete id="deleteAlarmByAlarmId" parameterType="AlarmDto">
+        DELETE from Alarm WHERE ALARM_ID=#{alarmId}
+    </delete>
+    <select id="findMonthAlarm" parameterType="AlarmDto" resultType="AlarmDto">
+			    SELECT * FROM Alarm WHERE 
+			    TO_CHAR(ALARM_TIME, 'YYYY-MM') = #{month}
+    </select>
     
 
 </mapper>

@@ -1,5 +1,6 @@
 package com.nutrimate.nutrimatebackend.model.alarm;
 
+import java.time.LocalDateTime;
 import org.apache.ibatis.type.Alias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,11 +21,12 @@ public class AlarmDto {
 	private int alarmId;
 	private int userId;
 	private String alarmCategory;
-	private String alarmTime;
-	private String[] updatedAlarmWeek;
-	private int createdDate;//전체 페이지
+	private LocalDateTime alarmTime;
+	private LocalDateTime[] updatedAlarmWeek;
+	private String createdDate;//전체 페이지
 	private String startWeek ;//한주 시작
 	private String endWeek ;//한주 끝
+	private String month;
 
 	
 }
