@@ -146,12 +146,13 @@ public class ChallengeController {
 	@PostMapping("/comment/record")
 	public Map challengeCommentRecord(@RequestBody ChallengeCommentDto dto) {
 		Map map = new HashMap();
-	//int count = challengeService.countChallengeSuccess(dto);
+	    //int count = challengeService.countChallengeSuccess(dto);
 		//if (count == 0) {}
 		    System.out.println(dto);
 			int affect = challengeService.savechallengeComment(dto);
 			if (affect == 1) {
 				map.put("SUCCESS", 1);
+				map.put("cmtId",dto.getCmtId());
 			} else {
 				map.put("SUCCESSNOT", 1);
 			}
