@@ -52,6 +52,12 @@ public class MemberDto {
 		return new ArrayList<>();
 	}
 	
-	
+	public List<String> getAllergyList() {
+		if (this.userAllergy != null) {
+			return Arrays.asList(this.userAllergy.split(","));
+		} else {
+			return new ArrayList<>();
+		}
+	}
 }
 
