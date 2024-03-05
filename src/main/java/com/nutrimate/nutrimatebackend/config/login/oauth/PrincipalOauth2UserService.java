@@ -1,20 +1,23 @@
 package com.nutrimate.nutrimatebackend.config.login.oauth;
 
 
-import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
-import com.nutrimate.nutrimatebackend.config.login.oauth.provider.*;
-import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
-import com.nutrimate.nutrimatebackend.model.member.MemberDto;
-import com.nutrimate.nutrimatebackend.service.member.MemberService;
-import lombok.extern.log4j.Log4j2;
+import java.util.Map;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
+import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
+import com.nutrimate.nutrimatebackend.config.login.oauth.provider.FacebookUserInfo;
+import com.nutrimate.nutrimatebackend.config.login.oauth.provider.GoogleUserInfo;
+import com.nutrimate.nutrimatebackend.config.login.oauth.provider.KakaoUserInfo;
+import com.nutrimate.nutrimatebackend.config.login.oauth.provider.NaverUserInfo;
+import com.nutrimate.nutrimatebackend.config.login.oauth.provider.OAuth2UserInfo;
+import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
+import com.nutrimate.nutrimatebackend.model.member.MemberDto;
+import com.nutrimate.nutrimatebackend.service.member.MemberService;
+import lombok.extern.log4j.Log4j2;
 
 
 @Service
