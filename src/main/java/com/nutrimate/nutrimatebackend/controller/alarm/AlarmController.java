@@ -31,6 +31,7 @@ public class AlarmController {
 	//알람저장
 	@PostMapping("/list")
 	public Map saveAlarm(@RequestBody AlarmDto dto) {
+	    System.out.println(dto.getUserId());
 	    Map alarmMap = new HashMap();
 		//채팅에 참여해 본적이 있는지 확인
 	    for (LocalDateTime alarm : dto.getUpdatedAlarmWeek()) {

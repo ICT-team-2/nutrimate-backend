@@ -11,8 +11,8 @@
     <!-- 알람주단위 -->
     
     <select id="findWeekAlarm" parameterType="AlarmDto" resultType="AlarmDto">
-			    SELECT * FROM Alarm WHERE 
-			    trunc(ALARM_TIME) BETWEEN #{startWeek} AND  #{endWeek}
+			    SELECT * FROM Alarm WHERE user_id = #{userId}
+			    AND trunc(ALARM_TIME) BETWEEN #{startWeek} AND  #{endWeek}
 			    order by ALARM_TIME
     </select>
     
@@ -21,7 +21,8 @@
         DELETE from Alarm WHERE ALARM_ID=#{alarmId}
     </delete>
     <select id="findMonthAlarm" parameterType="AlarmDto" resultType="AlarmDto">
-			    SELECT * FROM Alarm WHERE 
+			    SELECT * FROM Alarm WHERE user_id = #{userId}
+			    AND
 			    TO_CHAR(ALARM_TIME, 'YYYY-MM') = #{month}
     </select>
     
