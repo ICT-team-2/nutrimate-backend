@@ -90,14 +90,15 @@
 	</insert>
 	<select id="findAllChatByRoomType"
 	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
-		 <![CDATA[
+
 		SELECT cc.*, cu.*, m.user_profile
-			FROM challengechat cc
-				     JOIN challengeuser cu ON cc.user_id = cu.user_id
-				     JOIN member m ON cc.user_id = m.user_id
-			WHERE chatroom_id = #{chatroomId} AND trunc(cc.created_date) >= trunc(sysdate) - 1
-			order by cc.created_date
-		]]>
+		FROM challengechat cc
+		JOIN challengeuser cu ON cc.user_id = cu.user_id
+		JOIN member m ON cc.user_id = m.user_id
+		WHERE cc.chatroom_id = #{chatroomId} 
+		AND ROWNUM BETWEEN 1 AND 100
+		ORDER BY cc.created_date
+
 		</select>
 
 	<!-- 채팅 닉네임 아이디 구하기(임시)-->
