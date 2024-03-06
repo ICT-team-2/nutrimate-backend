@@ -6,8 +6,8 @@
     <!--    기본 유저정보 가져오기-->
     <select id="findMemberProfileByUserId" resultType="MemberProfileDto">
         SELECT *
-            FROM member
-            WHERE user_id = #{userId}
+            FROM member m
+            WHERE m.user_id = #{userId}
     </select>
     <!--    자신이 작성한 게시글의 개수 가져오기-->
     <select id="findWriteBoardCountByUserId" resultType="int">

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.record.RecordAnalysisMapper">
+    <select id="findRecordAnalysis" resultType="RecordAnalysisDto">
+        WITH d1 AS (SELECT m.user_cal AS recommend_cal,
+        sum(food_cal)
+        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_diet_cal, --total_cal
+        sum(food_carbo)
+        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_carbo, --total_carbohydrate
+        sum(food_protein)
+        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_protein, --total_protein
+        sum(food_provi)
+        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_provi, --total_fat
+        trunc(do_date) AS do_date,
+        r.user_id AS user_id
+        FROM record r
+        JOIN member m ON r.user_id = m.user_id
+        JOIN dietrecord dr ON r.record_id = dr.record_id
+        JOIN food f ON dr.food_id = f.food_id
+        WHERE r.user_id = #{userId}
+        AND r.deleted = 'N'
+        ORDER BY r.record_id DESC),
+        d2 AS (SELECT DISTINCT *
+        FROM d1),
+        n1 AS (SELECT DISTINCT *
+        FROM nutriratio nr
+        WHERE user_id = #{userId}),
+        n2 AS (SELECT d2.*, n1.carbo, n1.protein, n1.province,
+        (carbo + protein + province) AS total_ratio
+        FROM d2
+        JOIN n1 ON d2.user_id = n1.user_id),
+        n3 AS (SELECT n2.*,
+        recommend_cal * carbo / total_ratio / 4.0 AS recommend_carbo,
+        recommend_cal * protein / total_ratio / 4.0 AS recommend_protein,
+        recommend_cal * province / total_ratio / 9.0 AS recommend_provi
+        FROM n2),
+        s1 AS (SELECT r.user_id,
+        sum(sr.sport_time)
+        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_sport_time,
+        sum(sr.sport_cal)
+        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_sport_cal
+        FROM sport s
+        JOIN sportrecord sr ON s.sport_id = sr.sport_id
+        JOIN record r ON sr.record_id = r.record_id)
+        <choose>
+            <when test="doDate != null">
+                SELECT DISTINCT *
+                FROM n3
+                JOIN s1 ON n3.user_id = s1.user_id
+                AND trunc(do_date) = to_date(#{doDate})
+            </when>
+            <when test="period != null">
+                , ra as (
+                <foreach collection="period" item="item" separator="UNION">
+                    select DISTINCT
+                    sum(recommend_cal) as recommend_cal,
+                    sum(total_diet_cal) as total_diet_cal,
+                    sum(total_carbo) as total_carbo,
+                    sum(total_protein) as total_protein,
+                    sum(total_provi) as total_provi,
+                    sum(total_sport_time) as total_sport_time,
+                    sum(total_sport_cal) as total_sport_cal,
+                    sum(recommend_carbo) as recommend_carbo,
+                    sum(recommend_protein) as recommend_protein,
+                    sum(recommend_provi) as recommend_provi,
+                    #{item.startDate} as start_date,
+                    #{item.endDate} as end_date
+                    from n3 join s1 on n3.user_id = s1.user_id
+                    and trunc(do_date) BETWEEN #{item.startDate} AND #{item.endDate}
+                </foreach>
+                )
+                select * from ra
+                order by end_date
+            </when>
+            <otherwise>
+                SELECT DISTINCT *
+                FROM n3
+                JOIN s1 ON n3.user_id = s1.user_id
+            </otherwise>
+        </choose>
+    </select>
+</mapper>
