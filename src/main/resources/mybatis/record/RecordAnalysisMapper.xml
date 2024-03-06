@@ -35,7 +35,7 @@
         recommend_cal * protein / total_ratio / 4.0 AS recommend_protein,
         recommend_cal * province / total_ratio / 9.0 AS recommend_provi
         FROM n2),
-        s1 AS (SELECT r.user_id,
+        s1 AS (SELECT DISTINCT r.user_id,
         sum(sr.sport_time)
         OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_sport_time,
         sum(sr.sport_cal)
@@ -53,7 +53,7 @@
             <when test="period != null">
                 , ra as (
                 <foreach collection="period" item="item" separator="UNION">
-                    select DISTINCT
+                    select
                     sum(recommend_cal) as recommend_cal,
                     sum(total_diet_cal) as total_diet_cal,
                     sum(total_carbo) as total_carbo,
