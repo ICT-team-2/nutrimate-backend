@@ -20,23 +20,24 @@ public class MemberDto {
 	private long userId;
 	private String userName; // 이름
 	private String userNick;
-	private String userPhone; // 전화번호
+	private String userPhone = ""; // 전화번호
 	private String userProfile; // 프로필 사진 경로
-	private String userRole; // 권한
+	private String userRole = "ROLE_USER"; // 권한
 	private String createdDate; // 가입일
-	private long userHeight;
-	private long userWeight;
-	private String userEmail;
-	private String userGender;
-	private String userSportHard;
-	private String userAllergy;
-	private long userCal;
-	private String userDiet;
-	private String deleted;
-	private String userIntro;
-	private long carbo;
-	private long protein;
-	private long province;
+	private double userHeight;
+	private double userWeight;
+	private String userEmail = "";
+	private String userGender = "";
+	private String userSportHard = "MEDIUM";
+	private String userAllergy = "";
+	private double userCal;
+	private String userDiet = "";
+	private String deleted = "N";
+	private String userIntro = "";
+	
+	private int carbo;
+	private int protein;
+	private int province;
 	
 	// 일반 로그인(CommonUser)
 	private String userUid;

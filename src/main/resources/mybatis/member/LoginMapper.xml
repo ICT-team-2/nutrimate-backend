@@ -1,113 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.member.MemberMapper">
-	
-	<insert id="insertMember" parameterType="MemberDto">
-		<selectKey keyProperty="userId"
-		           order="BEFORE" resultType="long">
-			SELECT SEQ_MEMBER.NEXTVAL userId
-				FROM DUAL
-		</selectKey>
-		INSERT INTO
-		member(user_id, user_nick, user_height, user_weight,
-		user_email, user_gender, user_sport_hard,
-		user_cal,user_name,user_uid,user_pwd,user_phone, user_diet, user_allergy)
-		VALUES (#{userId}, #{userNick}, #{userHeight},
-		#{userWeight}, #{userEmail}, #{userGender},
-		#{userSportHard}, #{userCal}, #{userName},
-		#{userUid}, #{userPwd}, #{userPhone}, #{userDiet}, #{userAllergy})
-	</insert>
-	<insert id="insertMemberWithOAuth" parameterType="MemberDto">
-		<selectKey keyProperty="userId"
-		           order="BEFORE" resultType="long">
-			SELECT seq_member.nextval userid
-				FROM dual
-		</selectKey>
-		INSERT INTO member(user_id, user_uid,user_pwd,user_nick)
-		VALUES (#{userId},#{userUid},#{userPwd},#{userNick})
-	</insert>
-	<insert id="insertOAuth" parameterType="MemberDto">
-		INSERT INTO oauth(user_id, provider, provider_id)
-			VALUES (#{userId}, #{provider}, #{providerId})
-	</insert>
-	
-	
-	<select id="findCommonMemberByUid" parameterType="String"
-	        resultType="MemberDto">
-		SELECT *
-			FROM member
-			WHERE deleted = 'N'
-			  AND user_uid = #{userUid}
-	</select>
-	
-	<select id="findOAuthMemberByProviderId" parameterType="String" resultType="MemberDto">
-		SELECT m.*,
-		       o.provider,
-		       o.provider_id
-			FROM member m
-				     JOIN oauth o ON m.user_id = o.user_id
-			WHERE o.provider_id = #{providerId}
-			  AND m.deleted = 'N'
-	</select>
-	
-	<select id="findMemberInfoById" parameterType="Long" resultType="MemberDto">
-		SELECT user_id,
-		       user_nick,
-		       user_height,
-		       user_weight,
-		       user_email,
-		       user_gender,
-		       user_sport_hard,
-		       user_cal,
-		       user_name,
-		       user_uid,
-		       user_phone,
-		       user_role,
-		       user_diet,
-		       user_intro,
-		       user_allergy
-			FROM member
-			WHERE user_id = #{userId}
-			  AND deleted = 'N'
-	</select>
-	<update id="updateMemberInfo" parameterType="MemberDto">
-		UPDATE member
-		SET user_height=#{userHeight},
-		    user_weight=#{userWeight},
-		    user_email=#{userEmail},
-		    user_gender=#{userGender},
-		    user_sport_hard=#{userSportHard},
-		    user_cal=#{userCal},
-		    user_diet=#{userDiet},
-		    user_intro=#{userIntro},
-		    user_allergy=#{userAllergy}
-			WHERE user_id = #{userId}
-	</update>
-	
-	<update id="updateMemberDiet" parameterType="MemberDto">
-		UPDATE nutriratio
-		SET protein=#{protein},
-		    carbo=#{carbo},
-		    province=#{province}
-			WHERE user_id = #{userId}
-	</update>
-	
-	<select id="checkPhoneNumber" parameterType="string" resultType="boolean">
-		SELECT count(*)
-			FROM member
-			WHERE user_phone = #{userPhone}
-	</select>
-	
-	<select id="checkEmail" parameterType="string" resultType="boolean">
-		SELECT count(*)
-			FROM member
-			WHERE user_email = #{userEmail}
-	</select>
-	
-	<select id="checkNick" parameterType="string" resultType="boolean">
-		SELECT count(*)
-			FROM member
-			WHERE user_nick = #{userNick}
-	</select>
+    
+    <insert id="insertMember" parameterType="MemberDto">
+        <selectKey keyProperty="userId"
+                   order="BEFORE" resultType="long">
+            SELECT SEQ_MEMBER.NEXTVAL userId
+                FROM DUAL
+        </selectKey>
+        INSERT INTO
+        member(user_id, user_nick, user_height, user_weight,
+        user_email, user_gender, user_sport_hard,
+        user_cal,user_name,user_uid,user_pwd,user_phone, user_diet, user_allergy)
+        VALUES (#{userId}, #{userNick}, #{userHeight},
+        #{userWeight}, #{userEmail}, #{userGender},
+        #{userSportHard}, #{userCal}, #{userName},
+        #{userUid}, #{userPwd}, #{userPhone}, #{userDiet}, #{userAllergy})
+    </insert>
+    <insert id="insertMemberWithOAuth" parameterType="MemberDto">
+        <selectKey keyProperty="userId"
+                   order="BEFORE" resultType="long">
+            SELECT seq_member.nextval userid
+                FROM dual
+        </selectKey>
+        INSERT INTO member(user_id, user_uid,user_pwd,user_nick)
+        VALUES (#{userId},#{userUid},#{userPwd},#{userNick})
+    </insert>
+    <insert id="insertOAuth" parameterType="MemberDto">
+        INSERT INTO oauth(user_id, provider, provider_id)
+            VALUES (#{userId}, #{provider}, #{providerId})
+    </insert>
+    <insert id="insertMemberDiet">
+        INSERT INTO nutriratio(user_id, protein, carbo, province)
+            VALUES (#{userId}, #{protein}, #{carbo}, #{province})
+    </insert>
+    
+    
+    <select id="findCommonMemberByUid" parameterType="String"
+            resultType="MemberDto">
+        SELECT *
+            FROM member
+            WHERE deleted = 'N'
+              AND user_uid = #{userUid}
+    </select>
+    
+    <select id="findOAuthMemberByProviderId" parameterType="String" resultType="MemberDto">
+        SELECT m.*,
+               o.provider,
+               o.provider_id
+            FROM member m
+                     JOIN oauth o ON m.user_id = o.user_id
+            WHERE o.provider_id = #{providerId}
+              AND m.deleted = 'N'
+    </select>
+    
+    <select id="findMemberInfoById" parameterType="Long" resultType="MemberDto">
+        SELECT user_id,
+               user_nick,
+               user_height,
+               user_weight,
+               user_email,
+               user_gender,
+               user_sport_hard,
+               user_cal,
+               user_name,
+               user_uid,
+               user_phone,
+               user_role,
+               user_diet,
+               user_intro,
+               user_allergy
+            FROM member
+            WHERE user_id = #{userId}
+              AND deleted = 'N'
+    </select>
+    <update id="updateMemberInfo" parameterType="MemberDto">
+        UPDATE member
+        SET user_height=#{userHeight},
+            user_weight=#{userWeight},
+            user_email=#{userEmail},
+            user_gender=#{userGender},
+            user_sport_hard=#{userSportHard},
+            user_cal=#{userCal},
+            user_diet=#{userDiet},
+            user_intro=#{userIntro},
+            user_allergy=#{userAllergy}
+            WHERE user_id = #{userId}
+    </update>
+    
+    <update id="updateMemberDiet" parameterType="MemberDto">
+        UPDATE nutriratio
+        SET protein=#{protein},
+            carbo=#{carbo},
+            province=#{province}
+            WHERE user_id = #{userId}
+    </update>
+    
+    <select id="checkPhoneNumber" parameterType="string" resultType="boolean">
+        SELECT count(*)
+            FROM member
+            WHERE user_phone = #{userPhone}
+    </select>
+    
+    <select id="checkEmail" parameterType="string" resultType="boolean">
+        SELECT count(*)
+            FROM member
+            WHERE user_email = #{userEmail}
+    </select>
+    
+    <select id="checkNick" parameterType="string" resultType="boolean">
+        SELECT count(*)
+            FROM member
+            WHERE user_nick = #{userNick}
+    </select>
+    <select id="findCheckInsertNutriRatio" resultType="java.lang.Integer">
+        SELECT count(*)
+            FROM nutriratio
+            WHERE user_id = #{userId}
+    </select>
 </mapper>

@@ -231,6 +231,4 @@
         INSERT INTO boardfooddata(board_id, food_id)
             VALUES (#{boardId}, #{foodId})
     </insert>
-
-
 </mapper>

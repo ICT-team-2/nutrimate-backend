@@ -3,9 +3,6 @@ package com.nutrimate.nutrimatebackend.model.record;
 import lombok.*;
 import org.apache.ibatis.type.Alias;
 
-import java.sql.Date;
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,25 +12,21 @@ import java.util.List;
 @Alias("RecordAnalysisDto")
 public class RecordAnalysisDto {
 	
-	List<SportRecordDto> sportList;
-	List<FoodRecordDto> foodList;
-	
 	private int userId;//유저아이디
 	private int totalSportTime;//오늘 운동한 총 시간
-	private int totalSportCalorie;//오늘 소모한 총 칼로리
+	private Double totalSportCal;//오늘 소모한 총 칼로리
 	
-	private int totalDietCalorie;//오늘 섭취한 총 칼로리
-	private int totalCarbo;//오늘 섭취한 총 탄수화물
-	private int totalProtein;//오늘 섭취한 총 단백질
-	private int totalProvi;//오늘 섭취한 총 지방
+	private Double totalDietCal;//오늘 섭취한 총 칼로리
+	private Double totalCarbo;//오늘 섭취한 총 탄수화물
+	private Double totalProtein;//오늘 섭취한 총 단백질
+	private Double totalProvi;//오늘 섭취한 총 지방
 	
-	private int recommendedCalorie; //추천칼로리
-	private int recommendedCarbo; //추천탄수화물
-	private int recommendedProtein;//추천단백질
-	private int recommendedProvi;//추천지방
-	
-	private Date startDate;//시작날짜(그래프)
-	private Date endDate;
+	private Double recommendCal; //추천칼로리
+	private Double recommendCarbo; //추천탄수화물
+	private Double recommendProtein;//추천단백질
+	private Double recommendProvi;//추천지방
 	
 	private String doDate;//기록 날짜
+	private String startDate;//기록 시작 날짜
+	private String endDate;//기록 끝 날짜
 }
