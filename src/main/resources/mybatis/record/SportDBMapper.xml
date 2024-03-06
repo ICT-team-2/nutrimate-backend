@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.record.SportDBMapper">
+    <insert id="insertSport">
+        <selectKey keyProperty="sportId" resultType="int" order="BEFORE">
+            SELECT seq_sport.nextval
+                FROM dual
+        </selectKey>
+        INSERT INTO sport(sport_id, sporrt_name, sport_met)
+        VALUES (#{sportId}, #{sportName}, #{sportMet})
+    </insert>
+    
+    <select id="findSportListBySearchWord" resultType="SportDto">
+        SELECT s.*
+        FROM sport s
+        <if test="searchWord != null and searchWord != ''">
+            WHERE s.sport_name LIKE '%' || #{searchWord} || '%'
+        </if>
+    </select>
+    <select id="findMetBySportId" resultType="java.lang.Double">
+        SELECT sport_met
+            FROM sport
+            WHERE sport_id = #{sportId}
+    </select>
+</mapper>

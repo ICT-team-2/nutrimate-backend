@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.record.FoodDBMapper">
+    <insert id="insertFood" parameterType="FoodDto">
+        <selectKey keyProperty="foodId" resultType="int" order="BEFORE">
+            SELECT seq_food.nextval
+                FROM dual
+        </selectKey>
+        INSERT INTO food(food_id
+        , food_name
+        <if test="foodGroup != null">
+            , food_group
+        </if>
+        , food_cal
+        <if test="foodIntake != null">
+            , food_intake
+        </if>
+        <if test="intakeUnit != null">
+            , intake_unit
+        </if>
+        <if test="foodProtein != null">
+            ,food_protein
+        </if>
+        <if test="foodCarbo != null">
+            , food_carbo
+        </if>
+        <if test="foodProvi != null">
+            , food_provi
+        </if>
+        <if test="foodChole != null">
+            , food_chole
+        </if>
+        <if test="foodSalt != null">
+            , food_salt
+        </if>
+        )
+        VALUES (#{foodId}, #{foodName}
+        <if test="foodGroup != null">
+            , #{foodGroup}
+        </if>
+        , #{foodCal}
+        <if test="foodIntake != null">
+            , #{foodIntake}
+        </if>
+        <if test="intakeUnit != null">
+            , #{intakeUnit}
+        </if>
+        <if test="foodProtein != null">
+            ,#{foodProtein}
+        </if>
+        <if test="foodCarbo != null">
+            , #{foodCarbo}
+        </if>
+        <if test="foodProvi != null">
+            , #{foodProvi}
+        </if>
+        <if test="foodChole != null">
+            , #{foodChole}
+        </if>
+        <if test="foodSalt != null">
+            , #{foodSalt}
+        </if>
+        )
+    </insert>
+    <!--    db에 저장된 음식 정보 가져오기 (커스텀 제외)   -->
+    <select id="findFoodListBySearchWord" resultType="FoodDto">
+        SELECT f.*
+        FROM food f
+        LEFT JOIN customfood cf ON f.food_id = cf.food_id
+        WHERE cf.food_id IS NULL
+        <if test="searchWord != null">
+            AND f.food_name LIKE '%' || #{searchWord} || '%'
+        </if>
+    </select>
+    <!--    db에 저장된 음식 정보 foodId로 가져오기    -->
+    <select id="findFoodListByFoodId" resultType="FoodDto">
+        <foreach collection="foodId" item="item" index="index" separator="UNION">
+            SELECT *
+            FROM food
+            WHERE food_id = #{item}
+        </foreach>
+    </select>
+    <!--    db에 저장된 음식 정보(로그인한 유저가 직접 넣은 내용 한정)    -->
+    <select id="findCustomFoodListBySearchWord" resultType="FoodDto">
+        SELECT f.*, cf.user_id, cf.created_date
+        FROM food f
+        JOIN customfood cf ON f.food_id = cf.food_id
+        WHERE cf.user_id = #{userId}
+        <if test="searchWord != null">
+            AND f.food_name LIKE '%' || #{searchWord} || '%'
+        </if>
+    </select>
+
+</mapper>

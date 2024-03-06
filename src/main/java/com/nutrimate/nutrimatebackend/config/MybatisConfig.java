@@ -1,6 +1,6 @@
 package com.nutrimate.nutrimatebackend.config;
 
-import javax.sql.DataSource;
+import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -8,12 +8,15 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import lombok.extern.log4j.Log4j2;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.sql.DataSource;
 
 
 @Configuration
 @MapperScan(value = {"com.nutrimate.nutrimatebackend.mapper"},
-    sqlSessionFactoryRef = "sqlSessionFactory")
+		sqlSessionFactoryRef = "sqlSessionFactory")
+@EnableTransactionManagement
 @Log4j2
 public class MybatisConfig {
 	// https://mybatis.org/spring/ko/factorybean.html

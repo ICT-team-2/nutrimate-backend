@@ -1,6 +1,6 @@
 package com.nutrimate.nutrimatebackend.model.board.diet;
 
-import com.nutrimate.nutrimatebackend.model.FoodDto;
+import com.nutrimate.nutrimatebackend.model.record.FoodDto;
 import lombok.*;
 import org.apache.ibatis.type.Alias;
 
