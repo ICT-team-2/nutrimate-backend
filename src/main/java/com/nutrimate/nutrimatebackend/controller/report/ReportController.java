@@ -5,6 +5,7 @@ import com.nutrimate.nutrimatebackend.service.report.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class ReportController {
 	
 	//한 게시글 or 댓글 당 한사람만 신고하도록 하기
 	@PostMapping("report")
-	public Map WriteBlock(@ModelAttribute ReportDto dto) {
+	public Map WriteBlock(@RequestBody ReportDto dto) {
 		Map map = new HashMap();
 		String searchKeyWord = dto.getSeachKeyWord();
 		if (searchKeyWord.equals("BOARD")) {
