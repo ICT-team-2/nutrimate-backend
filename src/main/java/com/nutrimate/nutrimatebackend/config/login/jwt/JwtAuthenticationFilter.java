@@ -2,7 +2,7 @@ package com.nutrimate.nutrimatebackend.config.login.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
-import com.nutrimate.nutrimatebackend.dto.member.LoginRequestDto;
+import com.nutrimate.nutrimatebackend.service.member.LoginRequestDto;
 import com.nutrimate.nutrimatebackend.util.JWTOkens;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
