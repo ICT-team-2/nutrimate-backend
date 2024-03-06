@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.record.DietRecordMapper">
+    <resultMap id="FoodRecordDto" type="FoodRecordDto">
+        <id property="dietId" column="diet_id"/>
+        <result property="foodId" column="food_id"/>
+        <result property="foodName" column="food_name"/>
+        <result property="foodCal" column="food_cal"/>
+        <result property="foodCarbo" column="food_carbo"/>
+        <result property="foodProtein" column="food_protein"/>
+        <result property="foodProvi" column="food_provi"/>
+        <result property="foodChole" column="food_chole"/>
+        <result property="foodSalt" column="food_salt"/>
+        <result property="foodIntake" column="food_intake"/>
+        <result property="intakeUnit" column="intake_unit"/>
+        <result property="foodGroup" column="food_group"/>
+        <result property="mealTime" column="meal_time"/>
+        <association property="record" javaType="RecordDto">
+            <id property="recordId" column="record_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="doDate" column="do_date"/>
+        </association>
+    </resultMap>
+    
+    <insert id="insertFoodRecord" parameterType="FoodRecordDto">
+        <selectKey keyProperty="dietId" resultType="int" order="BEFORE">
+            SELECT seq_dietrecord.nextval
+                FROM dual
+        </selectKey>
+        INSERT INTO dietrecord(diet_id, record_id, food_id,meal_time)
+        VALUES (#{dietId}, #{record.recordId}, #{foodId}, #{mealTime})
+    </insert>
+    
+    <insert id="insertCustomFood">
+        INSERT INTO customfood(food_id, user_id)
+            VALUES (#{foodId}, #{userId})
+    </insert>
+    
+    <select id="findDietRecordByUserIdAndDoDate" resultMap="FoodRecordDto">
+        SELECT *
+        FROM food f
+        JOIN dietrecord dr ON f.food_id = dr.food_id
+        JOIN record r ON dr.record_id = r.record_id
+        WHERE r.user_id = #{userId}
+        AND r.deleted = 'N'
+        <if test="doDate != null">
+            AND r.do_date like to_date('2024-03-06', 'YYYY-MM-DD')
+        </if>
+        <if test="mealTime != null">
+            AND upper(dr.meal_time) = #{mealTime}
+        </if>
+        order by dr.diet_id
+    </select>
+</mapper>

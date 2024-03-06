@@ -1,7 +1,7 @@
 package com.nutrimate.nutrimatebackend.mapper.board.diet;
 
-import com.nutrimate.nutrimatebackend.model.FoodDto;
 import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
+import com.nutrimate.nutrimatebackend.model.record.FoodDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
