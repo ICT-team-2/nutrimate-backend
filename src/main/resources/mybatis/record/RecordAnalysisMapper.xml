@@ -64,7 +64,8 @@
                     #{item.startDate} as start_date,
                     #{item.endDate} as end_date
                     from n3 join s1 on n3.user_id = s1.user_id
-                    and trunc(do_date) BETWEEN #{item.startDate} AND #{item.endDate}
+                    and trunc(do_date) BETWEEN to_date(#{item.startDate}) AND
+                    to_date(#{item.endDate})
                 </foreach>
                 )
                 select DISTINCT n3.recommend_cal, n3.recommend_carbo,

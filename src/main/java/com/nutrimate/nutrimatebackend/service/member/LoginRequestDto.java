@@ -1,4 +1,4 @@
-package com.nutrimate.nutrimatebackend.dto.member;
+package com.nutrimate.nutrimatebackend.service.member;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginRequestDto {
-  Long userId;
-  String userUid;
-  String userPwd;
+	Long userId;
+	String userUid;
+	String userPwd;
 }
