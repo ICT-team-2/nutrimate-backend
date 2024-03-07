@@ -17,6 +17,7 @@
         <result property="foodGroup" column="food_group"/>
         <result property="mealTime" column="meal_time"/>
         <result property="recordIntake" column="record_intake"/>
+        <result property="serving" column="serving"/>
         <association property="record" javaType="RecordDto">
             <id property="recordId" column="record_id"/>
             <result property="userId" column="user_id"/>
@@ -42,6 +43,7 @@
         WITH f2 AS (SELECT f.*,
         dr.record_intake,
         dr.diet_id,
+        dr.meal_time,
         r.*,
         (record_intake/food_intake) as serving
         FROM food f
@@ -70,7 +72,8 @@
         record_id,
         user_id,
         do_date,
-        serving
+        serving,
+        f2.meal_time
         FROM f2
         ORDER BY f2.diet_id
     </select>
