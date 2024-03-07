@@ -19,8 +19,14 @@
         </if>
         )
         SELECT * FROM s2
-        WHERE rank BETWEEN #{nowPage}*1 and #{nowPage}*#{receivePage}
+        WHERE rank BETWEEN ((#{nowPage}-1)*#{receivePage}+1) and (#{nowPage}*#{receivePage})
     </select>
+    
+    <select id="findCountSportList" resultType="java.lang.Integer">
+        SELECT count(*)
+            FROM sport
+    </select>
+    
     <select id="findMetBySportId" resultType="java.lang.Double">
         SELECT sport_met
             FROM sport

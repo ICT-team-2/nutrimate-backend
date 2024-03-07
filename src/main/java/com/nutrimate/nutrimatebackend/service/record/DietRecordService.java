@@ -32,12 +32,20 @@ public class DietRecordService {
 	//foodDB로부터 음식정보 가져오기
 	//음식명으로 음식정보 가져오기
 	public List<FoodDto> findFoodListBySearchWord(RecordPagingDto dto) {
-		return foodDBMapper.findFoodListBySearchWord(dto);
+		return foodDBMapper.findFoodListByWithoutCustomSearchWord(dto);
+	}
+	
+	public int countFoodListWithoutCustom() {
+		return foodDBMapper.findCountFoodListWithoutCustom();
 	}
 	
 	//자신이 등록한 음식정보 가져오기
-	public List<FoodDto> findCustomFoodListBySearchWord(String searchWord, int userId) {
-		return foodDBMapper.findCustomFoodListBySearchWord(searchWord, userId);
+	public List<FoodDto> findCustomFoodListBySearchWord(RecordPagingDto dto) {
+		return foodDBMapper.findCustomFoodListBySearchWord(dto);
+	}
+	
+	public int countCustomFoodList(RecordPagingDto dto) {
+		return foodDBMapper.findCountCustomFoodList(dto);
 	}
 	
 	//foodId List로 음식정보 가져오기

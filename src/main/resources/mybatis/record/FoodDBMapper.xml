@@ -64,7 +64,7 @@
         )
     </insert>
     <!--    db에 저장된 음식 정보 가져오기 (커스텀 제외)   -->
-    <select id="findFoodListBySearchWord" resultType="FoodDto">
+    <select id="findFoodListByWithoutCustomSearchWord" resultType="FoodDto">
         with f2 as (SELECT f.*, rank() OVER (ORDER BY f.food_id) as rank
         FROM food f
         LEFT JOIN customfood cf ON f.food_id = cf.food_id
@@ -74,9 +74,17 @@
         </if>
         )
         SELECT * FROM f2
-        WHERE f2.rank BETWEEN #{nowPage}*1 AND #{nowPage}*#{receivePage}
+        WHERE rank BETWEEN ((#{nowPage}-1)*#{receivePage}+1) and (#{nowPage}*#{receivePage})
         order by f2.rank
     </select>
+    
+    <select id="findCountFoodListWithoutCustom" resultType="java.lang.Integer">
+        SELECT count(*)
+            FROM food f
+                     LEFT JOIN customfood cf ON f.food_id = cf.food_id
+            WHERE cf.food_id IS NULL
+    </select>
+    
     <!--    db에 저장된 음식 정보 foodId로 가져오기    -->
     <select id="findFoodListByFoodId" resultType="FoodDto">
         <foreach collection="foodId" item="item" index="index" separator="UNION">
@@ -97,8 +105,15 @@
         </if>
         )
         SELECT * from f2
-        WHERE f2.rank BETWEEN #{nowPage}*1 AND #{nowPage}*#{receivePage}
+        WHERE rank BETWEEN ((#{nowPage}-1)*#{receivePage}+1) and (#{nowPage}*#{receivePage})
         ORDER BY f2.rank
     </select>
+    <select id="findCountCustomFoodList" resultType="java.lang.Integer">
+        SELECT count(*)
+            FROM food f
+                     JOIN customfood cf ON f.food_id = cf.food_id
+            WHERE cf.user_id = #{userId}
+    </select>
+
 
 </mapper>

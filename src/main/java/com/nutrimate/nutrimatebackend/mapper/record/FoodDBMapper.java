@@ -9,16 +9,20 @@ import java.util.List;
 
 @Mapper
 public interface FoodDBMapper {
+	
 	//db에 저장된 음식 정보 가져오기
 	//read
-	List<FoodDto> findFoodListBySearchWord(RecordPagingDto dto);
+	List<FoodDto> findFoodListByWithoutCustomSearchWord(RecordPagingDto dto);
+	
+	int findCountFoodListWithoutCustom();
 	
 	List<FoodDto> findFoodListByFoodId(@Param("foodId") List<Integer> foodId);
 	
 	//유저가 직접 입력한 음식DB 가져오기
 	List<FoodDto> findCustomFoodListBySearchWord(
-			@Param("searchWord") String searchWord,
-			@Param("userId") int userId);
+			RecordPagingDto dto);
+	
+	int findCountCustomFoodList(RecordPagingDto dto);
 	
 	//create
 	int insertFood(FoodDto foodDto);

@@ -35,6 +35,10 @@ public class SportRecordService {
 		return sportDBMapper.findSportListBySearchWord(dto);
 	}
 	
+	public int findCountSportList() {
+		return sportDBMapper.findCountSportList();
+	}
+	
 	//sportId로 met값 가져오기
 	public double findMetBySportId(int sportId) {
 		return sportDBMapper.findMetBySportId(sportId);
