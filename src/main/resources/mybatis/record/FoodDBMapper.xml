@@ -80,9 +80,12 @@
     
     <select id="findCountFoodListWithoutCustom" resultType="java.lang.Integer">
         SELECT count(*)
-            FROM food f
-                     LEFT JOIN customfood cf ON f.food_id = cf.food_id
-            WHERE cf.food_id IS NULL
+        FROM food f
+        LEFT JOIN customfood cf ON f.food_id = cf.food_id
+        WHERE cf.food_id IS NULL
+        <if test="searchWord != null and searchWord != ''">
+            AND f.food_name LIKE '%' || #{searchWord} || '%'
+        </if>
     </select>
     
     <!--    db에 저장된 음식 정보 foodId로 가져오기    -->
@@ -110,9 +113,12 @@
     </select>
     <select id="findCountCustomFoodList" resultType="java.lang.Integer">
         SELECT count(*)
-            FROM food f
-                     JOIN customfood cf ON f.food_id = cf.food_id
-            WHERE cf.user_id = #{userId}
+        FROM food f
+        JOIN customfood cf ON f.food_id = cf.food_id
+        WHERE cf.user_id = #{userId}
+        <if test="searchWord != null and searchWord != ''">
+            AND f.food_name LIKE '%' || #{searchWord} || '%'
+        </if>
     </select>
 
 

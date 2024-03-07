@@ -35,8 +35,8 @@ public class DietRecordService {
 		return foodDBMapper.findFoodListByWithoutCustomSearchWord(dto);
 	}
 	
-	public int countFoodListWithoutCustom() {
-		return foodDBMapper.findCountFoodListWithoutCustom();
+	public int countFoodListWithoutCustom(RecordPagingDto dto) {
+		return foodDBMapper.findCountFoodListWithoutCustom(dto);
 	}
 	
 	//자신이 등록한 음식정보 가져오기

@@ -28,7 +28,7 @@ public class FoodDBController {
 	//음식명으로 음식정보 가져오기
 	@GetMapping("/search")
 	public Map<String, Object> findFoodListBySearchWord(RecordPagingDto dto) {
-		int totalCount = service.countFoodListWithoutCustom();
+		int totalCount = service.countFoodListWithoutCustom(dto);
 		dto.setTotalCount(totalCount);
 		dto.setTotalPage((int) Math.ceil((double) totalCount / dto.getReceivePage()));
 		

@@ -14,7 +14,7 @@ public interface FoodDBMapper {
 	//read
 	List<FoodDto> findFoodListByWithoutCustomSearchWord(RecordPagingDto dto);
 	
-	int findCountFoodListWithoutCustom();
+	int findCountFoodListWithoutCustom(RecordPagingDto dto);
 	
 	List<FoodDto> findFoodListByFoodId(@Param("foodId") List<Integer> foodId);
 	

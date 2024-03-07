@@ -13,7 +13,7 @@ public interface SportDBMapper {
 	//read
 	List<SportDto> findSportListBySearchWord(RecordPagingDto dto);
 	
-	int findCountSportList();
+	int findCountSportList(RecordPagingDto dto);
 	
 	//create
 	int insertSport(SportRecordDto sportDto);
