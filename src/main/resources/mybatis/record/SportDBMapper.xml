@@ -34,6 +34,5 @@
         SELECT sport_met
             FROM sport
             WHERE sport_id = #{sportId}
-    
     </select>
 </mapper>
