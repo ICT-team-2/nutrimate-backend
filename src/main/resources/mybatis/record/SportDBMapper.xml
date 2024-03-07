@@ -26,7 +26,7 @@
         SELECT count(*)
         FROM sport
         <if test="searchWord != null and searchWord != ''">
-            WHERE s.sport_name LIKE '%' || #{searchWord} || '%'
+            WHERE sport_name LIKE '%' || #{searchWord} || '%'
         </if>
     </select>
     

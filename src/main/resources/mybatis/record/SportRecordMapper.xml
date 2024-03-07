@@ -45,7 +45,7 @@
         JOIN record r ON sr.record_id = r.record_id
         WHERE r.user_id = #{userId}
         <if test="doDate != null">
-            AND r.do_date LIKE to_date(#{doDate}, 'YYYY-MM-DD')
+            AND trunc(r.do_date) LIKE to_date(#{doDate}, 'YYYY-MM-DD')
         </if>
         AND r.deleted = 'N'
         ORDER BY sr.exercise_id
