@@ -18,6 +18,9 @@ public class MemberProfileDto {
 	String userProfile; // 프로필 사진 경로
 	String userIntro; // 자기소개
 	
+	int userWeight;
+	int userHeight;
+	
 	int postCount; // 작성한 게시글 수
 	int followerCount; // 팔로워 수
 	int followingCount; // 팔로잉 수

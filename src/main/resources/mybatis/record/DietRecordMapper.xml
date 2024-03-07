@@ -73,7 +73,8 @@
         user_id,
         do_date,
         serving,
-        f2.meal_time
+        f2.meal_time,
+        f2.food_intake
         FROM f2
         ORDER BY f2.diet_id
     </select>
