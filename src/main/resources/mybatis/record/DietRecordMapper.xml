@@ -52,7 +52,7 @@
         WHERE r.user_id = #{userId}
         AND r.deleted = 'N'
         <if test="doDate != null">
-            AND r.do_date like to_date('2024-03-06', 'YYYY-MM-DD')
+            AND trunc(r.do_date) like to_date(#{doDate}, 'YYYY-MM-DD')
         </if>
         <if test="mealTime != null">
             AND upper(dr.meal_time) = #{mealTime}
@@ -71,7 +71,7 @@
         diet_id,
         record_id,
         user_id,
-        do_date,
+        trunc(do_date) as do_date,
         serving,
         f2.meal_time
         FROM f2
