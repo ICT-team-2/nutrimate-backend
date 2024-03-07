@@ -1,9 +1,9 @@
 package com.nutrimate.nutrimatebackend.mapper.record;
 
+import com.nutrimate.nutrimatebackend.model.record.RecordPagingDto;
 import com.nutrimate.nutrimatebackend.model.record.SportDto;
 import com.nutrimate.nutrimatebackend.model.record.SportRecordDto;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public interface SportDBMapper {
 	//crud
 	//read
-	List<SportDto> findSportListBySearchWord(@Param("searchWord") String searchWord);
+	List<SportDto> findSportListBySearchWord(RecordPagingDto dto);
 	
 	//create
 	int insertSport(SportRecordDto sportDto);

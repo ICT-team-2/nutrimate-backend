@@ -1,6 +1,7 @@
 package com.nutrimate.nutrimatebackend.mapper.record;
 
 import com.nutrimate.nutrimatebackend.model.record.FoodDto;
+import com.nutrimate.nutrimatebackend.model.record.RecordPagingDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public interface FoodDBMapper {
 	//db에 저장된 음식 정보 가져오기
 	//read
-	List<FoodDto> findFoodListBySearchWord(@Param("searchWord") String searchWord);
+	List<FoodDto> findFoodListBySearchWord(RecordPagingDto dto);
 	
 	List<FoodDto> findFoodListByFoodId(@Param("foodId") List<Integer> foodId);
 	
