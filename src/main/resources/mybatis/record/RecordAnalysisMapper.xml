@@ -68,7 +68,9 @@
         trunc(do_date) AS do_date
         FROM sport s
         JOIN sportrecord sr ON s.sport_id = sr.sport_id
-        JOIN record r ON sr.record_id = r.record_id)
+        JOIN record r ON sr.record_id = r.record_id
+        where r.deleted = 'N'
+        )
         <choose>
             <when test="doDate != null">
                 ,recommend as (SELECT n3.recommend_cal, n3.recommend_carbo,
