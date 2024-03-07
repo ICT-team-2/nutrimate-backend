@@ -51,26 +51,28 @@
                 AND trunc(do_date) = to_date(#{doDate})
             </when>
             <when test="period != null">
-                , ra as (
+                , total as (
                 <foreach collection="period" item="item" separator="UNION">
                     select
-                    sum(recommend_cal) as recommend_cal,
-                    sum(total_diet_cal) as total_diet_cal,
-                    sum(total_carbo) as total_carbo,
-                    sum(total_protein) as total_protein,
-                    sum(total_provi) as total_provi,
-                    sum(total_sport_time) as total_sport_time,
-                    sum(total_sport_cal) as total_sport_cal,
-                    sum(recommend_carbo) as recommend_carbo,
-                    sum(recommend_protein) as recommend_protein,
-                    sum(recommend_provi) as recommend_provi,
+                    #{userId} as user_id,
+                    coalesce(sum(total_diet_cal), 0) as total_diet_cal,
+                    coalesce(sum(total_carbo), 0) as total_carbo,
+                    coalesce(sum(total_protein), 0) as total_protein,
+                    coalesce(sum(total_provi), 0) as total_provi,
+                    coalesce(sum(total_sport_time), 0) as total_sport_time,
+                    coalesce(sum(total_sport_cal), 0) as total_sport_cal,
                     #{item.startDate} as start_date,
                     #{item.endDate} as end_date
                     from n3 join s1 on n3.user_id = s1.user_id
                     and trunc(do_date) BETWEEN #{item.startDate} AND #{item.endDate}
                 </foreach>
                 )
-                select * from ra
+                select DISTINCT n3.recommend_cal, n3.recommend_carbo,
+                n3.recommend_protein, n3.recommend_provi,
+                t.*
+                from total t
+                join n3 on t.user_id = n3.user_id
+                join s1 on t.user_id = s1.user_id
                 order by end_date
             </when>
             <otherwise>
