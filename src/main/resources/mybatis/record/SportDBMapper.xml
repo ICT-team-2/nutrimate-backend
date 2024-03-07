@@ -24,12 +24,16 @@
     
     <select id="findCountSportList" resultType="java.lang.Integer">
         SELECT count(*)
-            FROM sport
+        FROM sport
+        <if test="searchWord != null and searchWord != ''">
+            WHERE s.sport_name LIKE '%' || #{searchWord} || '%'
+        </if>
     </select>
     
     <select id="findMetBySportId" resultType="java.lang.Double">
         SELECT sport_met
             FROM sport
             WHERE sport_id = #{sportId}
+    
     </select>
 </mapper>

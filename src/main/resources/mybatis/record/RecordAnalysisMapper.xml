@@ -3,24 +3,49 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.record.RecordAnalysisMapper">
     <select id="findRecordAnalysis" resultType="RecordAnalysisDto">
-        WITH d1 AS (SELECT m.user_cal AS recommend_cal,
-        sum(food_cal)
-        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_diet_cal, --total_cal
-        sum(food_carbo)
-        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_carbo, --total_carbohydrate
-        sum(food_protein)
-        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_protein, --total_protein
-        sum(food_provi)
-        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_provi, --total_fat
-        trunc(do_date) AS do_date,
-        r.user_id AS user_id
-        FROM record r
-        JOIN member m ON r.user_id = m.user_id
-        JOIN dietrecord dr ON r.record_id = dr.record_id
-        JOIN food f ON dr.food_id = f.food_id
+        WITH f2 AS (SELECT f.*,
+        dr.record_intake,
+        dr.diet_id,
+        r.*,
+        coalesce((record_intake / food_intake),1) AS serving
+        FROM food f
+        JOIN dietrecord dr ON f.food_id = dr.food_id
+        JOIN record r ON dr.record_id = r.record_id
         WHERE r.user_id = #{userId}
         AND r.deleted = 'N'
-        ORDER BY r.record_id DESC),
+        ),
+        f3 as (SELECT f2.food_id,
+        f2.food_name,
+        f2.food_group,
+        (food_cal * serving) AS food_cal,
+        (food_protein * serving) AS food_protein,
+        (food_provi * serving) AS food_provi,
+        (food_carbo * serving) AS food_carbo,
+        (food_chole * serving) AS food_chole,
+        (food_salt * serving) AS food_salt,
+        record_intake,
+        diet_id,
+        record_id,
+        user_id,
+        do_date,
+        serving
+        FROM f2
+        ORDER BY f2.diet_id),
+        d1 AS (SELECT m.user_cal AS recommend_cal,
+        sum(food_cal)
+        OVER (PARTITION BY f3.user_id,trunc(do_date)) AS total_diet_cal, --total_cal
+        sum(food_carbo)
+        OVER (PARTITION BY f3.user_id,trunc(do_date)) AS total_carbo, --total_carbohydrate
+        sum(food_protein)
+        OVER (PARTITION BY f3.user_id,trunc(do_date)) AS total_protein, --total_protein
+        sum(food_provi)
+        OVER (PARTITION BY f3.user_id,trunc(do_date)) AS total_provi, --total_fat
+        trunc(do_date) AS do_date,
+        f3.user_id AS user_id
+        FROM f3
+        join member m ON f3.user_id = m.user_id
+        WHERE f3.user_id = 3
+        ORDER BY f3.record_id DESC),
         d2 AS (SELECT DISTINCT *
         FROM d1),
         n1 AS (SELECT DISTINCT *

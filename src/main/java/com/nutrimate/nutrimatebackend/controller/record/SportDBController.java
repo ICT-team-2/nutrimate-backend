@@ -23,7 +23,7 @@ public class SportDBController {
 	//운동명으로 운동정보 가져오기
 	@GetMapping("/sport")
 	public Map<String, Object> findSportListBySearchWord(RecordPagingDto dto) {
-		int totalCount = service.findCountSportList();
+		int totalCount = service.findCountSportList(dto);
 		dto.setTotalCount(totalCount);
 		dto.setTotalPage((int) Math.ceil((double) totalCount / dto.getReceivePage()));
 		

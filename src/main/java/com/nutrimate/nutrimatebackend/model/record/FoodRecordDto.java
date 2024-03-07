@@ -17,5 +17,6 @@ public class FoodRecordDto extends FoodDto {
 	RecordDto record;
 	private Integer dietId;// 식단 기록 번호
 	private MealTime mealTime; // 식사 시간
+	private Integer recordIntake; // 섭취량
 	
 }
