@@ -39,16 +39,31 @@
         sum(sr.sport_time)
         OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_sport_time,
         sum(sr.sport_cal)
-        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_sport_cal
+        OVER (PARTITION BY r.user_id,trunc(do_date)) AS total_sport_cal,
+        trunc(do_date) AS do_date
         FROM sport s
         JOIN sportrecord sr ON s.sport_id = sr.sport_id
         JOIN record r ON sr.record_id = r.record_id)
         <choose>
             <when test="doDate != null">
-                SELECT DISTINCT *
+                ,recommend as (SELECT n3.recommend_cal, n3.recommend_carbo,
+                n3.recommend_protein, n3.recommend_provi,
+                n3.user_id
                 FROM n3
-                JOIN s1 ON n3.user_id = s1.user_id
-                AND trunc(do_date) = to_date(#{doDate})
+                JOIN s1 ON n3.user_id = s1.user_id)
+                SELECT DISTINCT r.*,
+                coalesce(s1.total_sport_time, 0) AS total_sport_time,
+                coalesce(s1.total_sport_cal,0) AS total_sport_cal,
+                coalesce(n3.total_diet_cal, 0) AS total_diet_cal,
+                coalesce(n3.total_carbo, 0) AS total_carbo,
+                coalesce(n3.total_protein, 0) AS total_protein,
+                coalesce(n3.total_provi, 0) AS total_provi,
+                coalesce(n3.total_ratio, 0) AS total_ratio,
+                #{doDate} as do_date
+                FROM recommend r left join n3 on r.user_id = n3.user_id
+                and n3.do_date = #{doDate}
+                left join s1 on r.user_id = s1.user_id
+                and s1.do_date = #{doDate}
             </when>
             <when test="period != null">
                 , total as (
@@ -64,7 +79,9 @@
                     #{item.startDate} as start_date,
                     #{item.endDate} as end_date
                     from n3 join s1 on n3.user_id = s1.user_id
-                    and trunc(do_date) BETWEEN to_date(#{item.startDate}) AND
+                    and trunc(n3.do_date) BETWEEN to_date(#{item.startDate}) AND
+                    to_date(#{item.endDate})
+                    and trunc(s1.do_date) BETWEEN to_date(#{item.startDate}) AND
                     to_date(#{item.endDate})
                 </foreach>
                 )
