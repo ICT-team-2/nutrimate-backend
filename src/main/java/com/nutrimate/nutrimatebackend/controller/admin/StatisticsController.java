@@ -42,5 +42,12 @@ public class StatisticsController {
 		
 	}
 	
+	@GetMapping("/list/category/month")//월 카테고리별 게시글 수
+	public List<StatisticsDto> categoryBoardList() {
+		List<StatisticsDto> categoryBoardList = statisticsService.selectCategoryBoardList();
+		return categoryBoardList;
+		
+	}
+	
 	
 }

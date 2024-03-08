@@ -14,5 +14,8 @@ public interface StatisticsMapper {
       List<StatisticsDto> findMonthMember();//월간 가입자수 
 
       List<StatisticsDto> findBestBylikeAndBoardviewcount();//인기글
+     
+    //월 카테고리별 게시글 수
+	  List<StatisticsDto> findBestByBoardCategory();
 
 }

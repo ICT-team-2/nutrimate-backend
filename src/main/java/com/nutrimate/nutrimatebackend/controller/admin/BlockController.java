@@ -65,7 +65,7 @@ public class BlockController {
 		if (affected == 1) {
 			map.put("BLOCKOK", "게시글을 차단했습니다.");
 		} else {
-			map.put("BLOCKOK", "게시글 차단에 실패했습니다!");
+			map.put("BLOCKNOT", "게시글 차단에 실패했습니다!");
 			
 		}
 		return map;
@@ -78,9 +78,9 @@ public class BlockController {
 		Map map = new HashMap();
 		int affected = blockService.blockComment(dto);
 		if (affected == 1) {
-			map.put("BLOCKOK", "댓글을 차단했흡니다.");
+			map.put("BLOCKOK", "댓글을 차단했습니다.");
 		} else {
-			map.put("BLOCKOK", "댓글 차단에 실패했습니다!");
+			map.put("BLOCKNOT", "댓글 차단에 실패했습니다!");
 			
 		}
 		return map;
@@ -94,7 +94,7 @@ public class BlockController {
 		if (affected == 1) {
 			map.put("BLOCKOK", "게시글 차단 취소했습니다.");
 		} else {
-			map.put("BLOCKOK", "게시글 차단 취소에 실패했습니다!");
+			map.put("BLOCKNOT", "게시글 차단 취소에 실패했습니다!");
 			
 		}
 		return map;
@@ -108,7 +108,7 @@ public class BlockController {
 		if (affected == 1) {
 			map.put("BLOCKOK", "댓글 차단 취소 했습니다.");
 		} else {
-			map.put("BLOCKOK", "댓글 차단 취소에 실패했습니다!");
+			map.put("BLOCKNOT", "댓글 차단 취소에 실패했습니다!");
 			
 		}
 		return map;
@@ -122,7 +122,7 @@ public class BlockController {
 		if (affected == 1) {
 			map.put("BLOCKOK", "게시글 신고 내역을 삭제 했습니다.");
 		} else {
-			map.put("BLOCKOK", "게시글 신고 내역 삭제에 실패했습니다!");
+			map.put("BLOCKNOT", "게시글 신고 내역 삭제에 실패했습니다!");
 			
 		}
 		return map;
@@ -134,11 +134,13 @@ public class BlockController {
 	@DeleteMapping("/block/list/comment")
 	public Map deleteBlockListComment(@ModelAttribute BlockDto dto) {
 		Map map = new HashMap();
+		
+		
 		int affected = blockService.deleteBlockListComment(dto);
 		if (affected == 1) {
 			map.put("BLOCKOK", "댓글 신고 내역을 삭제 했습니다.");
 		} else {
-			map.put("BLOCKOK", "댓글 신고 내역 삭제에 실패했습니다!");
+			map.put("BLOCKNOT", "댓글 신고 내역 삭제에 실패했습니다!");
 			
 		}
 		return map;
