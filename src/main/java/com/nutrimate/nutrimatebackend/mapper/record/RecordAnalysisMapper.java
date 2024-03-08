@@ -12,5 +12,7 @@ public interface RecordAnalysisMapper {
 	// 먹은 칼로리와 일일 권장 칼로리 열람하기
 	List<RecordAnalysisDto> findRecordAnalysis(AnalyzeDateDto dto);
 	
+	List<RecordAnalysisDto> findRecordAnalysisForGraph(AnalyzeDateDto dto);
+	
 	
 }
