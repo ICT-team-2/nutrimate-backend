@@ -106,7 +106,7 @@ public class DietController {
 			fileNames = FileUtils.upload(files, phisicalPath);
 			dto.setFbImg(fileNames.toString());
 		} catch (Exception e) {//파일용량 초과시
-			map.put("WriteOK", "게시물 입력을 실패했습니다!!");
+			map.put("WriteOK", "파일용량 초과시/게시물 입력을 실패했습니다!!");
 			return map;
 		}
 		if (dto.getTagNameList() != null) {
