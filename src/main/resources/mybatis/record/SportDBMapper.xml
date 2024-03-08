@@ -12,12 +12,24 @@
     </insert>
     
     <select id="findSportListBySearchWord" resultType="SportDto">
-        SELECT s.*
+        WITH s2 as (SELECT s.*, rank() OVER (ORDER BY s.sport_id) AS rank
         FROM sport s
         <if test="searchWord != null and searchWord != ''">
             WHERE s.sport_name LIKE '%' || #{searchWord} || '%'
         </if>
+        )
+        SELECT * FROM s2
+        WHERE rank BETWEEN ((#{nowPage}-1)*#{receivePage}+1) and (#{nowPage}*#{receivePage})
     </select>
+    
+    <select id="findCountSportList" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM sport
+        <if test="searchWord != null and searchWord != ''">
+            WHERE sport_name LIKE '%' || #{searchWord} || '%'
+        </if>
+    </select>
+    
     <select id="findMetBySportId" resultType="java.lang.Double">
         SELECT sport_met
             FROM sport

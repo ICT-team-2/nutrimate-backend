@@ -49,6 +49,25 @@ public class DietRecordController {
 				"succeed", true);
 	}
 	
+	//식단 기록하기(DB)
+	@PostMapping("/db/list")
+	public Map<String, Object> insertFoodRecordListWithDB(@RequestBody FoodRecordDto dto) {
+		int index = 0;
+		for (Integer foodId : dto.getFoodIds()) {
+			dto.setFoodId(foodId);
+			dto.setRecordIntake(dto.getRecordIntakes().get(index));
+			
+			int affected = dietRecordService.insertFoodRecordWithDB(dto);
+			if (affected == 0) {
+				throw new RuntimeException("식단 기록에 실패했습니다.");
+			}
+			index++;
+		}
+		
+		return Map.of("message", "식단 기록에 성공했습니다.",
+				"succeed", true);
+	}
+	
 	//식단 기록하기(custom)
 	@PostMapping("/custom")
 	public Map<String, Object> insertFoodRecordWithCustom(@RequestBody FoodRecordDto dto) {

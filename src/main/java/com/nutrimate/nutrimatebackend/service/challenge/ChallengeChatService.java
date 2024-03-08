@@ -1,11 +1,15 @@
 package com.nutrimate.nutrimatebackend.service.challenge;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import com.nutrimate.nutrimatebackend.mapper.challenge.ChallengeChatMapper;
 import com.nutrimate.nutrimatebackend.model.challenge.ChallengeChatDto;
+import com.nutrimate.nutrimatebackend.model.challenge.ChallengeCommentDto;
+
 import lombok.extern.log4j.Log4j2;
 
 @Service
@@ -90,6 +94,41 @@ public class ChallengeChatService {
     public int saveChallengeSuccess(ChallengeChatDto dto) {     
       return challengeChatMapper.insertChallengeSuccessCount(dto);
     }
+    
+    
+    //댓글 저장
+    @Transactional
+	public int savechallengeComment(ChallengeCommentDto dto) {
+        try {
+            challengeChatMapper.insertComment(dto);
+            return challengeChatMapper.insertChallengeComment(dto);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return -1;
+        }
+	}
+
+    
+  //챌린지 댓글 가지고 오기
+	public List<ChallengeCommentDto> getChallengeCommentList(ChallengeCommentDto dto) {
+		return challengeChatMapper.findCommentList(dto);
+	}
+
+	//챌린지 댓글 수정
+	public int editChallengeComment(ChallengeCommentDto dto) {
+		return challengeChatMapper.updateComment(dto);
+	}
+
+	//챌린지 댓글 삭제
+	public int deleteChallengeComment(ChallengeCommentDto dto) {
+		return challengeChatMapper.deleteComment(dto);
+	}
+
+	//챌린지 유저 nick찾기 
+	public Map findUserNickByUserId(ChallengeCommentDto dto) {
+		return challengeChatMapper.selectUserNick(dto);
+	}
+
 
 
 

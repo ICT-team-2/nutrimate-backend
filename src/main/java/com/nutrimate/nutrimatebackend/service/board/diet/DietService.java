@@ -59,6 +59,7 @@ public class DietService {
 			insertFoodData(dto);//음식 데이터 입력
 			return 1;
 		} catch (Exception e) {
+			log.info(e.getMessage(), e);
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return -1;
 		}

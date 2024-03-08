@@ -6,6 +6,7 @@ import com.nutrimate.nutrimatebackend.mapper.record.RecordMapper;
 import com.nutrimate.nutrimatebackend.model.record.FoodDto;
 import com.nutrimate.nutrimatebackend.model.record.FoodRecordDto;
 import com.nutrimate.nutrimatebackend.model.record.RecordDto;
+import com.nutrimate.nutrimatebackend.model.record.RecordPagingDto;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +31,21 @@ public class DietRecordService {
 	
 	//foodDB로부터 음식정보 가져오기
 	//음식명으로 음식정보 가져오기
-	public List<FoodDto> findFoodListBySearchWord(String searchWord) {
-		return foodDBMapper.findFoodListBySearchWord(searchWord);
+	public List<FoodDto> findFoodListBySearchWord(RecordPagingDto dto) {
+		return foodDBMapper.findFoodListByWithoutCustomSearchWord(dto);
+	}
+	
+	public int countFoodListWithoutCustom(RecordPagingDto dto) {
+		return foodDBMapper.findCountFoodListWithoutCustom(dto);
 	}
 	
 	//자신이 등록한 음식정보 가져오기
-	public List<FoodDto> findCustomFoodListBySearchWord(String searchWord, int userId) {
-		return foodDBMapper.findCustomFoodListBySearchWord(searchWord, userId);
+	public List<FoodDto> findCustomFoodListBySearchWord(RecordPagingDto dto) {
+		return foodDBMapper.findCustomFoodListBySearchWord(dto);
+	}
+	
+	public int countCustomFoodList(RecordPagingDto dto) {
+		return foodDBMapper.findCountCustomFoodList(dto);
 	}
 	
 	//foodId List로 음식정보 가져오기

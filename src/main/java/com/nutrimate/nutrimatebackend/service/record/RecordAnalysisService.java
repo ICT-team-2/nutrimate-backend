@@ -58,6 +58,6 @@ public class RecordAnalysisService {
 				dateDto.setPeriod(setMonthPeriod(dateDto.getEndDate(), dateDto.getPeriodCount()));
 				break;
 		}
-		return recordAnalysisMapper.findRecordAnalysis(dateDto);
+		return recordAnalysisMapper.findRecordAnalysisForGraph(dateDto);
 	}
 }

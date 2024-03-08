@@ -58,7 +58,7 @@ public interface DietMapper {
 	int deleteBookMarkByBoardIdANDuserId(DietDto dto);
 	
 	//해당 해시태그 갯수
-	int findHashTagCountByHashTagName(@Param("tageName") String tageName);
+	int findHashTagCountByHashTagName(@Param("tagName") String tagName);
 	
 	//해시태그 저장
 	int insertHashTag(DietDto dto);

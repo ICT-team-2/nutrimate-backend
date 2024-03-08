@@ -36,6 +36,7 @@
                           ON c.user_id = m.user_id
             WHERE board_id = #{boardId}
               AND all_deleted = 'N'
+              AND blocked = 'N'
             START WITH cmt_depth = 0
             CONNECT BY PRIOR cmt_id = cmt_ref
             ORDER SIBLINGS BY c.created_date
@@ -46,6 +47,8 @@
             FROM comments c
                      JOIN member m ON c.user_id = m.user_id
             WHERE cmt_ref = #{parentCommentId}
+              AND all_deleted = 'N'
+              AND blocked = 'N'
     </select>
     
     <!-- 대댓글 수 확인 -->
@@ -61,6 +64,7 @@
         SELECT count(*)
             FROM comments
             WHERE deleted = 'N'
+              AND blocked = 'N'
             START WITH cmt_id = #{cmtId}
             CONNECT BY PRIOR cmt_id = cmt_ref
             ORDER SIBLINGS BY created_date DESC
@@ -71,6 +75,7 @@
         SELECT count(*)
             FROM comments
             WHERE deleted = 'Y'
+               OR blocked = 'Y'
             START WITH cmt_id = #{cmtId}
             CONNECT BY PRIOR cmt_id = cmt_ref
             ORDER SIBLINGS BY created_date DESC

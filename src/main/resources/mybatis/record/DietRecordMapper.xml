@@ -16,6 +16,8 @@
         <result property="intakeUnit" column="intake_unit"/>
         <result property="foodGroup" column="food_group"/>
         <result property="mealTime" column="meal_time"/>
+        <result property="recordIntake" column="record_intake"/>
+        <result property="serving" column="serving"/>
         <association property="record" javaType="RecordDto">
             <id property="recordId" column="record_id"/>
             <result property="userId" column="user_id"/>
@@ -28,8 +30,8 @@
             SELECT seq_dietrecord.nextval
                 FROM dual
         </selectKey>
-        INSERT INTO dietrecord(diet_id, record_id, food_id,meal_time)
-        VALUES (#{dietId}, #{record.recordId}, #{foodId}, #{mealTime})
+        INSERT INTO dietrecord(diet_id, record_id, food_id,meal_time,record_intake)
+        VALUES (#{dietId}, #{record.recordId}, #{foodId}, #{mealTime}, #{recordIntake})
     </insert>
     
     <insert id="insertCustomFood">
@@ -38,18 +40,42 @@
     </insert>
     
     <select id="findDietRecordByUserIdAndDoDate" resultMap="FoodRecordDto">
-        SELECT *
+        WITH f2 AS (SELECT f.*,
+        dr.record_intake,
+        dr.diet_id,
+        dr.meal_time,
+        r.*,
+        (record_intake/food_intake) as serving
         FROM food f
         JOIN dietrecord dr ON f.food_id = dr.food_id
         JOIN record r ON dr.record_id = r.record_id
         WHERE r.user_id = #{userId}
         AND r.deleted = 'N'
         <if test="doDate != null">
-            AND r.do_date like to_date('2024-03-06', 'YYYY-MM-DD')
+            AND trunc(r.do_date) like to_date(#{doDate}, 'YYYY-MM-DD')
         </if>
         <if test="mealTime != null">
             AND upper(dr.meal_time) = #{mealTime}
         </if>
-        order by dr.diet_id
+        )
+        SELECT f2.food_id,
+        f2.food_name,
+        f2.food_group,
+        (food_cal * coalesce(serving, 1)) as food_cal,
+        (food_protein * coalesce(serving, 1)) as food_protein,
+        (food_provi * coalesce(serving, 1)) as food_provi,
+        (food_carbo * coalesce(serving, 1)) as food_carbo,
+        (food_chole * coalesce(serving, 1)) as food_chole,
+        (food_salt * coalesce(serving, 1)) as food_salt,
+        record_intake,
+        diet_id,
+        record_id,
+        user_id,
+        trunc(do_date) as do_date,
+        serving,
+        f2.meal_time,
+        f2.food_intake
+        FROM f2
+        ORDER BY f2.diet_id
     </select>
 </mapper>
