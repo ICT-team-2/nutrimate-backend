@@ -1,8 +1,8 @@
 package com.nutrimate.nutrimatebackend.mapper.member;
 
-import com.nutrimate.nutrimatebackend.model.profile.InfoBoardDto;
+import com.nutrimate.nutrimatebackend.model.board.InfoBoardDto;
+import com.nutrimate.nutrimatebackend.model.board.PagingDto;
 import com.nutrimate.nutrimatebackend.model.profile.MemberProfileDto;
-import com.nutrimate.nutrimatebackend.model.profile.PagingDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

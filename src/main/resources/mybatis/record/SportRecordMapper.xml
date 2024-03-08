@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.record.SportRecordMapper">
+    <resultMap id="SportRecordDto" type="SportRecordDto">
+        <id property="exerciseId" column="exercise_id"/>
+        <result property="sportId" column="sport_id"/>
+        <result property="sportCal" column="sport_cal"/>
+        <result property="sportTime" column="sport_time"/>
+        <result property="sportWeight" column="sport_weight"/>
+        <result property="sportName" column="sport_name"/>
+        <result property="sportMet" column="sport_met"/>
+        <result property="sportSet" column="sport_set"/>
+        <association property="record" javaType="RecordDto">
+            <id property="recordId" column="record_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="doDate" column="do_date"/>
+        </association>
+    </resultMap>
+    
+    <insert id="insertSportRecord" parameterType="SportRecordDto">
+        <selectKey keyProperty="exerciseId" resultType="int" order="BEFORE">
+            SELECT seq_sportrecord.nextval
+                FROM dual
+        </selectKey>
+        INSERT INTO sportrecord(exercise_id, record_id, sport_id, sport_cal, sport_time,
+        sport_weight
+        <if test="sportSet != null">
+            , sport_set
+        </if>
+        )
+        VALUES (#{exerciseId}, #{record.recordId}, #{sportId},
+        #{sportCal}, #{sportTime}, #{sportWeight}
+        <if test="sportSet != null">
+            , #{sportSet}
+        </if>
+        )
+    </insert>
+    
+    
+    <select id="findSportRecordByUserIdAndDoDate" resultMap="SportRecordDto">
+        SELECT *
+        FROM sport s
+        JOIN sportrecord sr ON s.sport_id = sr.sport_id
+        JOIN record r ON sr.record_id = r.record_id
+        WHERE r.user_id = #{userId}
+        <if test="doDate != null">
+            AND trunc(r.do_date) LIKE to_date(#{doDate}, 'YYYY-MM-DD')
+        </if>
+        AND r.deleted = 'N'
+        ORDER BY sr.exercise_id
+    </select>
+</mapper>

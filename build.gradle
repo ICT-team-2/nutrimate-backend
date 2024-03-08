@@ -22,7 +22,7 @@ repositories {
 }
 
 tasks.withType(JavaCompile) {
-    options.compilerArgs << '-parameters'
+	options.compilerArgs << '-parameters'
 }
 
 compileJava {
@@ -38,8 +38,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-  	implementation 'org.webjars:stomp-websocket:2.3.3-1'
-  	implementation 'org.webjars:sockjs-client:1.1.2'
+	implementation 'org.webjars:stomp-websocket:2.3.3-1'
+	implementation 'org.webjars:sockjs-client:1.1.2'
+	implementation 'net.nurigo:sdk:4.2.7'
+	
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework:spring-context-support:6.1.4'
+	
 	
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

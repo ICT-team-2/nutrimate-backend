@@ -8,6 +8,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
@@ -15,6 +16,7 @@ import javax.sql.DataSource;
 @Configuration
 @MapperScan(value = {"com.nutrimate.nutrimatebackend.mapper"},
 		sqlSessionFactoryRef = "sqlSessionFactory")
+@EnableTransactionManagement
 @Log4j2
 public class MybatisConfig {
 	// https://mybatis.org/spring/ko/factorybean.html
@@ -43,7 +45,7 @@ public class MybatisConfig {
 			factoryBean.setConfiguration(configuration);
 			factory = factoryBean.getObject();
 		} catch (Exception e) {
-			log.warn(e.getMessage());
+			log.error(e.getMessage(), e);
 		}
 		return factory;
 		

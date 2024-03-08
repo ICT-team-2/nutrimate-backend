@@ -2,7 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,eclipse,intellij+all,intellij+iml,jetbrains+all,jetbrains+iml,java,gradle,visualstudiocode
 
 *.yml
-
+.idea/**/*
 ### Eclipse ###
 .metadata
 bin/

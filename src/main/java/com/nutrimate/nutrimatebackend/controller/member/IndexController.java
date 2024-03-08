@@ -2,8 +2,9 @@ package com.nutrimate.nutrimatebackend.controller.member;
 
 import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
 import com.nutrimate.nutrimatebackend.model.member.MemberDto;
-import com.nutrimate.nutrimatebackend.service.MemberService;
+import com.nutrimate.nutrimatebackend.service.member.MemberService;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -103,6 +104,17 @@ public class IndexController {
 		return json;
 	}
 	
+	@PostMapping("/member/checkNick")
+	public ResponseEntity<Map<String, Boolean>> checkNick(@RequestBody Map<String, String> params) {
+		String nickName = params.get("userNick");
+		
+		boolean exists = memberService.checkNick(nickName);
+		Map<String, Boolean> response = new HashMap();
+		response.put("exists", exists);
+		return ResponseEntity.ok().body(response);
+	}
+	
+	
 	@GetMapping("/member/mypage")
 	public Map<String, Object> myPage(@RequestParam(value = "userId", required = false) Long userId) {
 		System.out.println("userId :" + userId);
@@ -114,13 +126,12 @@ public class IndexController {
 	
 	
 	@PutMapping("/member/mypage")
-	public Map<String, Object> updateMemberInfo(@RequestBody MemberDto memberDto) {
+	public MemberDto updateMemberInfo(@RequestBody MemberDto memberDto) {
+		log.info(memberDto);
 		memberService.updateMemberInfo(memberDto);
-		memberDto.setUserPwd(passwordEncoder.encode(memberDto.getUserPwd()));
-		memberDto.setUserRole("ROLE_USER");
-		Map<String, Object> json = new HashMap<>();
-		json.put("memberDto", memberDto);
-		return json;
+		memberService.updateMemberDiet(memberDto);
+		// memberDto.setUserPwd(passwordEncoder.encode(memberDto.getUserPwd()));
+		return memberDto;
 	}
 	
 	@Secured("ROLE_ADMIN")

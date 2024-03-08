@@ -1,9 +1,9 @@
 package com.nutrimate.nutrimatebackend.controller.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nutrimate.nutrimatebackend.model.profile.InfoBoardDto;
+import com.nutrimate.nutrimatebackend.model.board.InfoBoardDto;
+import com.nutrimate.nutrimatebackend.model.board.PagingDto;
 import com.nutrimate.nutrimatebackend.model.profile.MemberProfileDto;
-import com.nutrimate.nutrimatebackend.model.profile.PagingDto;
 import com.nutrimate.nutrimatebackend.service.board.feed.FeedService;
 import com.nutrimate.nutrimatebackend.service.profile.MemberProfileService;
 import lombok.extern.log4j.Log4j2;

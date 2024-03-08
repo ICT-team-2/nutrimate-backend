@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.nutrimate.nutrimatebackend.model.member.MemberDto;
-import com.nutrimate.nutrimatebackend.service.MemberService;
+import com.nutrimate.nutrimatebackend.service.member.MemberService;
 import lombok.extern.log4j.Log4j2;
 
 

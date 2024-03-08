@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
 import com.nutrimate.nutrimatebackend.mapper.member.MemberMapper;
 import com.nutrimate.nutrimatebackend.model.member.MemberDto;
-import com.nutrimate.nutrimatebackend.service.MemberService;
+import com.nutrimate.nutrimatebackend.service.member.MemberService;
 import com.nutrimate.nutrimatebackend.util.JWTOkens;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -70,7 +70,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		String refreshToken = JWTOkens.getToken(request, "REFRESH");
 		
 		
-		Map<String, Object> payload = JWTOkens.getTokenPayloads(refreshToken, JWTOkens.REFRESH);
+		Map<String, Object> payload = null;
+		try {
+			payload = JWTOkens.getTokenPayloads(refreshToken, JWTOkens.REFRESH);
+		} catch (Exception e) {
+			JWTOkens.removeToken(request, response);
+		}
 		log.info("payload : " + payload);
 		
 		String userUid = payload.get("sub").toString();

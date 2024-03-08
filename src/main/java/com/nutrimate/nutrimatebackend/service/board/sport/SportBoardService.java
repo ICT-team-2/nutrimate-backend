@@ -44,21 +44,21 @@ public class SportBoardService {
 	}
 	
 	//게시글 조회(상세)
-	public SportBoardDto getBoard(int boardId) {
-		SportBoardDto board = sportBoardMapper.selectBoard(boardId);
+	public SportBoardDto getBoard(int boardId, int userId) {
+		SportBoardDto board = sportBoardMapper.selectBoard(boardId, userId);
 		return board; //게시판 정보 조회
 	}
-
+	
 	//해당 글의 해시태그 가져오기
 	public List<SportBoardDto> findHashtagsByBoardId(String boardId) {
-	    SportBoardDto board = new SportBoardDto();
-	    try {
-	        int intBoardId = Integer.parseInt(boardId);
-	        board.setBoardId(intBoardId);
-	    } catch (NumberFormatException e) {
-	        e.printStackTrace();
-	    }
-	    return sportBoardMapper.findHashtagsByBoardId(board);
+		SportBoardDto board = new SportBoardDto();
+		try {
+			int intBoardId = Integer.parseInt(boardId);
+			board.setBoardId(intBoardId);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return sportBoardMapper.findHashtagsByBoardId(board);
 	}
 	
 	//게시글 조회(전체)
@@ -107,7 +107,7 @@ public class SportBoardService {
 	public int checkUserLike(LikeDto likeDto) {
 		return sportBoardMapper.checkUserLike(likeDto);
 	}
-		
+	
 	//좋아요 수 조회
 	public int countLikes(String boardId) {
 		return sportBoardMapper.countLikes(boardId);
@@ -115,9 +115,9 @@ public class SportBoardService {
 	
 	//좋아요 여부 확인
 	public boolean isLiked(LikeDto likeDto) {
-	    return sportBoardMapper.countLike(likeDto) > 0;
+		return sportBoardMapper.countLike(likeDto) > 0;
 	}
-		
+	
 	//좋아요 생성
 	public boolean insertLike(LikeDto likeDto) {
 		return sportBoardMapper.insertLike(likeDto) == 1;
@@ -153,9 +153,9 @@ public class SportBoardService {
 	
 	//북마크 저장 여부 확인
 	public boolean isBookmarked(BookmarkDto bookmarkDto) {
-	    return sportBoardMapper.countBookmarks(bookmarkDto) > 0;
+		return sportBoardMapper.countBookmarks(bookmarkDto) > 0;
 	}
-
+	
 	//북마크 생성
 	public boolean insertBookmark(BookmarkDto bookmarkDto) {
 		return sportBoardMapper.insertBookmark(bookmarkDto) == 1;
@@ -165,7 +165,7 @@ public class SportBoardService {
 	public int deleteBookmark(BookmarkDto bookmarkDto) {
 		return sportBoardMapper.deleteBookmark(bookmarkDto);
 	}
-
+	
 	public List<SportBoardDto> findBoardsByTagName(SportBoardDto board) {
 		return sportBoardMapper.findBoardsByTagName(board);
 	}
