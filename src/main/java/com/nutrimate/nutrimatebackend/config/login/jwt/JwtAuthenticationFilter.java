@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,11 @@ import java.util.Map;
 
 @Log4j2
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+	@Value("${front-url}")
+	private String frontUrl;
+	
+	@Value("${front-domain}")
+	private String frontDomain;
 	
 	private AuthenticationManager authenticationManager;
 	private ObjectMapper objectMapper = new ObjectMapper();

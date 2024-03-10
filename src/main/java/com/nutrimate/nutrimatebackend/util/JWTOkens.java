@@ -180,7 +180,27 @@ public class JWTOkens {
 	// secret=Base64.getEncoder().encodeToString(secretkey.getBytes()).getBytes(StandardCharsets.UTF_8);
 	// secretKey= Keys.hmacShaKeyFor(secret);
 	// }
-	
+	public static void addSameSiteCookieAttribute(HttpServletResponse response, String name, String value, int maxAge, String sameSite) {
+		Cookie cookie = new Cookie(name, value);
+		cookie.setPath("/");
+		cookie.setMaxAge(maxAge);
+		if (name.equalsIgnoreCase("REFRESH")) {
+//			cookie.setHttpOnly(true);
+//			cookie.setSecure(true);
+		}
+		
+		// 쿠키의 기본 설정을 문자열로 구성합니다.
+		String cookieValue = String.format("%s=%s; Path=%s; Max-Age=%d", cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getMaxAge());
+		
+		// Secure 및 HttpOnly 설정이 필요한 경우 여기에 추가합니다. 예: "; Secure; HttpOnly"
+		String additionalAttributes = "";
+		
+		// SameSite 속성을 추가합니다.
+		cookieValue += additionalAttributes + "; SameSite=" + sameSite;
+		
+		// 최종적으로 구성된 쿠키 문자열을 응답 헤더에 추가합니다.
+		response.addHeader("Set-Cookie", cookieValue);
+	}
 	@PostConstruct
 	public void init() {
 		byte[] secretTobytes =
@@ -190,11 +210,9 @@ public class JWTOkens {
 				Base64.getEncoder().encodeToString(secret.getBytes()).getBytes(StandardCharsets.UTF_8);
 		refreshKey = Jwts.SIG.HS256.key().build();
 	}
-	
 	@Value("{$access-key,refresh-key}")
 	private void setSecret(String secret) {
 		this.secret = secret;
 	}
-	
 	
 }

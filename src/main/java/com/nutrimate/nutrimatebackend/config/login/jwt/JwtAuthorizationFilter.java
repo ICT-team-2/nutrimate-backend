@@ -12,6 +12,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,9 @@ import java.util.Map;
 // 만약에 권한이 인증이 필요한 주소가 아니라면 이 필터를 안탄다
 @Log4j2
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
+	
+	@Value("${front-url}")
+	private String frontUrl;
 	
 	private MemberMapper memberMapper;
 	private BCryptPasswordEncoder passwordEncoder;
@@ -92,14 +96,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			MemberService memberService =
 					(MemberService) request.getServletContext().getAttribute("service");
 			
-			// accessToken = JWTOkens.getToken(request, "ACCESS");
-			// String accessToken =
-			// JWTOkens.getToken(request, request.getServletContext().getInitParameter("ACCESS"));
-			// String refreshToken =
-			// JWTOkens.getToken(request, request.getServletContext().getInitParameter("REFRESH"));
-			
-			// System.out.println("accessToken1111111111 :" + accessToken);
-			// System.out.println("refreshToken2222222222 :" + refreshToken);
 			if (!accessToken.isEmpty()) {
 				int accessVerifyStatus = JWTOkens.verifyToken(accessToken, JWTOkens.ACCESS);
 				
@@ -116,15 +112,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 							case JWTOkens.SIGNED:
 								// access 토큰 재발급 후 쿠키에 담기
 								Map<String, Object> payloads = new HashMap<>();// 사용자 임의 데이타 추가
-								long expirationTime = 1000 * 30;// 토큰의 만료시간 설정(30)
+								long expirationTime = 1000 * 60 * 30;// 토큰의 만료시간 설정(30)
 								int status = 1;
-								accessToken =
-										JWTOkens.createToken(userUid, payloads, expirationTime, JWTOkens.ACCESS);
+								accessToken = JWTOkens.createToken(userUid, payloads, expirationTime, JWTOkens.ACCESS);
 								Cookie accessCookie = new Cookie("ACCESS", accessToken);
-								log.info(accessCookie);
 								accessCookie.setPath("/");
+								log.info(accessCookie);
 								response.addCookie(accessCookie);
-								// setUserInfo(refreshToken, request, response, memberService, userId);
 								break;
 							case JWTOkens.UNSIGNED:
 								JWTOkens.removeToken(request, response);
@@ -142,40 +136,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			
 			
 		}
-		// MemberService memberService =
-		// (MemberService) request.getServletContext().getAttribute("service");
-		// accessToken =
-		// JWTOkens.getToken(request, request.getServletContext().getInitParameter("ACCESS"));
-		//
-		//
-		// String refreshToken =
-		// JWTOkens.getToken(request, request.getServletContext().getInitParameter("REFRESH"));
-		
-		
-		// if (!accessToken.isEmpty()) {
-		// int accessVerifyStatus = JWTOkens.verifyToken(accessToken, JWTOkens.ACCESS);
-		// switch (accessVerifyStatus) {
-		// case JWTOkens.SIGNED:
-		// case JWTOkens.EXPIRED:
-		// int refreshVerifyStatus = JWTOkens.verifyToken(refreshToken, JWTOkens.REFRESH);
-		// switch (refreshVerifyStatus) {
-		// case JWTOkens.EXPIRED:
-		// JWTOkens.getToken(request, refreshToken);
-		// System.out.println("DDDD");
-		// case JWTOkens.SIGNED:
-		// setUserInfo(refreshToken, request, response, memberService, userId);
-		// break;
-		// case JWTOkens.UNSIGNED:
-		// JWTOkens.removeToken(request, response);
-		// loginFail(response);
-		// }
-		// break;
-		// case JWTOkens.UNSIGNED: {
-		// JWTOkens.removeToken(request, response);
-		// loginFail(response);
-		// }
-		// }
-		// }
 		chain.doFilter(request, response);
 	}
 	
