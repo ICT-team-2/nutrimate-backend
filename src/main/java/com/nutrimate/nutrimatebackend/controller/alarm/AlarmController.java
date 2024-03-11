@@ -1,6 +1,7 @@
 package com.nutrimate.nutrimatebackend.controller.alarm;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,17 +34,23 @@ public class AlarmController {
 	public Map saveAlarm(@RequestBody AlarmDto dto) {
 	    System.out.println(dto.getUserId());
 	    Map alarmMap = new HashMap();
+	    List<Integer> useridList = new ArrayList<>();
 		//채팅에 참여해 본적이 있는지 확인
 	    for (LocalDateTime alarm : dto.getUpdatedAlarmWeek()) {
 	      dto.setAlarmTime(alarm); // DTO에 알람 시간 설정
 	      System.out.println(dto.getAlarmTime());
 	      int affect = alramService.saveAlram(dto);
+	      System.out.println(affect);
+	      useridList.add(dto.getAlarmId());
+
 	      if (affect == 1) {
 	          alarmMap.put("alarmOk", 1); // 알람 성공 상태 코드 설정
 	      } else {
 	          alarmMap.put("alarmOk", 0); // 알람 실패 상태 코드 설정
 	      }
-	  }
+
+	  } 
+	    alarmMap.put("alarmId", useridList);
 	  return alarmMap;
 	
 	

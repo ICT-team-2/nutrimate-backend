@@ -7,6 +7,9 @@
     <!-- 알람저장 -->
     <insert id="insertAlarm" parameterType="AlarmDto">
         INSERT INTO alarm VALUES (seq_alarm.nextval, #{userId}, #{alarmCategory}, #{alarmTime}, sysdate)
+		    <selectKey keyProperty="alarmId" resultType="int" order="AFTER">
+		        SELECT seq_alarm.currval FROM dual
+		    </selectKey>
     </insert>
     <!-- 알람주단위 -->
     
