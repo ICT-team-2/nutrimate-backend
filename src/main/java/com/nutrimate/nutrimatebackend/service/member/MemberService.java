@@ -19,8 +19,10 @@ public class MemberService {
 		this.passwordEncoder = passwordEncoder;
 	}
 	
+	@Transactional
 	public int insertMember(MemberDto memberDto) {
-		return memberMapper.insertMember(memberDto);
+		memberMapper.insertMember(memberDto);
+		return insertMemberDiet(memberDto);
 	}
 	
 	public MemberDto findCommonMemberByUid(String userUid) {
@@ -33,6 +35,7 @@ public class MemberService {
 	public MemberDto insertOAuthMember(MemberDto memberDto) {
 		memberMapper.insertMemberWithOAuth(memberDto);
 		memberMapper.insertOAuth(memberDto);
+		insertMemberDiet(memberDto);
 		return memberDto;
 	}
 	
