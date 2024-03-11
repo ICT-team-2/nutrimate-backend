@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.dmchat.DMChatRoomMapper">
+    <insert id="insertChatRoom">
+        <selectKey keyProperty="chatroomId" resultType="int" order="BEFORE">
+            SELECT seq_chatroom.nextval
+                FROM dual
+        </selectKey>
+        INSERT INTO chatroom(chatroom_id, chatroom_name, chatroom_type)
+        VALUES (#{chatroomId}, #{chatroomName}, #{chatroomType})
+    </insert>
+    <insert id="insertMemberChatRoom">
+        INSERT ALL
+        <foreach collection="userIds" item="userId" separator=" ">
+            INTO memberchatroom(chatroom_id, user_id)
+        VALUES (
+            #{chatroomId},
+            #{userId}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+    <update id="updateChatRoomName">
+        UPDATE chatroom
+        SET chatroom_name = #{chatroomName}
+            WHERE chatroom_id = #{chatroomId}
+    </update>
+    <update id="deleteChatRoom">
+        UPDATE chatroom
+        SET deleted = 'Y'
+            WHERE chatroom_id = #{chatroomId}
+    </update>
+    <select id="findChatRoomsByUserId" resultType="DMChatRoomDto">
+        WITH mc AS (SELECT m.*,
+                           rank() OVER (ORDER BY m.created_date DESC) AS rank
+                        FROM memberchat m)
+        SELECT cr.*, mcr.user_id, m.user_nick,
+               (SELECT mc.chat_message
+                    FROM mc
+                    WHERE mc.rank = 1) AS latest_chat
+            FROM chatroom cr
+                     JOIN memberchatroom mcr ON cr.chatroom_id = mcr.chatroom_id
+                     JOIN member m ON mcr.user_id = m.user_id
+            WHERE m.user_id = #{userId}
+              AND cr.deleted = 'N'
+    </select>
+</mapper>

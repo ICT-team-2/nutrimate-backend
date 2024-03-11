@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.dmchat.DMChatMessageMapper">
+    
+    <insert id="insertChatMessage">
+        INSERT INTO memberchat(chat_id, user_id, chatroom_id, message_type, chat_message)
+            VALUES (#{chatId}, #{userId}, #{chatroomId}, #{messageType}, #{chatMessage})
+    </insert>
+    <update id="deleteChatMessage">
+        UPDATE memberchat
+        SET deleted = 'Y'
+            WHERE chat_id = #{chatId}
+    </update>
+    <select id="findChatMessagesByChatroomId"
+            resultType="DMChatMessageDto">
+        SELECT mc.*, m.user_nick
+            FROM memberchat mc
+                     JOIN member m ON mc.user_id = m.user_id
+            WHERE chatroom_id = #{chatroomId}
+    </select>
+</mapper>
