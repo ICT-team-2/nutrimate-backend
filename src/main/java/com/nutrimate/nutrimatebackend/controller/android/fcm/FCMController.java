@@ -14,6 +14,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -28,7 +29,8 @@ public class FCMController {
 
     @PostMapping("/fcm/token")
     @ResponseBody
-    public Map<String, String> fcmTokenSave(@RequestParam String token) {
+    public Map<String, String> fcmTokenSave(@RequestBody Map<String, String> data) {
+        String token = data.get("token");
         System.out.println("토큰:" + token);
         return service.saveToken(token);
     }
@@ -70,7 +72,7 @@ public class FCMController {
 
 
         final String serverKey =
-                "AAAAZdTadQM:APA91bGrVWKyVa_Iu4prcoCLLoiSxEz5x61EYCy4kazYErcSVthPmCAC5wx-Zl8H8uNv3yr5W80FL2tdZJNjJJBmQCQQ5iiKZrAbv87K9KsfabYnauV4dJC1RJqJXnqI8rrWr5NsHq-0";
+                "AAAA9j1G_j4:APA91bHl4PU7tIn5fYwNClVidQ_nrangnNxVCs-Tc7yTnNtQOTbUQbxgzHKdTk3HCab891f8ea02-gYjg5khEx0P63ilgqmnx1_XDG9LdO0pvAf50uQOx5nEk-9kvpWaeI3ASgqWwulv";
         String gcmURL = "https://fcm.googleapis.com/fcm/send";
 
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
