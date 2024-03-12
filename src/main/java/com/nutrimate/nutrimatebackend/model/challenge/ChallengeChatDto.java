@@ -26,8 +26,8 @@ public class ChallengeChatDto {
 	private String messageId;
 	private int COUNT;
 	
-	private Long chatroomId;
-	private Long userId;
+	private int chatroomId;
+	private long userId;
 	private MessageType messageType;
 	private String chatMessage;
 	private String challengeNick;
