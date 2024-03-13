@@ -1,10 +1,9 @@
 package com.nutrimate.nutrimatebackend.mapper.admin;
 
+import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
 import com.nutrimate.nutrimatebackend.model.admin.AdminReportDto;
 import com.nutrimate.nutrimatebackend.model.admin.BlockDto;
-import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
 
 @Mapper
 public interface BlockMapper {
@@ -31,5 +30,9 @@ public interface BlockMapper {
 	int deleteBoardReportByReport_id(BlockDto dto);//게시글 신고 내역 삭제-boardreport
 	
 	int deleteCommentReportByReport_id(BlockDto dto);//댓글 신고 내역 삭제-boardreport
+
+    List<BlockDto> findReportIdByBoardId(BlockDto dto);   //게시글 리포트 아이디 가지고 오기
+
+    List<BlockDto> findReportIdByCmtId(BlockDto dto);  //댓글 리포트 아이디 가지고 오기
 	
 }

@@ -19,8 +19,8 @@ import lombok.extern.log4j.Log4j2;
 @ToString
 @Alias("ChallengeChatDto")
 public class ChallengeChatDto {
-
-
+	
+	
 
     private String channelId;
     private String messageId;
