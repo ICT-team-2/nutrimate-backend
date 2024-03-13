@@ -134,6 +134,19 @@ public class IndexController {
 		return memberDto;
 	}
 	
+	@DeleteMapping("/member")
+	public Map<String, Object> deleteMember(int userId) {
+		try {
+			memberService.deleteMember(userId);
+			return Map.of("success", true,
+					"messsage", "회원탈퇴 성공");
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Map.of("success", false,
+					"error", e.getMessage());
+		}
+	}
+	
 	@Secured("ROLE_ADMIN")
 	@GetMapping("/info")
 	public String info() {

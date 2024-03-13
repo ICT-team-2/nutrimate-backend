@@ -23,6 +23,7 @@ public class DMChatMessageService {
 		return mapper.findChatMessagesByChatroomId(chatroomId);
 	}
 	
+	
 	public int deleteChatMessage(int chatId) {
 		return mapper.deleteChatMessage(chatId);
 	}

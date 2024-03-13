@@ -19,6 +19,12 @@ public class DMChatRoomDto {
 	int opponentId; //private
 	String chatroomName;
 	ChatRoomType chatroomType;
+	String chatroomProfile;
+	
+	String latestChat;
+	String latestChatDate;
+	
+	List<DMChatUserInfo> memberList; //group
 	
 	
 	public enum ChatRoomType {

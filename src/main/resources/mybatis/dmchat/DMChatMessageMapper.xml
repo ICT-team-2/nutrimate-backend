@@ -4,8 +4,12 @@
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.dmchat.DMChatMessageMapper">
     
     <insert id="insertChatMessage">
+        <selectKey keyProperty="chatId" resultType="int" order="BEFORE">
+            SELECT seq_member_chat.nextval
+                FROM dual
+        </selectKey>
         INSERT INTO memberchat(chat_id, user_id, chatroom_id, message_type, chat_message)
-            VALUES (#{chatId}, #{userId}, #{chatroomId}, #{messageType}, #{chatMessage})
+        VALUES (#{chatId}, #{userId}, #{chatroomId}, #{messageType}, #{chatMessage})
     </insert>
     <update id="deleteChatMessage">
         UPDATE memberchat
@@ -14,9 +18,11 @@
     </update>
     <select id="findChatMessagesByChatroomId"
             resultType="DMChatMessageDto">
-        SELECT mc.*, m.user_nick
+        SELECT mc.*, m.user_nick, m.user_profile
             FROM memberchat mc
                      JOIN member m ON mc.user_id = m.user_id
             WHERE chatroom_id = #{chatroomId}
+              AND mc.deleted = 'N'
+            ORDER BY mc.created_date
     </select>
 </mapper>
