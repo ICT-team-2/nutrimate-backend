@@ -2,8 +2,9 @@ package com.nutrimate.nutrimatebackend.controller.member;
 
 import com.nutrimate.nutrimatebackend.config.login.auth.PrincipalDetails;
 import com.nutrimate.nutrimatebackend.model.member.MemberDto;
-import com.nutrimate.nutrimatebackend.service.MemberService;
+import com.nutrimate.nutrimatebackend.service.member.MemberService;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -30,27 +31,6 @@ public class IndexController {
 		this.memberService = memberService;
 		this.passwordEncoder = passwordEncoder;
 	}
-	
-	// @GetMapping("/test/login")
-	// public @ResponseBody String testLogin(Authentication authentication,
-	// @AuthenticationPrincipal PrincipalDetails userDetails) {// DI(의존성 주입)
-	// System.out.println("/test/login ========");
-	// PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-	// System.out.println("authentication:" + principalDetails.getMemberDto());
-	//
-	// System.out.println("userDetails:" + userDetails.getUsername());
-	// return "세션정보 확인하기";
-	// }
-	//
-	// @GetMapping("/test/oauth/login")
-	// public @ResponseBody String testOAuthLogin(Authentication authentication,
-	// @AuthenticationPrincipal OAuth2User oauth) {// DI(의존성 주입)
-	// System.out.println("/test/oauth/login ========");
-	// OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-	// System.out.println("authentication:" + oauth2User.getAttributes());
-	// System.out.println("oauth2User:" + oauth.getAttributes());
-	// return "OAuth 세션정보 확인하기";
-	// }
 	
 	// 스프링 시큐리티 자기만의 시큐리티 세션을 가지고있다
 	// x라는 클래스를 만들어서 userDetails & OAuth2User 상속받아 사용
@@ -81,17 +61,6 @@ public class IndexController {
 	}
 	
 	
-	// @GetMapping("/loginForm")
-	// public String loginForm() {
-	// return "loginForm";
-	// }
-	//
-	// @GetMapping("/joinForm")
-	// public String joinForm() {
-	// return "joinForm";
-	// }
-	
-	
 	@PostMapping("/member/join")
 	public Map<String, Object> insertMember(@RequestBody MemberDto memberDto) {
 		memberDto.setUserPwd(passwordEncoder.encode(memberDto.getUserPwd()));
@@ -102,6 +71,17 @@ public class IndexController {
 		System.out.println(memberDto);
 		return json;
 	}
+	
+	@PostMapping("/member/checkNick")
+	public ResponseEntity<Map<String, Boolean>> checkNick(@RequestBody Map<String, String> params) {
+		String nickName = params.get("userNick");
+		
+		boolean exists = memberService.checkNick(nickName);
+		Map<String, Boolean> response = new HashMap();
+		response.put("exists", exists);
+		return ResponseEntity.ok().body(response);
+	}
+	
 	
 	@GetMapping("/member/mypage")
 	public Map<String, Object> myPage(@RequestParam(value = "userId", required = false) Long userId) {
@@ -114,13 +94,25 @@ public class IndexController {
 	
 	
 	@PutMapping("/member/mypage")
-	public Map<String, Object> updateMemberInfo(@RequestBody MemberDto memberDto) {
+	public MemberDto updateMemberInfo(@RequestBody MemberDto memberDto) {
+		log.info(memberDto);
 		memberService.updateMemberInfo(memberDto);
-		memberDto.setUserPwd(passwordEncoder.encode(memberDto.getUserPwd()));
-		memberDto.setUserRole("ROLE_USER");
-		Map<String, Object> json = new HashMap<>();
-		json.put("memberDto", memberDto);
-		return json;
+		memberService.updateMemberDiet(memberDto);
+		// memberDto.setUserPwd(passwordEncoder.encode(memberDto.getUserPwd()));
+		return memberDto;
+	}
+	
+	@DeleteMapping("/member")
+	public Map<String, Object> deleteMember(int userId) {
+		try {
+			memberService.deleteMember(userId);
+			return Map.of("success", true,
+					"messsage", "회원탈퇴 성공");
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Map.of("success", false,
+					"error", e.getMessage());
+		}
 	}
 	
 	@Secured("ROLE_ADMIN")

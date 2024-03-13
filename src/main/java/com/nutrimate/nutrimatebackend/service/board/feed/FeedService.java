@@ -130,7 +130,7 @@ public class FeedService {
 	/** 해시태그 **/
 	// 해당 글의 해시태그 가져오기
 	public List<String> findHashtagsByBoardId(FeedDto feedDto) {
-		return feedMapper.findHashtagsByBoardId(feedDto);
+		return feedMapper.findHashtagsByBoardId(feedDto.getBoardId());
 	}
 	
 	// 해시태그로 글 검색

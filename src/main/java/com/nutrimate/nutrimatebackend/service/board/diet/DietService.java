@@ -1,21 +1,23 @@
 package com.nutrimate.nutrimatebackend.service.board.diet;
 
-import java.util.List;
+import com.nutrimate.nutrimatebackend.mapper.board.diet.DietMapper;
+import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import com.nutrimate.nutrimatebackend.mapper.board.diet.DietMapper;
-import com.nutrimate.nutrimatebackend.model.board.diet.DietDto;
+
+import java.util.List;
 
 @Service
+@Log4j2
 public class DietService {
 	@Autowired
 	private DietMapper dietmapper;
 	
 	//게시글 전체 리스트
 	public List<DietDto> selectListDietBoard(DietDto dto) {
-		
 		return dietmapper.findAllDietBoard(dto);
 	}
 	//게시글 상세 보기
@@ -27,7 +29,9 @@ public class DietService {
 	public int saveBoard(DietDto dto) {
 		try {
 			dietmapper.insertBoard(dto);
-			return dietmapper.insertFoodBoard(dto);
+			dietmapper.insertFoodBoard(dto);
+			insertFoodData(dto);//음식 데이터 입력
+			return 1;
 		} catch (Exception e) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return -1;
@@ -45,16 +49,17 @@ public class DietService {
 				dto.setTagName(tagName);
 				if (count == 0) {
 					dietmapper.insertHashTag(dto);
-					return dietmapper.insertBoardHashTagByBoardId(dto);
+					dietmapper.insertBoardHashTagByBoardId(dto);
 				} else {
 					int tagId = dietmapper.findHashTagIdByHashTagName(tagName);
 					dto.setTagId(tagId);
-					return dietmapper.insertBoardHashTagByBoardId(dto);
+					dietmapper.insertBoardHashTagByBoardId(dto);
 				}
-				
 			}
-			return -1;
+			insertFoodData(dto);//음식 데이터 입력
+			return 1;
 		} catch (Exception e) {
+			log.info(e.getMessage(), e);
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return -1;
 		}
@@ -64,49 +69,69 @@ public class DietService {
 	//게시글 수정
 	@Transactional
 	public int editBoard(DietDto dto) {
-		
 		try {
 			dietmapper.updateBoardByboardId(dto);
-			return dietmapper.updateFoodBoardByboardId(dto);
+			if (dto.getFbImg() != null) {
+				dietmapper.updateFoodBoardByboardId(dto);
+			}
+			editFoodData(dto);//음식 데이터 입력
+			return 1;
 		} catch (Exception e) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return -1;
 		}
-		
+	}
+	
+	int insertFoodData(DietDto dto) throws Exception {
+		for (Integer foodId : dto.getFoodId()) {
+			dietmapper.insertFoodData(dto.getBoardId(), foodId);
+		}
+		return 1;
+	}
+	
+	int editFoodData(DietDto dto) throws Exception {
+		dietmapper.deleteFoodDataByBoardId(dto);
+		for (Integer foodId : dto.getFoodId()) {
+			dietmapper.insertFoodData(dto.getBoardId(), foodId);
+		}
+		return 1;
 	}
 	
 	
 	//해시보드 수정+글 수정
 	@Transactional
 	public int editBoardANDHashBoardANDHashTag(DietDto dto) {
+		log.info("dto.getTagNameList(): " + dto.getTagNameList());
 		try {
 			dietmapper.updateBoardByboardId(dto);
-			dietmapper.updateFoodBoardByboardId(dto);
+			if (dto.getFbImg() != null) {
+				dietmapper.updateFoodBoardByboardId(dto);
+			}
 			List<DietDto> hashtagList = dietmapper.findHashTagByBoardId(dto);
 			if (hashtagList != null) {
 				dietmapper.deleteBoardHashTagByBoardIdAndTagId(dto);
 			}
-			
 			for (String tagName : dto.getTagNameList()) {
 				int count = dietmapper.findHashTagCountByHashTagName(tagName);
 				dto.setTagName(tagName);
-				
+				log.info("tagname: " + tagName);
 				if (count == 0) {
+					log.info("tagname count 0 : " + tagName);
 					dietmapper.insertHashTag(dto);
-					return dietmapper.insertBoardHashTagByBoardId(dto);
+					dietmapper.insertBoardHashTagByBoardId(dto);
 				} else {
+					log.info("tagname count 1 : " + tagName);
 					int tagId = dietmapper.findHashTagIdByHashTagName(tagName);
 					dto.setTagId(tagId);
-					return dietmapper.insertBoardHashTagByBoardId(dto);
+					dietmapper.insertBoardHashTagByBoardId(dto);
 				}
-				
 			}
-			return -1;
+			editFoodData(dto);//음식 데이터 입력
+			return 1;
 		} catch (Exception e) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return -1;
 		}
-		
 	}
 	
 	

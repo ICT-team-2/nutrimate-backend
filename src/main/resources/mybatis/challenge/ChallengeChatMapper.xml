@@ -90,21 +90,64 @@
 	</insert>
 	<select id="findAllChatByRoomType"
 	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
-		 <![CDATA[
+
 		SELECT cc.*, cu.*, m.user_profile
-			FROM challengechat cc
-				     JOIN challengeuser cu ON cc.user_id = cu.user_id
-				     JOIN member m ON cc.user_id = m.user_id
-			WHERE chatroom_id = #{chatroomId} AND trunc(cc.created_date) >= trunc(sysdate) - 1
-		]]>
+		FROM challengechat cc
+		JOIN challengeuser cu ON cc.user_id = cu.user_id
+		JOIN member m ON cc.user_id = m.user_id
+		WHERE cc.chatroom_id = #{chatroomId} 
+		AND ROWNUM BETWEEN 1 AND 100
+		ORDER BY cc.created_date
+
 		</select>
-	
-	
+
 	<!-- 채팅 닉네임 아이디 구하기(임시)-->
 	<select id="findUser" resultType="int" parameterType="ChallengeChatDto">
 		SELECT user_id
 			FROM challengeuser
 			WHERE challenge_nick = #{challengeNick}
+	</select>
+	
+	
+		<!--챌린지 댓글입력-->
+	 <insert id="insertChallengeComment" parameterType="ChallengeCommentDto">
+		INSERT INTO ChallengeComments VALUES (#{cmtId},#{userId})
+	</insert>
+	
+	
+	<!--챌린지 댓글입력-->
+	<insert id="insertComment" parameterType="ChallengeCommentDto">
+		<selectKey keyProperty="cmtId" resultType="int" order="BEFORE">
+			SELECT SEQ_COMMENTS.NEXTVAL FROM DUAL
+		</selectKey>
+	        INSERT INTO comments (cmt_id, user_id, cmt_content, CREATED_DATE)
+            VALUES (SEQ_COMMENTS.CURRVAL, #{userId}, #{cmtContent}, SYSDATE)
+	</insert>
+	
+		
+    <!-- 챌린지 댓글 가지고 오기-->
+	<select id="findCommentList" resultType="ChallengeCommentDto" parameterType="ChallengeCommentDto">
+		SELECT * FROM (
+		        SELECT c.*,m.user_nick,RANK() OVER (ORDER BY c.created_date desc) AS label 
+		        FROM challengecomments cc  JOIN comments c ON c.cmt_id=cc.cmt_id JOIN member m ON m.user_id = cc.user_id 
+		        WHERE c.blocked='N' AND c.deleted='N'
+		        ORDER BY c.created_date DESC		
+		) WHERE label BETWEEN (#{nowPage}-1)*10+1 AND #{nowPage}*10
+	</select>
+	
+   <update id="updateComment" parameterType="ChallengeCommentDto">
+		UPDATE comments
+		SET cmt_content=#{cmtContent} where cmt_id=#{cmtId}
+	
+	</update>
+	   <update id="deleteComment" parameterType="ChallengeCommentDto">
+		UPDATE comments
+		SET deleted='Y' where cmt_id=#{cmtId}
+	
+	</update>
+	
+	<select id="selectUserNick" resultType="Map" parameterType="ChallengeCommentDto">
+		select user_nick from MEMBER where user_id=#{userId}
 	</select>
 
 

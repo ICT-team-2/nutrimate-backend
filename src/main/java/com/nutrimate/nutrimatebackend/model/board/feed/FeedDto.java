@@ -60,6 +60,9 @@ public class FeedDto {
 	// private int boardId; // 글번호(+북마크FK)
 	// private Date createdDate; // 북마크 누른 날짜
 	
+	//팔로우
+	private int checkedFollowed; // 팔로우 체크
+	
 	/** 해시태그 (검색) **/
 	// private int boardId; // 글번호(+해시태그FK)
 	private int tagId; // 태그 기본키

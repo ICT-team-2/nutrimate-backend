@@ -28,6 +28,10 @@ public class StatisticsService {
     public List<StatisticsDto> selectBestList() {
       return statisticsmapper.findBestBylikeAndBoardviewcount();
     }
+  //월 카테고리별 게시글 수
+	public List<StatisticsDto> selectCategoryBoardList() {
+		 return statisticsmapper.findBestByBoardCategory();
+	}
 
 
 

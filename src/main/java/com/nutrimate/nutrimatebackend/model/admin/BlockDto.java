@@ -18,11 +18,13 @@ import lombok.ToString;
 public class BlockDto {
 	
   private int reportid;
+  private int[] reportId;
   private String seachKeyWord;
   private String userid;
   private java.sql.Date createddate;
   private String reportreason;
   private String boardid;
+  private String boardContent;
   private String cmtid;
   private String usernick;
   private String count;// 신고들어온 수

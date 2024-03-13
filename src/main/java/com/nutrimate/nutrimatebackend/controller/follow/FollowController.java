@@ -113,7 +113,7 @@ public class FollowController {
 	// 입력 데이터 : userId,followeeId
 	// 출력 데이터 : message
 	@DeleteMapping("/unfollow")
-	public ResponseEntity<Map<String, Object>> deletefollowUser(@RequestBody FollowDto followDto) {
+	public ResponseEntity<Map<String, Object>> deletefollowUser(FollowDto followDto) {
 		Integer unfollow = followservice.deletefollowUser(followDto);
 		Map<String, Object> jsonResponse = new HashMap<>();
 		jsonResponse.put("message", (unfollow >= 1) ? "팔로우를 해제했어요" : "팔로우 상태가 아니에요");

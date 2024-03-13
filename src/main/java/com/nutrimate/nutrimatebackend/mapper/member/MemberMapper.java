@@ -20,5 +20,18 @@ public interface MemberMapper {
 	
 	int updateMemberInfo(MemberDto memberDto);
 	
+	int updateMemberDiet(MemberDto memberDto);
 	
+	boolean checkPhoneNumber(String userPhone);
+	
+	boolean checkNick(String nickName);
+	
+	boolean checkEmail(String email);
+	
+	
+	int findCheckInsertNutriRatio(MemberDto memberDto); // 영양비율 등록 여부 확인
+	
+	int insertMemberDiet(MemberDto memberDto); // 영양비율 등록
+	
+	int deleteMember(int userId); // 영양비율 삭제
 }

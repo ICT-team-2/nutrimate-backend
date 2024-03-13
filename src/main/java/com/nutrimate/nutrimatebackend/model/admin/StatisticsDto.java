@@ -20,6 +20,8 @@ public class StatisticsDto {
   private String count;
   private String boardcategory;
   private String boardtitle;
+  private String boardId;
+  private String boardContent;
   private String usernick;
   private java.sql.Date createddate;
   private java.sql.Date day;

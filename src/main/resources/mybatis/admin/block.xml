@@ -19,18 +19,19 @@
 		<result property="totalPage" column="totalpage"/>
 		<result property="nowPage" column="nowPage"/>
 		<result property="boardcategory" column="board_category"/>
+		<result property="reportid" column="report_id"/>
 	</resultMap>
 	
 	
 	<select id="findAllBoard" resultMap="boardResult">
 		select * from(
-		SELECT user_id,user_profile,board_id,board_category,board_title,user_nick,COUNT,totalPage,
+		SELECT user_id,user_profile,board_id,board_category,board_title,user_nick,COUNT,totalPage,blocked,board_content,
 		ROW_NUMBER() OVER (ORDER BY board_id DESC) AS label
 		FROM (
 		SELECT
-		DISTINCT m.user_id, m.user_profile, b.board_id,board_category,b.board_title, m.user_nick,
+		DISTINCT m.user_id, m.user_profile, b.board_id,board_category,b.board_title, m.user_nick,blocked,board_content,
 		COUNT(*) OVER (PARTITION BY b.board_id) AS COUNT,
-		CEIL((SELECT COUNT(*) FROM boardreport) / 10) AS totalpage
+		(SELECT COUNT(DISTINCT board_id) FROM boardreport) AS totalpage
 		FROM boardreport br
 		JOIN board b ON br.board_id = b.board_id
 		JOIN member m ON b.user_id = m.user_id
@@ -43,7 +44,7 @@
 			</if>
 		</where>
 		))
-		WHERE label BETWEEN (#{nowPage}-1)*10+1 AND #{nowPage}*10
+		WHERE label BETWEEN (#{nowPage}-1)*5+1 AND #{nowPage}*5
 		ORDER BY
 		board_id DESC
 	
@@ -64,12 +65,11 @@
 	</resultMap>
 	<select id="findAllComment" resultMap="commentResult">
 		select * from(
-		SELECT cmt_id,user_id,board_id,user_profile,user_nick,totalPage,cmt_content,
+		SELECT cmt_id,user_id,board_id,user_profile,user_nick,totalPage,cmt_content,blocked,
 		COUNT,ROW_NUMBER() OVER (ORDER BY cmt_id DESC) AS label
 		FROM (
-		SELECT DISTINCT c.cmt_id,c.user_id,c.board_id,m.user_nick,m.user_profile,c.cmt_content,
-		COUNT(*) OVER (PARTITION BY c.cmt_id) AS COUNT,CEIL(((select count(*) from
-		commentreport)/10)) totalPage
+		SELECT DISTINCT c.cmt_id,c.user_id,c.board_id,m.user_nick,m.user_profile,c.cmt_content,blocked,
+		COUNT(*) OVER (PARTITION BY c.cmt_id) AS COUNT,(SELECT COUNT(DISTINCT cmt_id) FROM commentreport) AS totalpage
 		FROM commentreport cr join comments c on cr.cmt_id=c.cmt_id join member m on c.user_id =
 		m.user_id
 		<where>
@@ -162,6 +162,7 @@
 		DELETE commentreport
 			WHERE report_id = #{reportid}
 	</delete>
+	
 
 
 </mapper>
