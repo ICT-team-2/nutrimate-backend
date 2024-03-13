@@ -22,40 +22,39 @@ public class ChallengeChatDto {
 	
 	
 
-	private String channelId;
-	private String messageId;
-	private int COUNT;
-	
-	private int chatroomId;
-	private long userId;
-	private MessageType messageType;
-	private String chatMessage;
-	private String challengeNick;
-	private String chatRoomType;
-	private RoomType roomType;
-	private Date createdDate;
-	
-	public enum MessageType {
-		CHAT,//채팅
-		ENTER,//채팅 입장
-		LEAVE,//채탕 나가기
-		CHALLENGE
-	}
-	
-	
+    private String channelId;
+    private String messageId;
+    private int COUNT;
+
+    private int chatroomId;
+    private int userId;
+    private MessageType messageType;
+    private String chatMessage;
+    private String challengeNick;
+    private String chatRoomType;
+    private RoomType roomType;
+    private Date createdDate;
+
+    public enum MessageType {
+        CHAT, // 채팅
+        ENTER, // 채팅 입장
+        LEAVE, // 채탕 나가기
+        CHALLENGE
+    }
 
 
-	public enum RoomType {
-		FIRST_ROOM("FIRST_ROOM"),
-		SECOND_ROOM("SECOND_ROOM");
-		
-		private final String roomName;
-		RoomType(String roomName) {
-			this.roomName = roomName;
-		}
-   
-		
-	}
+
+    public enum RoomType {
+        FIRST_ROOM("FIRST_ROOM"), SECOND_ROOM("SECOND_ROOM");
+
+        private final String roomName;
+
+        RoomType(String roomName) {
+            this.roomName = roomName;
+        }
+
+
+    }
 
 
 }
