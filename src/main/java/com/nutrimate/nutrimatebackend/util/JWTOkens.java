@@ -32,6 +32,9 @@ public class JWTOkens {
 	private static SecretKey refreshKey;
 	private static String secret;
 	
+	@Value("${domain}")
+	private static String domain;
+	
 	/**
 	 * JWT토큰을 생성해서 반환하는 메소드
 	 *
@@ -166,11 +169,17 @@ public class JWTOkens {
 	
 	
 	public static void removeToken(HttpServletRequest request, HttpServletResponse response) {
+		log.info("removeToken 실행");
+		log.info("domain: " + domain);
 		Cookie accessCookie = new Cookie("ACCESS", "");
 		accessCookie.setPath("/");
+		if (domain != null)
+			accessCookie.setDomain(domain);
 		accessCookie.setMaxAge(0);
 		Cookie refreshCookie = new Cookie("REFRESH", "");
 		refreshCookie.setPath("/");
+		if (domain != null)
+			refreshCookie.setDomain(domain);
 		refreshCookie.setMaxAge(0);
 		response.addCookie(accessCookie);
 		response.addCookie(refreshCookie);
@@ -195,6 +204,9 @@ public class JWTOkens {
 	private void setSecret(String secret) {
 		this.secret = secret;
 	}
-	
+	@Value("${domain}")
+	private void setDomain(String domain) {
+		this.domain = domain;
+	}
 	
 }

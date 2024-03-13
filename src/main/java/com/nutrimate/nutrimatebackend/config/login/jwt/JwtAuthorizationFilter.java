@@ -32,18 +32,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	private MemberMapper memberMapper;
 	private BCryptPasswordEncoder passwordEncoder;
 	private ObjectMapper objectMapper;
+	private String domain;
 	
-	public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
-	                              MemberMapper memberMapper, BCryptPasswordEncoder passwordEncoder,
-	                              ObjectMapper objectMapper
-	                              // ,MemberService memberService
+	public JwtAuthorizationFilter(
+			AuthenticationManager authenticationManager,
+			MemberMapper memberMapper, BCryptPasswordEncoder passwordEncoder,
+			ObjectMapper objectMapper, String domain
+			// ,MemberService memberService
 	) {
 		super(authenticationManager);
 		this.memberMapper = memberMapper;
 		this.passwordEncoder = passwordEncoder;
 		// this.memberService = memberService;
 		this.objectMapper = objectMapper;
-		
+		this.domain = domain;
 	}
 	
 	
@@ -123,6 +125,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 								Cookie accessCookie = new Cookie("ACCESS", accessToken);
 								log.info(accessCookie);
 								accessCookie.setPath("/");
+								if (domain != null) {
+									accessCookie.setDomain(domain);
+								}
 								response.addCookie(accessCookie);
 								// setUserInfo(refreshToken, request, response, memberService, userId);
 								break;

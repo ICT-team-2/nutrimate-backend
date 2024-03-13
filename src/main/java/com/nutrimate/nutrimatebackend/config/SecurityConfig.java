@@ -10,6 +10,7 @@ import com.nutrimate.nutrimatebackend.service.member.MemberService;
 import com.nutrimate.nutrimatebackend.util.JWTOkens;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,12 @@ import java.util.Map;
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Log4j2
 public class SecurityConfig {
+	
+	@Value("${front-url}")
+	String frontUrl;
+	@Value("${domain}")
+	String domain;
+	
 	
 	@Autowired
 	ClientRegistrationRepository clientRegistrationRepository;
@@ -67,28 +74,11 @@ public class SecurityConfig {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 	
-	// @Bean
-	// public CorsConfigurationSource corsConfigurationSource() {
-	// CorsConfiguration configuration = new CorsConfiguration();
-	// configuration.setAllowedOrigins(Arrays.asList("http://localhost:5555")); // 허용할 출처 목록
-	// configuration
-	// .setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // 허용할
-	// // HTTP
-	// // 메소드
-	// configuration
-	// .setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With")); // 허용할
-	// // 헤더
-	// configuration.setAllowCredentials(true); // 쿠키를 포함할지 여부
-	// UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	// source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 이 정책을 적용
-	// return source;
-	// }
 	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http,
 	                                        AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder)
 			throws Exception {
-		
 		
 		// http.addFilterBefore(corsFilter, ChannelProcessingFilter.class);
 		http.csrf(t -> t.disable())
@@ -100,17 +90,19 @@ public class SecurityConfig {
 						.requestMatchers("/api/v1/admin/**").hasRole("ADMIN").anyRequest().permitAll())
 				.addFilter(corsFilter) // @CrossOrigin(인증 x), 시큐리티 필터에 등록인증(o)
 				
-				.addFilter(new JwtAuthenticationFilter(authenticationManager, objectMapper)) // AuthenticationManager
-				.addFilter(new JwtAuthorizationFilter(authenticationManager, memberMapper, passwordEncoder,
-						objectMapper)) // AuthenticationManager
-				
+				.addFilter(new JwtAuthenticationFilter(authenticationManager, objectMapper, domain)) // AuthenticationManager
+				.addFilter(new JwtAuthorizationFilter(
+						authenticationManager,
+						memberMapper,
+						passwordEncoder,
+						objectMapper, domain)) // AuthenticationManager
 				.formLogin(t -> t
 						// .loginPage("/loginForm")
 						.loginProcessingUrl("/login").defaultSuccessUrl("/"))
 				.oauth2Login(t -> t
 						// .loginPage("/loginForm")
 						.userInfoEndpoint(endpoint -> endpoint.userService(principalOauth2UserService))
-						.defaultSuccessUrl("http://localhost:5555/")
+						.defaultSuccessUrl(frontUrl)
 						.failureHandler((request, response, exception) -> {
 							log.info("exception: ", exception);
 							response.getWriter().println(exception.getMessage());

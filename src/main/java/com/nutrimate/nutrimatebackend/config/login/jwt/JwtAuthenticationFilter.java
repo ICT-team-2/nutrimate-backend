@@ -22,14 +22,18 @@ import java.util.Map;
 
 @Log4j2
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+	String domain;
 	
 	private AuthenticationManager authenticationManager;
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
-	                               ObjectMapper objectMapper) {
+	public JwtAuthenticationFilter(
+			AuthenticationManager authenticationManager,
+			ObjectMapper objectMapper,
+			String domain) {
 		this.authenticationManager = authenticationManager;
 		this.objectMapper = objectMapper;
+		this.domain = domain;
 	}
 	
 	
@@ -89,7 +93,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				payloads, expirationTime, JWTOkens.ACCESS);
 		Cookie accessCookie = new Cookie("ACCESS", accessToken);
 		accessCookie.setPath("/");
-		log.info(accessCookie);
+		if (domain != null) {
+			accessCookie.setDomain(domain);
+		}
+		log.info("domain:" + domain);
 		response.addCookie(accessCookie);
 		
 		if (status == JWTOkens.ACCESS) {
@@ -98,6 +105,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 					payloads, expirationTime, JWTOkens.REFRESH);
 			Cookie refreshCookie = new Cookie("REFRESH", refreshToken);
 			refreshCookie.setPath("/");
+			if (domain != null) {
+				refreshCookie.setDomain(domain);
+			}
+			refreshCookie.setHttpOnly(true);
+			refreshCookie.setSecure(true);
 			log.info(refreshCookie);
 			response.addCookie(refreshCookie);
 		}
