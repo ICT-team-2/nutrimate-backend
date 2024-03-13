@@ -90,4 +90,8 @@ public class MemberService {
 		boolean exists = memberMapper.checkNick(nickName);
 		return exists;
 	}
+	
+	public int deleteMember(int userId) {
+		return memberMapper.deleteMember(userId);
+	}
 }
