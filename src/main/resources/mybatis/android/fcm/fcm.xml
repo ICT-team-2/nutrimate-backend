@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 매퍼파일 -->
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.android.fcm.FCMMapper">
+	
+	<insert id="insertFcmToken" parameterType="String">
+		INSERT INTO FCM_TOKENS VALUES(TOKENS_SEQ.NEXTVAL,#{token})
+	</insert>
+	<select id="findAllTokens" resultType="String">
+		SELECT TOKEN FROM FCM_TOKENS ORDER BY ID DESC
+	</select>
+</mapper>
