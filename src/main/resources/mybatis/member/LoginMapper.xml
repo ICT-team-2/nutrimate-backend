@@ -35,8 +35,11 @@
         INSERT INTO nutriratio(user_id, protein, carbo, province)
             VALUES (#{userId}, #{protein}, #{carbo}, #{province})
     </insert>
-    
-    
+    <update id="deleteMember">
+        UPDATE member
+        SET deleted = 'Y'
+            WHERE user_id = #{userId}
+    </update>
     <select id="findCommonMemberByUid" parameterType="String"
             resultType="MemberDto">
         SELECT *
@@ -101,12 +104,14 @@
         SELECT count(*)
             FROM member
             WHERE user_phone = #{userPhone}
+              AND deleted = 'N'
     </select>
     
     <select id="checkEmail" parameterType="string" resultType="boolean">
         SELECT count(*)
             FROM member
             WHERE user_email = #{userEmail}
+              AND deleted = 'N'
     </select>
     
     <select id="checkNick" parameterType="string" resultType="boolean">
