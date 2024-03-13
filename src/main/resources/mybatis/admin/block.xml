@@ -81,7 +81,7 @@
 			</if>
 		</where>
 		))
-		WHERE label BETWEEN (#{nowPage}-1)*10+1 AND #{nowPage}*10
+		WHERE label BETWEEN (#{nowPage}-1)*5+1 AND #{nowPage}*5
 		ORDER BY
 		cmt_id DESC
 	</select>
@@ -98,30 +98,20 @@
 		<result property="label" column="label"/>
 	</resultMap>
 	<select id="findByBoarderId" resultMap="reportResult" parameterType="blockDto">
-		SELECT *
-			FROM (SELECT m.user_nick, r.*,
-			             ceil((SELECT count(*) FROM boardreport WHERE board_id = #{boardid}) /
-			                  5) AS totalpage, rank() OVER (ORDER BY r.report_id DESC) AS label
-				      FROM report r
-					           JOIN boardreport br ON r.report_id = br.report_id
-					           JOIN member m ON r.user_id = m.user_id
-				      WHERE br.board_id = #{boardid}
-				      ORDER BY r.report_id DESC)
-			WHERE label BETWEEN (#{nowPage} - 1) * 5 + 1 AND #{nowPage} * 5
+		SELECT m.user_nick, r.* FROM report r
+				JOIN boardreport br ON r.report_id = br.report_id
+				JOIN member m ON r.user_id = m.user_id
+				 WHERE br.board_id = #{boardid}
+				 ORDER BY r.report_id DESC
 	</select>
 	
 	<!--/신고한 글 사유-댓글 -->
 	<select id="findByCmtId" resultMap="reportResult" parameterType="blockDto">
-		SELECT *
-			FROM (SELECT m.user_nick, r.*,
-			             ceil((SELECT count(*) FROM commentreport WHERE cmt_id = #{cmtid}) /
-			                  5) AS totalpage, rank() OVER (ORDER BY r.report_id DESC) AS label
-				      FROM report r
-					           JOIN commentreport cr ON r.report_id = cr.report_id
-					           JOIN member m ON r.user_id = m.user_id
-				      WHERE cr.cmt_id = #{cmtid}
-				      ORDER BY r.report_id DESC)
-			WHERE label BETWEEN (#{nowPage} - 1) * 5 + 1 AND #{nowPage} * 5
+		SELECT m.user_nick, r.* FROM report r
+				JOIN commentreport cr ON r.report_id = cr.report_id
+				JOIN member m ON r.user_id = m.user_id
+				WHERE cr.cmt_id = #{cmtid}
+				ORDER BY r.report_id DESC
 	</select>
 	<!-- 신고한 게시글 차단 -->
 	<update id="updateBoarderBlockByBoardId" parameterType="blockDto">
@@ -147,6 +137,20 @@
 		SET blocked='N'
 			WHERE cmt_id = #{cmtid}
 	</update>
+	
+	<resultMap id="reportIdResult" type="blockDto">
+		<result property="reportid" column="report_id"/>
+	</resultMap>
+	<!-- board값으로 report id 불러오기 -->
+	<select id="findReportIdByBoardId" resultMap="reportIdResult" parameterType="blockDto">
+		SELECT REPORT_ID FROM BOARDREPORT WHERE BOARD_ID=#{boardid}
+	</select>
+	
+	<!-- cmt값으로 report id 불러오기 -->
+	<select id="findReportIdByCmtId" resultMap="reportIdResult" parameterType="blockDto">
+		SELECT REPORT_ID FROM COMMENTREPORT WHERE CMT_ID=#{cmtid}
+	</select>
+	
 	<!-- report에서 삭제 -->
 	<delete id="deleteReportByReport_id" parameterType="blockDto">
 		DELETE report

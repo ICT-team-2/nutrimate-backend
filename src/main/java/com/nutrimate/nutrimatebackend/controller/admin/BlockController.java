@@ -118,13 +118,16 @@ public class BlockController {
 	@DeleteMapping("/block/list")
 	public Map deleteBlockList(@ModelAttribute BlockDto dto) {
 		Map map = new HashMap();
-		int affected = blockService.deleteBlockList(dto);
-		if (affected == 1) {
-			map.put("BLOCKOK", "게시글 신고 내역을 삭제 했습니다.");
-		} else {
-			map.put("BLOCKNOT", "게시글 신고 내역 삭제에 실패했습니다!");
-			
-		}
+		List<BlockDto> blockList = blockService.selectReportIdByBoardId(dto);
+	      for(BlockDto report :blockList) {
+	        int affected = blockService.deleteBlockList(report);
+	        if (affected == 1) {
+	            map.put("BLOCKOK", "게시글 신고 내역을 삭제 했습니다.");
+	        } else {
+	            map.put("BLOCKNOT", "게시글 신고 내역 삭제에 실패했습니다!");
+	            
+	         }
+	       }
 		return map;
 		
 	}
@@ -134,18 +137,21 @@ public class BlockController {
 	@DeleteMapping("/block/list/comment")
 	public Map deleteBlockListComment(@ModelAttribute BlockDto dto) {
 		Map map = new HashMap();
-		
-		
-		int affected = blockService.deleteBlockListComment(dto);
-		if (affected == 1) {
-			map.put("BLOCKOK", "댓글 신고 내역을 삭제 했습니다.");
-		} else {
-			map.put("BLOCKNOT", "댓글 신고 내역 삭제에 실패했습니다!");
-			
+		List<BlockDto> blockList = blockService.selectReportIdByCmtId(dto);
+		for(BlockDto report :blockList) {
+	        int affected = blockService.deleteBlockListComment(report);
+	        if (affected == 1) {
+	            map.put("BLOCKOK", "댓글 신고 내역을 삭제 했습니다.");
+	        } else {
+	            map.put("BLOCKNOT", "댓글 신고 내역 삭제에 실패했습니다!");
+	            
+	        }
 		}
 		return map;
 		
 	}
+	
+	//댓글 삭제을 위해 cmd_id,board_id로 리포트 가지고 오기
 	
 	
 }

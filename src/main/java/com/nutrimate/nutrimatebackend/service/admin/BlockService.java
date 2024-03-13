@@ -73,6 +73,15 @@ public class BlockService {
 			return -1;
 		}
 	}
+    
+	//게시글 리포트 아이디 가지고 오기
+    public List<BlockDto> selectReportIdByBoardId(BlockDto dto) {
+      return blockmapper.findReportIdByBoardId(dto);
+    }
+    //댓글 리포트 아이디 가지고 오기
+    public List<BlockDto> selectReportIdByCmtId(BlockDto dto) {
+      return blockmapper.findReportIdByCmtId(dto);
+    }
 	
 	
 	

@@ -32,27 +32,6 @@ public class IndexController {
 		this.passwordEncoder = passwordEncoder;
 	}
 	
-	// @GetMapping("/test/login")
-	// public @ResponseBody String testLogin(Authentication authentication,
-	// @AuthenticationPrincipal PrincipalDetails userDetails) {// DI(의존성 주입)
-	// System.out.println("/test/login ========");
-	// PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-	// System.out.println("authentication:" + principalDetails.getMemberDto());
-	//
-	// System.out.println("userDetails:" + userDetails.getUsername());
-	// return "세션정보 확인하기";
-	// }
-	//
-	// @GetMapping("/test/oauth/login")
-	// public @ResponseBody String testOAuthLogin(Authentication authentication,
-	// @AuthenticationPrincipal OAuth2User oauth) {// DI(의존성 주입)
-	// System.out.println("/test/oauth/login ========");
-	// OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-	// System.out.println("authentication:" + oauth2User.getAttributes());
-	// System.out.println("oauth2User:" + oauth.getAttributes());
-	// return "OAuth 세션정보 확인하기";
-	// }
-	
 	// 스프링 시큐리티 자기만의 시큐리티 세션을 가지고있다
 	// x라는 클래스를 만들어서 userDetails & OAuth2User 상속받아 사용
 	
@@ -80,17 +59,6 @@ public class IndexController {
 	public String manager() {
 		return "manager";
 	}
-	
-	
-	// @GetMapping("/loginForm")
-	// public String loginForm() {
-	// return "loginForm";
-	// }
-	//
-	// @GetMapping("/joinForm")
-	// public String joinForm() {
-	// return "joinForm";
-	// }
 	
 	
 	@PostMapping("/member/join")
@@ -132,6 +100,19 @@ public class IndexController {
 		memberService.updateMemberDiet(memberDto);
 		// memberDto.setUserPwd(passwordEncoder.encode(memberDto.getUserPwd()));
 		return memberDto;
+	}
+	
+	@DeleteMapping("/member")
+	public Map<String, Object> deleteMember(int userId) {
+		try {
+			memberService.deleteMember(userId);
+			return Map.of("success", true,
+					"messsage", "회원탈퇴 성공");
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return Map.of("success", false,
+					"error", e.getMessage());
+		}
 	}
 	
 	@Secured("ROLE_ADMIN")
