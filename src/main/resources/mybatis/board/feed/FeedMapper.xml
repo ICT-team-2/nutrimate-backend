@@ -72,6 +72,14 @@
         ),
         b5 AS (SELECT b4.*, row_number() OVER (ORDER BY b4.board_id DESC) AS rnum
         FROM b4
+        <where>
+            <if test="profile!=null and profile==true">
+                AND user_id = #{profileUserId}
+            </if>
+            <if test="bookmark!=null and bookmark==true">
+                AND checked_profile_user_bookmark = 1
+            </if>
+        </where>
         GROUP BY b4.board_id, b4.board_thumbnail, b4.board_content, b4.user_nick,
         b4.user_profile, b4.like_count, b4.checked_like, b4.bookmark_count,
         b4.checked_bookmark, b4.user_id
@@ -80,16 +88,12 @@
         </if>
         )
         SELECT b5.*,
-        (select count(*) from follow f where f.followee_id = b5.user_id and f.follower_id =
-        #{userId}) as checked_followed
+        (select count(*)
+        from follow f
+        where f.followee_id = b5.user_id
+        and f.follower_id =#{userId}) as checked_followed
         FROM b5
         WHERE rnum BETWEEN #{startRow} AND #{endRow}
-        <if test="profile!=null and profile==true">
-            AND user_id = #{profileUserId}
-        </if>
-        <if test="bookmark!=null and bookmark==true">
-            AND checked_profile_user_bookmark = 1
-        </if>
     </select>
     
     <!-- 피드 총 페이지 수 가져오기(페이징 시 필요) -->

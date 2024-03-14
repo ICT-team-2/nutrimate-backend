@@ -1,12 +1,11 @@
 package com.nutrimate.nutrimatebackend.service.follow;
 
-import com.nutrimate.nutrimatebackend.mapper.follow.FollowMapper;
-import com.nutrimate.nutrimatebackend.model.follow.FollowDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.sql.SQLException;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.nutrimate.nutrimatebackend.mapper.follow.FollowMapper;
+import com.nutrimate.nutrimatebackend.model.follow.FollowDto;
 
 @Service
 public class FollowService {
@@ -53,5 +52,10 @@ public class FollowService {
 	public int deletefollowUser(FollowDto followDto) {
 		return followMapper.deletefollowUser(followDto);
 	}
+
+      public String findNickName(FollowDto followDto) {
+        return followMapper.findfollowUser(followDto);
+        
+      }
 	
 }

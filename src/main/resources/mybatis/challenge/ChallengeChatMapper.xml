@@ -75,58 +75,56 @@
             WHERE rownum BETWEEN 1 AND 5
         ]]>
 		 </select>
-    <!--챌린지 등수 출력-->
-    <select id="findChallengeSuccessCount" resultType="int" parameterType="ChallengeChatDto">
-        SELECT count(*)
-            FROM challengesuccess
-            WHERE user_id = #{userId} AND trunc(success_date) = trunc(sysdate)
-              AND chatroom_id = #{chatroomId}
-    </select>
-    
-    <!--챌린지 성공 기록하기-->
-    <insert id="insertChallengeSuccessCount" parameterType="ChallengeChatDto">
-        INSERT INTO challengesuccess
-            VALUES (#{userId}, #{chatroomId}, sysdate, seq_board.nextval)
-    </insert>
-    <select id="findAllChatByRoomType"
-            resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
-        
-        SELECT cc.*, cu.*, m.user_profile
-            FROM challengechat cc
-                     JOIN challengeuser cu ON cc.user_id = cu.user_id
-                     JOIN member m ON cc.user_id = m.user_id
-            WHERE cc.chatroom_id = #{chatroomId}
-              AND rownum BETWEEN 1 AND 100
-            ORDER BY cc.created_date
-    
-    </select>
-    
-    <!-- 채팅 닉네임 아이디 구하기(임시)-->
-    <select id="findUser" resultType="int" parameterType="ChallengeChatDto">
-        SELECT user_id
-            FROM challengeuser
-            WHERE challenge_nick = #{challengeNick}
-    </select>
-    
-    
-    <!--챌린지 댓글입력-->
-    <insert id="insertChallengeComment" parameterType="ChallengeCommentDto">
-        INSERT INTO challengecomments
-            VALUES (#{cmtId}, #{userId})
-    </insert>
-    
-    
-    <!--챌린지 댓글입력-->
-    <insert id="insertComment" parameterType="ChallengeCommentDto">
-        <selectKey keyProperty="cmtId" resultType="int" order="BEFORE">
-            SELECT SEQ_COMMENTS.NEXTVAL
-                FROM DUAL
-        </selectKey>
-        INSERT INTO comments (cmt_id, user_id, cmt_content, created_date)
-        VALUES (seq_comments.currval, #{userId}, #{cmtContent}, sysdate)
-    </insert>
-    
-    
+	<!--챌린지 등수 출력-->
+	<select id="findChallengeSuccessCount" resultType="int" parameterType="ChallengeChatDto">
+		SELECT count(*)
+			FROM challengesuccess
+			WHERE user_id = #{userId} AND trunc(success_date) = trunc(sysdate)
+			  AND chatroom_id = #{chatroomId}
+	</select>
+	
+	<!--챌린지 성공 기록하기-->
+	<insert id="insertChallengeSuccessCount" parameterType="ChallengeChatDto">
+		INSERT INTO ChallengeSuccess (success_id, success_date, user_id, chatroom_id)
+					VALUES (SEQ_CHALLENGE_SUCCESS.NEXTVAL, SYSDATE,#{userId}, #{chatroomId})
+	</insert>
+	<select id="findAllChatByRoomType"
+	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
+
+		SELECT cc.*, cu.*, m.user_profile
+		FROM challengechat cc
+		JOIN challengeuser cu ON cc.user_id = cu.user_id
+		JOIN member m ON cc.user_id = m.user_id
+		WHERE cc.chatroom_id = #{chatroomId} 
+		AND ROWNUM BETWEEN 1 AND 100
+		ORDER BY cc.created_date
+
+		</select>
+
+	<!-- 채팅 닉네임 아이디 구하기(임시)-->
+	<select id="findUser" resultType="int" parameterType="ChallengeChatDto">
+		SELECT user_id
+			FROM challengeuser
+			WHERE challenge_nick = #{challengeNick}
+	</select>
+	
+	
+		<!--챌린지 댓글입력-->
+	 <insert id="insertChallengeComment" parameterType="ChallengeCommentDto">
+		INSERT INTO ChallengeComments VALUES (#{cmtId},#{userId})
+	</insert>
+	
+	
+	<!--챌린지 댓글입력-->
+	<insert id="insertComment" parameterType="ChallengeCommentDto">
+		<selectKey keyProperty="cmtId" resultType="int" order="BEFORE">
+			SELECT SEQ_COMMENTS.NEXTVAL FROM DUAL
+		</selectKey>
+	        INSERT INTO comments (cmt_id, user_id, cmt_content, CREATED_DATE)
+            VALUES (SEQ_COMMENTS.CURRVAL, #{userId}, #{cmtContent}, SYSDATE)
+	</insert>
+	
+		
     <!-- 챌린지 댓글 가지고 오기-->
     <select id="findCommentList" resultType="ChallengeCommentDto"
             parameterType="ChallengeCommentDto">

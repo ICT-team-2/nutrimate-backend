@@ -1,9 +1,8 @@
 package com.nutrimate.nutrimatebackend.mapper.follow;
 
-import com.nutrimate.nutrimatebackend.model.follow.FollowDto;
-import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import com.nutrimate.nutrimatebackend.model.follow.FollowDto;
 
 @Mapper
 public interface FollowMapper {
@@ -31,5 +30,11 @@ public interface FollowMapper {
 	
 	// 내가 등록한 사람 삭제. 팔로우 취소
 	int deletefollowUser(FollowDto followDto);
+   
+
+    String findfollowUser(FollowDto followDto);
+
+
+
 	
 }

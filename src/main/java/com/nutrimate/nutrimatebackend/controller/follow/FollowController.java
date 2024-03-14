@@ -1,16 +1,21 @@
 package com.nutrimate.nutrimatebackend.controller.follow;
 
-import com.nutrimate.nutrimatebackend.model.follow.FollowDto;
-import com.nutrimate.nutrimatebackend.service.follow.FollowService;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.nutrimate.nutrimatebackend.model.follow.FollowDto;
+import com.nutrimate.nutrimatebackend.service.follow.FollowService;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 @RequestMapping("/follow")
@@ -49,11 +54,13 @@ public class FollowController {
 		int followerId = followDto.getFollowerId();
 		int followeeId = followDto.getFolloweeId();
 		int recordId = followDto.getRecordId();
+		String userNick= followservice.findNickName(followDto);
 		Map<String, Object> jsonResponse = new HashMap<>();
 		jsonResponse.put("message", "Follow successfully");
 		jsonResponse.put("followerId", followerId);
 		jsonResponse.put("followeeId", followeeId);
 		jsonResponse.put("recordId", recordId);
+		jsonResponse.put("userNick", userNick);
 		return ResponseEntity.ok(jsonResponse);
 	}
 	
@@ -113,7 +120,9 @@ public class FollowController {
 	// 입력 데이터 : userId,followeeId
 	// 출력 데이터 : message
 	@DeleteMapping("/unfollow")
-	public ResponseEntity<Map<String, Object>> deletefollowUser(FollowDto followDto) {
+	public ResponseEntity<Map<String, Object>> deletefollowUser(@RequestBody FollowDto followDto) {
+	    System.out.println(followDto.getFolloweeId());
+	    System.out.println(followDto.getUserId());
 		Integer unfollow = followservice.deletefollowUser(followDto);
 		Map<String, Object> jsonResponse = new HashMap<>();
 		jsonResponse.put("message", (unfollow >= 1) ? "팔로우를 해제했어요" : "팔로우 상태가 아니에요");
