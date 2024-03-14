@@ -54,7 +54,7 @@
 		]]></if>
         ORDER BY b.created_date DESC),
         b3 as (SELECT b2.*,
-        rank() OVER (ORDER BY b2.created_date DESC) AS rank
+        row_number() OVER (ORDER BY b2.created_date DESC) AS rank
         FROM b2)
         SELECT * FROM b3
         WHERE rank
@@ -89,7 +89,7 @@
         SELECT count(*) FROM b2
     </select>
     <select id="findRankByBoardId" resultType="java.lang.Integer">
-        WITH b1 AS (SELECT rank() OVER (ORDER BY board_id DESC) rank, board_id
+        WITH b1 AS (SELECT row_number() OVER (ORDER BY board_id DESC) rank, board_id
                         FROM board
                         WHERE upper(board_category) = upper(#{category})
                           AND blocked = 'N'
@@ -102,7 +102,7 @@
         WITH b1 AS (SELECT board_id, board_category
                         FROM board
                         WHERE deleted = 'N' AND blocked = 'N'),
-             b2 AS (SELECT b1.*, rank() OVER (ORDER BY b1.board_id DESC) rank
+             b2 AS (SELECT b1.*, row_number() OVER (ORDER BY b1.board_id DESC) rank
                         FROM b1
                         WHERE upper(board_category) = upper(#{category}))
         SELECT (SELECT board_id FROM b2 WHERE rank = #{rank} + 1) prev_board_id,

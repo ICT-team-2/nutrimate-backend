@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nutrimate.nutrimatebackend.mapper.follow.FollowMapper">
-    
-    <!-- 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기) -->
-    <select id="findRecommendedFollowersList" resultType="FollowDto">
+	
+	<!-- 회원을 위한 추천 팔로우(랜덤으로 5명의 회원 가져오기) -->
+	<select id="findRecommendedFollowersList" resultType="FollowDto">
 	    <![CDATA[
         SELECT m.*,
                (SELECT count(*)
@@ -14,82 +14,82 @@
             FROM (SELECT *
                       FROM member
                       WHERE user_id != #{userId}
+                        AND user_role != 'ROLE_ADMIN'
                       ORDER BY dbms_random.value) m
             WHERE rownum <= 5
         ]]>
 	</select>
-    
-    <!-- 내가 상대를 팔로우 하는 쿼리문 -->
-    <insert id="insertFollowUser" parameterType="FollowDto">
-        <selectKey keyProperty="recordId" resultType="int" order="AFTER">
-            SELECT SEQ_FOLLOW.CURRVAL
-                FROM DUAL
-        </selectKey>
-        INSERT INTO follow (follow_id, follower_id, created_date, followee_id)
-        VALUES (seq_follow.nextval, #{followerId}, sysdate, #{followeeId})
-    </insert>
-    
-    <!-- 내 팔로잉(내가 등록한 사람) 수를 가져오는 쿼리문 -->
-    <select id="findFollowingCount" resultType="int" parameterType="FollowDto">
-        SELECT count(*)
-            FROM follow
-            WHERE follower_id = #{userId}
-    </select>
-    
-    <!-- 내 팔로워(나를 등록한 사람) 수를 가져오는 쿼리문 -->
-    <!-- 입력 데이터 : userId -->
-    <select id="findFollowerCount" resultType="int" parameterType="FollowDto">
-            SELECT count(*)
-            FROM follow
-            WHERE followee_id = #{userId}
-    </select>
-     <select id="findfollowUser" resultType="String" parameterType="FollowDto">
+	
+	<!-- 내가 상대를 팔로우 하는 쿼리문 -->
+	<insert id="insertFollowUser" parameterType="FollowDto">
+		<selectKey keyProperty="recordId" resultType="int" order="AFTER">
+			SELECT SEQ_FOLLOW.CURRVAL
+				FROM DUAL
+		</selectKey>
+		INSERT INTO follow (follow_id, follower_id, created_date, followee_id)
+		VALUES (seq_follow.nextval, #{followerId}, sysdate, #{followeeId})
+	</insert>
+	
+	<!-- 내 팔로잉(내가 등록한 사람) 수를 가져오는 쿼리문 -->
+	<select id="findFollowingCount" resultType="int" parameterType="FollowDto">
+		SELECT count(*)
+			FROM follow
+			WHERE follower_id = #{userId}
+	</select>
+	
+	<!-- 내 팔로워(나를 등록한 사람) 수를 가져오는 쿼리문 -->
+	<!-- 입력 데이터 : userId -->
+	<select id="findFollowerCount" resultType="int" parameterType="FollowDto">
+		SELECT count(*)
+			FROM follow
+			WHERE followee_id = #{userId}
+	</select>
+    <select id="findfollowUser" resultType="String" parameterType="FollowDto">
         SELECT user_nick
             FROM Member
             WHERE user_id = #{followerId}
     </select>
-    
-    <!-- 내 팔로잉(내가 등록한 사람) 목록을 가져오는 쿼리문 -->
-    <select id="findFollowingList" resultType="FollowDto" parameterType="FollowDto">
-        SELECT f.*, m.*,
-               (SELECT count(*)
-                    FROM follow
-                    WHERE follower_id = #{userId}
-                      AND followee_id = m.user_id) AS is_following
-            FROM follow f
-                     RIGHT JOIN member m
-                                ON m.user_id = f.followee_id
-            WHERE follower_id = #{userId}
-    </select>
-    
-    <!-- 내 팔로워(나를 등록한 사람) 목록을 가져오는 쿼리문 -->
-    <select id="findFollowerList" resultType="FollowDto" parameterType="FollowDto">
-        SELECT f.*, m.*,
-               (SELECT count(*)
-                    FROM follow
-                    WHERE follower_id = #{userId}
-                      AND followee_id = m.user_id) AS is_following
-            FROM follow f
-                     RIGHT JOIN member m
-                                ON m.user_id = f.follower_id
-            WHERE followee_id = #{userId}
-    </select>
-    
-    <!-- 팔로우 유무 확인 (0일시 안누름) -->
-    <select id="checkFollowStatus" resultType="int" parameterType="FollowDto">
-        SELECT count(*)
-            FROM follow
-            WHERE follower_id = #{userId} AND followee_id = #{followeeId}
-    </select>
-    
-    <!-- 내가 등록한 사람 삭제. 팔로우 취소 -->
-    <delete id="deletefollowUser" parameterType="FollowDto">
-        DELETE
-            FROM follow
-            WHERE follow_id = (SELECT max(follow_id)
-                                   FROM follow
-                                   WHERE followee_id = #{followeeId}
-                                     AND follower_id = #{userId})
-    </delete>
+	<!-- 내 팔로잉(내가 등록한 사람) 목록을 가져오는 쿼리문 -->
+	<select id="findFollowingList" resultType="FollowDto" parameterType="FollowDto">
+		SELECT f.*, m.*,
+		       (SELECT count(*)
+			        FROM follow
+			        WHERE follower_id = #{userId}
+				      AND followee_id = m.user_id) AS is_following
+			FROM follow f
+				     RIGHT JOIN member m
+				                ON m.user_id = f.followee_id
+			WHERE follower_id = #{profileUserId}
+	</select>
+	
+	<!-- 내 팔로워(나를 등록한 사람) 목록을 가져오는 쿼리문 -->
+	<select id="findFollowerList" resultType="FollowDto" parameterType="FollowDto">
+		SELECT f.*, m.*,
+		       (SELECT count(*)
+			        FROM follow
+			        WHERE follower_id = #{userId}
+				      AND followee_id = m.user_id) AS is_following
+			FROM follow f
+				     RIGHT JOIN member m
+				                ON m.user_id = f.follower_id
+			WHERE followee_id = #{profileUserId}
+	</select>
+	
+	<!-- 팔로우 유무 확인 (0일시 안누름) -->
+	<select id="checkFollowStatus" resultType="int" parameterType="FollowDto">
+		SELECT count(*)
+			FROM follow
+			WHERE follower_id = #{userId} AND followee_id = #{followeeId}
+	</select>
+	
+	<!-- 내가 등록한 사람 삭제. 팔로우 취소 -->
+	<delete id="deletefollowUser" parameterType="FollowDto">
+		DELETE
+			FROM follow
+			WHERE follow_id = (SELECT max(follow_id)
+				                   FROM follow
+				                   WHERE followee_id = #{followeeId}
+					                 AND follower_id = #{userId})
+	</delete>
 
 </mapper>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nutrimate.nutrimatebackend.mapper.dmchat.DMChatRoomMapper">
+    <resultMap id="DMChatRoomDto" type="DMChatRoomDto">
+        <id property="chatroomId" column="chatroom_id"/>
+        <result property="chatroomName" column="chatroom_name"/>
+        <result property="chatroomType" column="chatroom_type"/>
+        <result property="userId" column="user_id"/>
+        <result property="latestChat" column="latest_chat"/>
+        <result property="latestChatDate" column="latest_chat_date"/>
+        <collection
+                property="memberList"
+                ofType="DMChatUserInfo"
+                column="{chatroomId=chatroom_id, userId=user_id}"
+                javaType="java.util.ArrayList"
+                select="findUserInfoByUserId"
+        />
+    </resultMap>
+    <insert id="insertChatRoom">
+        <selectKey keyProperty="chatroomId" resultType="int" order="BEFORE">
+            SELECT seq_chatroom.nextval
+                FROM dual
+        </selectKey>
+        INSERT INTO chatroom(
+        chatroom_id,
+        <if test="chatroomName != null">
+            chatroom_name,
+        </if>
+        chatroom_type)
+        VALUES
+        (#{chatroomId},
+        <if test="chatroomName != null">
+            #{chatroomName},
+        </if>
+        #{chatroomType})
+    </insert>
+    <insert id="insertMemberChatRoom">
+        INSERT ALL
+        <foreach collection="userIds" item="userId" separator=" ">
+            INTO memberchatroom(chatroom_id, user_id)
+        VALUES (
+            #{chatroomId},
+            #{userId}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+    <update id="updateChatRoomName">
+        UPDATE chatroom
+        SET chatroom_name = #{chatroomName}
+            WHERE chatroom_id = #{chatroomId}
+    </update>
+    <update id="deleteChatRoom">
+        UPDATE chatroom
+        SET deleted = 'Y'
+            WHERE chatroom_id = #{chatroomId}
+    </update>
+    <update id="updateChatroomProfile">
+        UPDATE chatroom
+        SET chatroom_profile = #{chatroomProfile}
+            WHERE chatroom_id = #{chatroomId}
+    </update>
+    <delete id="deleteMemberChatRoom">
+        DELETE
+            FROM memberchatroom
+            WHERE chatroom_id = #{chatroomId}
+              AND user_id = #{userId}
+    </delete>
+    <select id="findChatRoomsByUserId" resultMap="DMChatRoomDto">
+        WITH chat AS (SELECT cr.*, mcr.user_id, m.user_nick,
+                             (SELECT mc.chat_message
+                                  FROM (SELECT m.*,
+                                               row_number() OVER (ORDER BY m.created_date DESC) AS rank
+                                            FROM memberchat m
+                                            WHERE m.chatroom_id = cr.chatroom_id
+                                              AND m.deleted = 'N') mc
+                                  WHERE mc.rank = 1) AS latest_chat,
+                             (SELECT coalesce(mc.created_date, cr.created_date)
+                                  FROM (SELECT m.*,
+                                               row_number() OVER (ORDER BY m.created_date DESC ) AS rank
+                                            FROM memberchat m
+                                            WHERE m.chatroom_id = cr.chatroom_id
+                                              AND m.deleted = 'N') mc
+                                  WHERE mc.rank = 1) AS lcd
+                          FROM chatroom cr
+                                   JOIN memberchatroom mcr ON cr.chatroom_id = mcr.chatroom_id
+                                   JOIN member m ON mcr.user_id = m.user_id
+                          WHERE m.user_id = #{userId}
+                            AND cr.deleted = 'N')
+        SELECT chat.*,
+               coalesce(chat.lcd, created_date) AS latest_chat_date
+            FROM chat
+            ORDER BY latest_chat_date DESC, created_date DESC
+    </select>
+    
+    <select id="findUserInfoByUserId" parameterType="java.util.Map" resultType="DMChatUserInfo">
+        SELECT m.*
+            FROM memberchatroom mcr
+                     JOIN member m ON mcr.user_id = m.user_id
+            WHERE mcr.chatroom_id = #{chatroomId}
+              AND mcr.user_id != #{userId}
+    </select>
+    <select id="findUserListBySearchWord"
+            resultType="DMChatUserInfo">
+        SELECT m.*
+            FROM member m
+            WHERE m.user_nick LIKE '%' || #{searchWord} || '%'
+              AND m.deleted = 'N'
+              AND user_role != 'ROLE_ADMIN'
+    </select>
+</mapper>

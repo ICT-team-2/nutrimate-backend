@@ -17,6 +17,7 @@ public class MemberProfileDto {
 	String userUid;// 아이디
 	String userProfile; // 프로필 사진 경로
 	String userIntro; // 자기소개
+	String userRole; // 유저 권한
 	
 	int userWeight;
 	int userHeight;
@@ -25,5 +26,6 @@ public class MemberProfileDto {
 	int followerCount; // 팔로워 수
 	int followingCount; // 팔로잉 수
 	
-	
+	Integer profileUserId; // 프로필 페이지의 유저아이디
+	int isFollowing; // 팔로우 유무 확인
 }

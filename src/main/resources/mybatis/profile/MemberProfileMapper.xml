@@ -5,15 +5,26 @@
     
     <!--    기본 유저정보 가져오기-->
     <select id="findMemberProfileByUserId" resultType="MemberProfileDto">
-        SELECT *
-            FROM member m
-            WHERE m.user_id = #{userId}
+        SELECT m.*
+        <if test="profileUserId!=null">
+            ,(SELECT count(*)
+            FROM follow
+            WHERE follower_id = #{userId}
+            AND followee_id =#{profileUserId}) AS is_following
+        </if>
+        FROM member m
+        <if test="profileUserId!=null">
+            WHERE user_id = #{profileUserId}
+        </if>
+        <if test="profileUserId==null">
+            WHERE user_id = #{userId}
+        </if>
     </select>
     <!--    자신이 작성한 게시글의 개수 가져오기-->
     <select id="findWriteBoardCountByUserId" resultType="int">
         SELECT count(*)
             FROM board b
-            WHERE user_id = #{userId}
+            WHERE user_id = #{profileUserId}
               AND deleted = 'N' AND blocked = 'N'
     </select>
     
@@ -23,7 +34,7 @@
         FROM ict.bookmark bm
         WHERE b.board_id = bm.board_id
         AND bm.user_id = #{userId}) AS bookmark_count,
-        rank() OVER (ORDER BY b.created_date DESC) AS rank,
+        row_number() OVER (ORDER BY b.created_date DESC) AS rank,
         user_nick
         FROM board b
         LEFT JOIN ict.bookmark bm ON b.board_id = bm.board_id
