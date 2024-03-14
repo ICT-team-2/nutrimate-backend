@@ -130,7 +130,7 @@
     
     <!-- 피드 상세보기 정보 가져오기 -->
     <select id="findFeedDetail" resultMap="FeedDto">
-        WITH b3 AS (SELECT b.board_id, b.board_thumbnail, b.board_content,
+        WITH b3 AS (SELECT b.board_id, b.board_thumbnail, b.board_content, b.board_title,
                            m.user_nick, m.user_profile, m.user_id,
                            (SELECT count(bl3.like_id)
                                 FROM boardlike bl3
@@ -147,7 +147,7 @@
                                  LEFT JOIN hashtag h ON bh.tag_id = h.tag_id
                         WHERE b.board_id = #{boardId}
                         GROUP BY b.board_id, b.board_thumbnail,
-                                 b.board_content, m.user_nick, m.user_profile, m.user_id),
+                                 b.board_content, b.board_title, m.user_nick, m.user_profile, m.user_id),
              b4 AS (SELECT b3.*,
                            (SELECT count(bm.user_id)
                                 FROM bookmark bm
@@ -158,7 +158,7 @@
                                   AND bm.user_id = #{userId}) AS checked_bookmark
                         FROM b3
                                  LEFT JOIN bookmark bm ON b3.board_id = bm.board_id
-                        GROUP BY b3.board_id, b3.board_thumbnail, b3.board_content, b3.user_nick,
+                        GROUP BY b3.board_id, b3.board_thumbnail, b3.board_content, b3.board_title, b3.user_nick,
                                  b3.user_profile, b3.like_count, b3.checked_like, bm.user_id,
                                  b3.user_id)
         SELECT DISTINCT b4.*,
