@@ -71,14 +71,14 @@
         WITH chat AS (SELECT cr.*, mcr.user_id, m.user_nick,
                              (SELECT mc.chat_message
                                   FROM (SELECT m.*,
-                                               rank() OVER (ORDER BY m.created_date DESC) AS rank
+                                               row_number() OVER (ORDER BY m.created_date DESC) AS rank
                                             FROM memberchat m
                                             WHERE m.chatroom_id = cr.chatroom_id
                                               AND m.deleted = 'N') mc
                                   WHERE mc.rank = 1) AS latest_chat,
                              (SELECT coalesce(mc.created_date, cr.created_date)
                                   FROM (SELECT m.*,
-                                               rank() OVER (ORDER BY m.created_date DESC ) AS rank
+                                               row_number() OVER (ORDER BY m.created_date DESC ) AS rank
                                             FROM memberchat m
                                             WHERE m.chatroom_id = cr.chatroom_id
                                               AND m.deleted = 'N') mc

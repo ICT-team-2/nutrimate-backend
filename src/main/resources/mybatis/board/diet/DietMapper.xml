@@ -44,7 +44,7 @@
         CEIL(((select count(*) from foodboard fb
         join board b on fb.board_id=b.board_id
         where deleted ='N' AND BLOCKED ='N')/#{receivePage})) totalPage,
-        RANK() OVER (ORDER BY b.board_id desc) AS label
+        row_number() OVER (ORDER BY b.board_id desc) AS label
         FROM board b
         LEFT JOIN boardlike bl ON b.board_id=bl.board_id
         JOIN member m ON m.user_id= b.user_id

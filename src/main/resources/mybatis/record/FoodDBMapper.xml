@@ -65,7 +65,7 @@
     </insert>
     <!--    db에 저장된 음식 정보 가져오기 (커스텀 제외)   -->
     <select id="findFoodListByWithoutCustomSearchWord" resultType="FoodDto">
-        with f2 as (SELECT f.*, rank() OVER (ORDER BY f.food_id) as rank
+        with f2 as (SELECT f.*, row_number() OVER (ORDER BY f.food_id) as rank
         FROM food f
         LEFT JOIN customfood cf ON f.food_id = cf.food_id
         WHERE cf.food_id IS NULL
@@ -92,14 +92,14 @@
     <select id="findFoodListByFoodId" resultType="FoodDto">
         <foreach collection="foodId" item="item" index="index" separator="UNION">
             SELECT *
-            FROM food
-            WHERE food_id = #{item}
+                FROM food
+                WHERE food_id = #{item}
         </foreach>
     </select>
     <!--    db에 저장된 음식 정보(로그인한 유저가 직접 넣은 내용 한정)    -->
     <select id="findCustomFoodListBySearchWord" resultType="FoodDto">
         WITH f2 as (SELECT f.*, cf.user_id, cf.created_date,
-        rank() OVER (ORDER BY f.food_id) as rank
+        row_number() OVER (ORDER BY f.food_id) as rank
         FROM food f
         JOIN customfood cf ON f.food_id = cf.food_id
         WHERE cf.user_id = #{userId}
