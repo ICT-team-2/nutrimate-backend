@@ -39,9 +39,14 @@
     <!-- 내 팔로워(나를 등록한 사람) 수를 가져오는 쿼리문 -->
     <!-- 입력 데이터 : userId -->
     <select id="findFollowerCount" resultType="int" parameterType="FollowDto">
-        SELECT count(*)
+            SELECT count(*)
             FROM follow
             WHERE followee_id = #{userId}
+    </select>
+     <select id="findfollowUser" resultType="String" parameterType="FollowDto">
+        SELECT user_nick
+            FROM Member
+            WHERE user_id = #{followerId}
     </select>
     
     <!-- 내 팔로잉(내가 등록한 사람) 목록을 가져오는 쿼리문 -->

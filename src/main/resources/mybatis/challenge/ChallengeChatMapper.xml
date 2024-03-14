@@ -85,8 +85,8 @@
 	
 	<!--챌린지 성공 기록하기-->
 	<insert id="insertChallengeSuccessCount" parameterType="ChallengeChatDto">
-		INSERT INTO challengesuccess
-			VALUES (#{userId}, #{chatroomId}, sysdate, seq_board.nextval)
+		INSERT INTO ChallengeSuccess (success_id, success_date, user_id, chatroom_id)
+					VALUES (SEQ_CHALLENGE_SUCCESS.NEXTVAL, SYSDATE,#{userId}, #{chatroomId})
 	</insert>
 	<select id="findAllChatByRoomType"
 	        resultType="ChallengeChatDto" parameterType="ChallengeChatDto">
