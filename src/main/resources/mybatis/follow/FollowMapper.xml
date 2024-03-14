@@ -14,6 +14,7 @@
             FROM (SELECT *
                       FROM member
                       WHERE user_id != #{userId}
+                        AND user_role != 'ROLE_ADMIN'
                       ORDER BY dbms_random.value) m
             WHERE rownum <= 5
         ]]>

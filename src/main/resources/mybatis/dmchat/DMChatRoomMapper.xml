@@ -107,6 +107,6 @@
             FROM member m
             WHERE m.user_nick LIKE '%' || #{searchWord} || '%'
               AND m.deleted = 'N'
+              AND user_role != 'ROLE_ADMIN'
     </select>
-
 </mapper>
