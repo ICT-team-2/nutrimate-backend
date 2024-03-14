@@ -2,10 +2,9 @@ package com.nutrimate.nutrimatebackend.model.challenge;
 
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.ibatis.type.Alias;
 
 import java.sql.Date;
-
-import org.apache.ibatis.type.Alias;
 
 @Builder
 @Setter
@@ -25,6 +24,8 @@ public class ChallengeCommentDto {
 	private Date createdDate;
 	private int label;
 	private int nowPage;
+	
+	private String userProfile;
 	
 	private String deleted;
 	private String cmtDepth;
