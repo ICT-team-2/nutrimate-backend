@@ -25,4 +25,7 @@ public class MemberProfileDto {
 	int postCount; // 작성한 게시글 수
 	int followerCount; // 팔로워 수
 	int followingCount; // 팔로잉 수
+	
+	Integer profileUserId; // 프로필 페이지의 유저아이디
+	int isFollowing; // 팔로우 유무 확인
 }

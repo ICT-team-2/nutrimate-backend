@@ -17,7 +17,8 @@ public class FollowDto {
 	private int followerId; // 팔로워
 	private int isFollowing; // 팔로우 유무
 	
-	private int userId; // 유저아이디
+	private int userId; // 로그인한 유저아이디
+	private int profileUserId; // 프로필 페이지의 유저아이디
 	private String userProfile; // 프로필사진
 	private String userNick; // 닉네임
 	private String userIntro; // 자기소개
