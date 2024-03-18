@@ -7,7 +7,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -17,15 +16,19 @@ import java.util.Map;
 
 @Log4j2
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
-	@Value("${front-url}")
+	
 	String frontUrl;
-	@Value("${domain}")
 	String domain;
 	
+	public OAuth2SuccessHandler(String frontUrl, String domain) {
+		this.frontUrl = frontUrl;
+		this.domain = domain;
+	}
 	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-	                                    Authentication authentication) throws IOException, ServletException {
-		log.info("successfulAuthentication 실행 : 인증 완료 뜻");
+	public void onAuthenticationSuccess(
+			HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws IOException, ServletException {
+		log.info("successfulAuthentication 실행 : 인증 완료 뜻" + frontUrl);
 		
 		PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 		

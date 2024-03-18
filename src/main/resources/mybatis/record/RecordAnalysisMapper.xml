@@ -95,21 +95,21 @@
             <when test="period != null">
                 , total as (
                 <foreach collection="period" item="item" separator="UNION">
-                    select
-                    #{userId} as user_id,
-                    coalesce(sum(total_diet_cal), 0) as total_diet_cal,
-                    coalesce(sum(total_carbo), 0) as total_carbo,
-                    coalesce(sum(total_protein), 0) as total_protein,
-                    coalesce(sum(total_provi), 0) as total_provi,
-                    coalesce(sum(total_sport_time), 0) as total_sport_time,
-                    coalesce(sum(total_sport_cal), 0) as total_sport_cal,
-                    #{item.startDate} as start_date,
-                    #{item.endDate} as end_date
-                    from n3 join s1 on n3.user_id = s1.user_id
-                    and trunc(n3.do_date) BETWEEN to_date(#{item.startDate}) AND
-                    to_date(#{item.endDate})
-                    and trunc(s1.do_date) BETWEEN to_date(#{item.startDate}) AND
-                    to_date(#{item.endDate})
+                    SELECT #{userId} AS user_id,
+                           coalesce(sum(total_diet_cal), 0) AS total_diet_cal,
+                           coalesce(sum(total_carbo), 0) AS total_carbo,
+                           coalesce(sum(total_protein), 0) AS total_protein,
+                           coalesce(sum(total_provi), 0) AS total_provi,
+                           coalesce(sum(total_sport_time), 0) AS total_sport_time,
+                           coalesce(sum(total_sport_cal), 0) AS total_sport_cal,
+                           #{item.startDate} AS start_date,
+                           #{item.endDate} AS end_date
+                        FROM n3
+                                 JOIN s1 ON n3.user_id = s1.user_id
+                                AND trunc(n3.do_date) BETWEEN to_date(#{item.startDate}) AND
+                                                to_date(#{item.endDate})
+                                AND trunc(s1.do_date) BETWEEN to_date(#{item.startDate}) AND
+                                                to_date(#{item.endDate})
                 </foreach>
                 )
                 select DISTINCT n3.recommend_cal, n3.recommend_carbo,
@@ -190,15 +190,15 @@
         total_diet AS (
         <foreach collection="period" item="item" separator="UNION">
             SELECT #{userId} AS user_id,
-            coalesce(sum(total_diet_cal), 0) AS total_diet_cal,
-            coalesce(sum(total_carbo), 0) AS total_carbo,
-            coalesce(sum(total_protein), 0) AS total_protein,
-            coalesce(sum(total_provi), 0) AS total_provi,
-            #{item.startDate} AS start_date,
-            #{item.endDate} AS end_date
-            FROM n3
-            WHERE trunc(n3.do_date) BETWEEN to_date(#{item.startDate}) AND
-            to_date(#{item.endDate})
+                   coalesce(sum(total_diet_cal), 0) AS total_diet_cal,
+                   coalesce(sum(total_carbo), 0) AS total_carbo,
+                   coalesce(sum(total_protein), 0) AS total_protein,
+                   coalesce(sum(total_provi), 0) AS total_provi,
+                   #{item.startDate} AS start_date,
+                   #{item.endDate} AS end_date
+                FROM n3
+                WHERE trunc(n3.do_date) BETWEEN to_date(#{item.startDate}) AND
+                          to_date(#{item.endDate})
         </foreach>
         ),
         td2 AS (SELECT DISTINCT n3.recommend_cal, n3.recommend_carbo,
@@ -221,13 +221,13 @@
         total_sport AS (
         <foreach collection="period" item="item" separator="UNION">
             SELECT #{userId} AS user_id,
-            coalesce(sum(total_sport_time), 0) AS total_sport_time,
-            coalesce(sum(total_sport_cal), 0) AS total_sport_cal,
-            #{item.startDate} AS start_date,
-            #{item.endDate} AS end_date
-            FROM s1
-            WHERE trunc(s1.do_date) BETWEEN to_date(#{item.startDate}) AND
-            to_date(#{item.endDate})
+                   coalesce(sum(total_sport_time), 0) AS total_sport_time,
+                   coalesce(sum(total_sport_cal), 0) AS total_sport_cal,
+                   #{item.startDate} AS start_date,
+                   #{item.endDate} AS end_date
+                FROM s1
+                WHERE trunc(s1.do_date) BETWEEN to_date(#{item.startDate}) AND
+                          to_date(#{item.endDate})
         </foreach>
         ),
         ts2 AS (SELECT DISTINCT ts.*
@@ -239,5 +239,29 @@
         FROM td2
         JOIN ts2 ON td2.end_date = ts2.end_date
         ORDER BY td2.end_date
+    </select>
+    <select id="findDefaultRecordAnalysis"
+            resultType="RecordAnalysisDto">
+        WITH n1 AS (SELECT DISTINCT *
+                        FROM nutriratio nr
+                        WHERE user_id = #{userId}),
+             n2 AS (SELECT m.user_cal AS recommend_cal, n1.carbo, n1.protein, n1.province,
+                           (carbo + protein + province) AS total_ratio
+                        FROM member m
+                                 JOIN n1 ON m.user_id = n1.user_id),
+             n3 AS (SELECT n2.*,
+                           recommend_cal * carbo / total_ratio / 4.0 AS recommend_carbo,
+                           recommend_cal * protein / total_ratio / 4.0 AS recommend_protein,
+                           recommend_cal * province / total_ratio / 9.0 AS recommend_provi
+                        FROM n2)
+        SELECT n3.*,
+               0 AS total_sport_time,
+               0 AS total_sport_cal,
+               0 AS total_diet_cal,
+               0 AS total_carbo,
+               0 AS total_protein,
+               0 AS total_provi,
+               #{doDate} AS do_date
+            FROM n3
     </select>
 </mapper>

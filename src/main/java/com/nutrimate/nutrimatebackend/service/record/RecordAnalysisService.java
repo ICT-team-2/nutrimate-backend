@@ -43,7 +43,11 @@ public class RecordAnalysisService {
 		}).toList();
 	}
 	public List<RecordAnalysisDto> findRecordAnalysis(AnalyzeDateDto dateDto) {
-		return recordAnalysisMapper.findRecordAnalysis(dateDto);
+		List<RecordAnalysisDto> result = recordAnalysisMapper.findRecordAnalysis(dateDto);
+		if (result.isEmpty()) {
+			result = recordAnalysisMapper.findDefaultRecordAnalysis(dateDto);
+		}
+		return result;
 	}
 	
 	public List<RecordAnalysisDto> findRecordAnalysisForGraph(AnalyzeDateDto dateDto) {

@@ -109,7 +109,7 @@ public class SecurityConfig {
 						}).successHandler((request, response, authentication) -> {
 							log.info("authentication: ", authentication);
 							response.getWriter().println("success");
-						}).successHandler(new OAuth2SuccessHandler()))
+						}).successHandler(new OAuth2SuccessHandler(frontUrl, domain)))
 				// .defaultSuccessUrl("http://localhost:5555/")
 				.logout(
 						t -> t.logoutUrl("/logout").addLogoutHandler((request, response, authentication) -> {

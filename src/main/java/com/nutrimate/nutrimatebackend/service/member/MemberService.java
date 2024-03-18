@@ -21,6 +21,7 @@ public class MemberService {
 	
 	@Transactional
 	public int insertMember(MemberDto memberDto) {
+		memberDto.setUserCal(getUserCalToUserInfo(memberDto));
 		memberMapper.insertMember(memberDto);
 		return insertMemberDiet(memberDto);
 	}
@@ -33,6 +34,13 @@ public class MemberService {
 	
 	@Transactional
 	public MemberDto insertOAuthMember(MemberDto memberDto) {
+		try {
+			memberDto.setUserCal(getUserCalToUserInfo(memberDto));
+			
+		} catch (Exception e) {
+			memberDto.setUserCal(0.0);
+			log.error("insertOAuthMember: " + e.getMessage(), e);
+		}
 		memberMapper.insertMemberWithOAuth(memberDto);
 		memberMapper.insertOAuth(memberDto);
 		insertMemberDiet(memberDto);

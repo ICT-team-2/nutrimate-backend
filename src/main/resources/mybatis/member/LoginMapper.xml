@@ -88,7 +88,8 @@
             user_cal=#{userCal},
             user_diet=#{userDiet},
             user_intro=#{userIntro},
-            user_allergy=#{userAllergy}
+            user_allergy=#{userAllergy},
+            user_nick=#{userNick}
             WHERE user_id = #{userId}
     </update>
     
